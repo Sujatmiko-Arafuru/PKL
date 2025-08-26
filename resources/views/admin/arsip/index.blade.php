@@ -249,6 +249,24 @@
     white-space: nowrap;
 }
 
+.table-borderless td {
+    border: none;
+}
+
+.font-monospace {
+    font-family: 'Courier New', monospace;
+}
+
+.progress {
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+}
+
+.progress-bar {
+    border-radius: 0.5rem;
+    transition: width 0.6s ease;
+}
+
 .badge {
     font-size: 0.75rem;
 }
@@ -441,87 +459,231 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     function showDetailModal(peminjamanId) {
-        const row = document.querySelector(`[data-peminjaman-id="${peminjamanId}"]`).closest('tr');
-        const cells = row.querySelectorAll('td');
-        
-        const kodePeminjaman = cells[0].querySelector('.badge').textContent;
-        const nama = cells[1].querySelector('.fw-semibold').textContent;
-        const unit = cells[1].querySelector('.text-muted').textContent;
-        const kegiatan = cells[2].querySelector('.fw-medium').getAttribute('title') || cells[2].querySelector('.fw-medium').textContent;
-        const periodeMulai = cells[3].querySelector('.small div:first-child').textContent.replace('Tanggal Mulai ', '');
-        const periodeSelesai = cells[3].querySelector('.small div:last-child').textContent.replace('Tanggal Selesai ', '');
-        const tanggalPengajuan = cells[4].querySelector('.small div:first-child').textContent.replace('Tanggal Pengajuan ', '');
-        const waktuPengajuan = cells[4].querySelector('.small div:last-child').textContent;
-        const status = cells[5].querySelector('.badge').textContent;
-        const noTelp = cells[6].textContent;
-        
-        const modalContent = `
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0 text-primary">
-                                <i class="bi bi-person me-2"></i>Data Peminjam
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-2">
-                                <small class="text-muted">Kode Peminjaman</small>
-                                <div class="fw-semibold text-primary">${kodePeminjaman}</div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Nama</small>
-                                <div class="fw-semibold">${nama}</div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Unit/Jurusan</small>
-                                <div class="fw-semibold">${unit}</div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">No HP</small>
-                                <div class="fw-semibold">${noTelp}</div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Nama Kegiatan</small>
-                                <div class="fw-semibold">${kegiatan}</div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Periode Peminjaman</small>
-                                <div class="fw-semibold">${periodeMulai} - ${periodeSelesai}</div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Tanggal Pengajuan</small>
-                                <div class="fw-semibold">${tanggalPengajuan} ${waktuPengajuan}</div>
-                            </div>
-                            <div class="mb-0">
-                                <small class="text-muted">Status</small>
-                                <div>${cells[5].innerHTML}</div>
-                            </div>
-                        </div>
-                    </div>
+        // Show loading state
+        document.getElementById('modalBody').innerHTML = `
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0 text-primary">
-                                <i class="bi bi-box-seam me-2"></i>Barang yang Dipinjam
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="text-center text-muted py-3">
-                                <i class="bi bi-info-circle fs-1"></i>
-                                <p class="mb-0 mt-2">Klik tombol Detail untuk melihat barang yang dipinjam</p>
-                                <small>Data lengkap tersedia di halaman detail peminjaman</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <p class="mt-2 text-muted">Memuat data...</p>
             </div>
         `;
         
-        document.getElementById('modalBody').innerHTML = modalContent;
+        // Show modal first
         const modal = new bootstrap.Modal(document.getElementById('detailModal'));
         modal.show();
+        
+        // Fetch data from API
+        fetch(`/api/list-peminjam/detail/${peminjamanId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const peminjaman = data.data;
+                    const modalContent = `
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0 text-primary">
+                                            <i class="bi bi-person me-2"></i>Data Peminjam
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-2">
+                                            <small class="text-muted">Kode Peminjaman</small>
+                                            <div class="fw-semibold text-primary">${peminjaman.kode_peminjaman}</div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted">Nama</small>
+                                            <div class="fw-semibold">${peminjaman.nama}</div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted">NIM/NIP</small>
+                                            <div class="fw-semibold">${peminjaman.nim_nip || 'Tidak tersedia'}</div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted">Unit/Jurusan</small>
+                                            <div class="fw-semibold">${peminjaman.unit}</div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted">No HP</small>
+                                            <div class="fw-semibold">${peminjaman.no_telp}</div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted">Nama Kegiatan</small>
+                                            <div class="fw-semibold">${peminjaman.nama_kegiatan}</div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted">Periode Peminjaman</small>
+                                            <div class="fw-semibold">${formatTanggal(peminjaman.tanggal_mulai)} - ${formatTanggal(peminjaman.tanggal_selesai)}</div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted">Tanggal Pengajuan</small>
+                                            <div class="fw-semibold">${formatTanggal(peminjaman.created_at, true)}</div>
+                                        </div>
+                                        <div class="mb-0">
+                                            <small class="text-muted">Status</small>
+                                            <div>
+                                                <span class="badge rounded-pill
+                                                    ${peminjaman.status == 'dikembalikan' ? 'bg-success' :
+                                                      peminjaman.status == 'disetujui' ? 'bg-success' :
+                                                      peminjaman.status == 'pengembalian_diajukan' ? 'bg-warning text-dark' :
+                                                      peminjaman.status == 'ditolak' || peminjaman.status == 'pengembalian ditolak' ? 'bg-danger' :
+                                                      'bg-secondary'}">
+                                                    ${peminjaman.status == 'pengembalian_diajukan' ? 'Pengembalian Diajukan' :
+                                                      peminjaman.status == 'pengembalian ditolak' ? 'Pengembalian Ditolak' :
+                                                      peminjaman.status == 'disetujui' ? 'Disetujui' :
+                                                      peminjaman.status.charAt(0).toUpperCase() + peminjaman.status.slice(1)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0 text-primary">
+                                            <i class="bi bi-box-seam me-2"></i>Barang yang Dipinjam
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        ${peminjaman.details && peminjaman.details.length > 0 ? `
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-borderless mb-0">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th class="text-muted small fw-semibold" style="width: 40%">Nama Barang</th>
+                                                            <th class="text-muted small fw-semibold text-center" style="width: 20%">Dipinjam</th>
+                                                            <th class="text-muted small fw-semibold text-center" style="width: 20%">Dikembalikan</th>
+                                                            <th class="text-muted small fw-semibold text-center" style="width: 20%">Kode</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        ${peminjaman.details.map(detail => `
+                                                            <tr class="border-bottom">
+                                                                <td class="py-2">
+                                                                    <div class="fw-semibold text-dark">${detail.barang.nama}</div>
+                                                                    <small class="text-muted">${detail.barang.kategori}</small>
+                                                                </td>
+                                                                <td class="text-center py-2">
+                                                                    <span class="badge bg-primary rounded-pill">${detail.jumlah}</span>
+                                                                </td>
+                                                                <td class="text-center py-2">
+                                                                    ${detail.jumlah_dikembalikan > 0 ? 
+                                                                        `<span class="badge bg-success rounded-pill">${detail.jumlah_dikembalikan}</span>` :
+                                                                        `<span class="badge bg-warning text-dark rounded-pill">0</span>`
+                                                                    }
+                                                                </td>
+                                                                <td class="text-center py-2">
+                                                                    <small class="text-muted font-monospace">${detail.barang.kode}</small>
+                                                                </td>
+                                                            </tr>
+                                                        `).join('')}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="mt-2 text-center">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-info-circle me-1"></i>
+                                                    Total: ${peminjaman.details.length} jenis barang
+                                                </small>
+                                                <div class="mt-1">
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-box me-1"></i>
+                                                        Total dipinjam: ${peminjaman.details.reduce((sum, detail) => sum + detail.jumlah, 0)} unit
+                                                    </small>
+                                                </div>
+                                                <div class="mt-1">
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-check-circle me-1"></i>
+                                                        Total dikembalikan: ${peminjaman.details.reduce((sum, detail) => sum + detail.jumlah_dikembalikan, 0)} unit
+                                                    </small>
+                                                </div>
+                                                <div class="mt-1">
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-clock me-1"></i>
+                                                        Sisa: ${peminjaman.details.reduce((sum, detail) => sum + detail.sisa_belum_dikembalikan, 0)} unit
+                                                    </small>
+                                                </div>
+                                                <div class="mt-2">
+                                                    ${(() => {
+                                                        const totalDipinjam = peminjaman.details.reduce((sum, detail) => sum + detail.jumlah, 0);
+                                                        const totalDikembalikan = peminjaman.details.reduce((sum, detail) => sum + detail.jumlah_dikembalikan, 0);
+                                                        const percentage = totalDipinjam > 0 ? Math.round((totalDikembalikan / totalDipinjam) * 100) : 0;
+                                                        return `
+                                                            <div class="progress mb-1" style="height: 8px;">
+                                                                <div class="progress-bar bg-success" role="progressbar" 
+                                                                     style="width: ${percentage}%" 
+                                                                     aria-valuenow="${percentage}" 
+                                                                     aria-valuemin="0" aria-valuemax="100">
+                                                                </div>
+                                                            </div>
+                                                            <small class="text-muted">
+                                                                <i class="bi bi-percent me-1"></i>
+                                                                Progress pengembalian: ${percentage}%
+                                                            </small>
+                                                        `;
+                                                    })()}
+                                                </div>
+                                                <div class="mt-2">
+                                                    <a href="/admin/arsip/${peminjaman.id}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-eye me-1"></i>Lihat Detail Lengkap
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        ` : `
+                                            <div class="text-center text-muted py-3">
+                                                <i class="bi bi-exclamation-triangle fs-1"></i>
+                                                <p class="mb-0 mt-2">Tidak ada barang yang dipinjam</p>
+                                                <small>Data barang tidak tersedia atau belum diinput</small>
+                                                <div class="mt-2">
+                                                    <a href="/admin/arsip/${peminjaman.id}" class="btn btn-sm btn-outline-secondary">
+                                                        <i class="bi bi-eye me-1"></i>Lihat Detail Lengkap
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        `}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('modalBody').innerHTML = modalContent;
+                } else {
+                    document.getElementById('modalBody').innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Gagal memuat data peminjaman.
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Terjadi kesalahan saat memuat data.
+                    </div>
+                `;
+            });
+    }
+    
+    function formatTanggal(dateString, includeTime = false) {
+        const date = new Date(dateString);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        
+        if (includeTime) {
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
+        }
+        
+        return `${day}/${month}/${year}`;
     }
     
     document.getElementById('detailModal').addEventListener('click', function(e) {

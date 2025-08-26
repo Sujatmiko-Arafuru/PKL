@@ -338,6 +338,8 @@ class PeminjamanController extends Controller
                         'id' => $detail->id,
                         'barang_id' => $detail->barang_id,
                         'jumlah' => $detail->jumlah,
+                        'jumlah_dikembalikan' => $detail->jumlah_dikembalikan,
+                        'sisa_belum_dikembalikan' => $detail->sisa_belum_dikembalikan,
                         'barang' => [
                             'id' => $detail->barang->id,
                             'nama' => $detail->barang->nama,
