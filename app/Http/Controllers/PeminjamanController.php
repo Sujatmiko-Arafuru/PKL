@@ -322,6 +322,7 @@ class PeminjamanController extends Controller
                 'id' => $peminjaman->id,
                 'kode_peminjaman' => $peminjaman->kode_peminjaman,
                 'nama' => $peminjaman->nama,
+                'nim_nip' => $peminjaman->nim_nip,
                 'unit' => $peminjaman->unit,
                 'no_telp' => $peminjaman->no_telp,
                 'nama_kegiatan' => $peminjaman->nama_kegiatan,

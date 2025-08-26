@@ -9,6 +9,7 @@
             <div class="card-body">
                 <h5 class="card-title text-primary">Data Peminjam</h5>
                 <p class="mb-1">Nama: <b>{{ $peminjaman->nama }}</b></p>
+                <p class="mb-1">NIM/NIP: <b>{{ $peminjaman->nim_nip ?? 'Tidak tersedia' }}</b></p>
                 <p class="mb-1">No HP: <b>{{ $peminjaman->no_telp }}</b></p>
                 <p class="mb-1">Unit/Jurusan: <b>{{ $peminjaman->unit }}</b></p>
                 <p class="mb-1">Nama Kegiatan: <b>{{ $peminjaman->nama_kegiatan }}</b></p>

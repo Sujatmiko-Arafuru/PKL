@@ -33,6 +33,10 @@
                                 <p class="mb-0 fw-semibold">{{ $peminjaman->nama }}</p>
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-muted">NIM/NIP</label>
+                                <p class="mb-0 fw-semibold">{{ $peminjaman->nim_nip ?? 'Tidak tersedia' }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold text-muted">No. Telepon</label>
                                 <p class="mb-0 fw-semibold">{{ $peminjaman->no_telp }}</p>
                             </div>

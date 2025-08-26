@@ -54,6 +54,10 @@
                                     <span>{{ $peminjaman->nama }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
+                                    <span><strong>NIM/NIP:</strong></span>
+                                    <span>{{ $peminjaman->nim_nip ?? 'Tidak tersedia' }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
                                     <span><strong>No. Telepon:</strong></span>
                                     <span>{{ $peminjaman->no_telp }}</span>
                                 </li>
