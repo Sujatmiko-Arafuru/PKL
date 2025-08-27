@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arsip Peminjaman SarPras</title>
     <style>
+        /* Import PDF optimization CSS */
+        @import url('{{ asset('assets/css/pdf-optimization.css') }}');
+        
         body {
             font-family: 'Arial', sans-serif;
             font-size: 12px;
@@ -109,14 +112,39 @@
         }
         
         .barang-list li {
-            background: #e3f2fd;
-            border: 1px solid #bbdefb;
-            border-radius: 3px;
-            padding: 2px 6px;
-            margin: 1px 0;
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+        
+        /* Styling untuk kolom barang yang dipinjam */
+        td:last-child {
+            word-wrap: break-word;
+            max-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            line-height: 1.2;
             font-size: 9px;
-            display: inline-block;
-            margin-right: 3px;
+        }
+        
+        /* Responsive table untuk PDF */
+        @media print {
+            table {
+                page-break-inside: auto;
+            }
+            
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            
+            thead {
+                display: table-header-group;
+            }
+            
+            tfoot {
+                display: table-footer-group;
+            }
         }
         
         .footer {
@@ -172,35 +200,37 @@
 
     <!-- Data Table -->
     @if($peminjamans->count() > 0)
-    <table>
+    <table class="pdf-table">
         <thead>
             <tr>
-                <th style="width: 5%;">No</th>
-                <th style="width: 18%;">Nama Peminjam</th>
-                <th style="width: 12%;">No HP</th>
-                <th style="width: 15%;">Unit/Jurusan</th>
-                <th style="width: 20%;">Nama Kegiatan</th>
-                <th style="width: 15%;">Tanggal Pinjam</th>
-                <th style="width: 10%;">Status</th>
-                <th style="width: 15%;">Barang Dipinjam</th>
+                <th class="col-no">No</th>
+                <th class="col-nama">Nama Peminjam</th>
+                <th class="col-hp">No HP</th>
+                <th class="col-jurusan">Jurusan/Ormawa</th>
+                <th class="col-kegiatan">Nama Kegiatan</th>
+                <th class="col-tanggal">Tanggal Pinjam</th>
+                <th class="col-status">Status</th>
+                <th class="col-barang">Barang Dipinjam</th>
             </tr>
         </thead>
         <tbody>
             @foreach($peminjamans as $index => $p)
             <tr>
-                <td style="text-align: center;">{{ $index + 1 }}</td>
-                <td>
-                    <strong>{{ $p->nama }}</strong><br>
-                    <small>Kode: {{ $p->kode_peminjaman }}</small>
+                <td class="col-no">{{ $index + 1 }}</td>
+                <td class="col-nama">
+                    <div class="nama-peminjam">{{ $p->nama }}</div>
+                    <div class="kode-peminjaman">Kode: {{ $p->kode_peminjaman }}</div>
                 </td>
-                <td>{{ $p->no_telp }}</td>
-                <td>{{ $p->unit }}</td>
-                <td>{{ Str::limit($p->nama_kegiatan, 30) }}</td>
-                <td>
-                    <strong>Mulai:</strong> {{ format_tanggal($p->tanggal_mulai) }}<br>
-                    <strong>Selesai:</strong> {{ format_tanggal($p->tanggal_selesai) }}
+                <td class="col-hp">{{ $p->no_telp }}</td>
+                <td class="col-jurusan">{{ $p->unit }}</td>
+                <td class="col-kegiatan">{{ Str::limit($p->nama_kegiatan, 25) }}</td>
+                <td class="col-tanggal">
+                    <div class="tanggal-info">
+                        <span class="tanggal-label">Mulai:</span> {{ format_tanggal($p->tanggal_mulai) }}<br>
+                        <span class="tanggal-label">Selesai:</span> {{ format_tanggal($p->tanggal_selesai) }}
+                    </div>
                 </td>
-                <td style="text-align: center;">
+                <td class="col-status">
                     <span class="status-badge status-{{ str_replace(' ', '-', $p->status) }}">
                         @if($p->status == 'pengembalian_diajukan')
                             Pengembalian Diajukan
@@ -211,12 +241,16 @@
                         @endif
                     </span>
                 </td>
-                <td>
-                    <ul class="barang-list">
-                        @foreach($p->details as $detail)
-                        <li>{{ $detail->barang->nama ?? '-' }} ({{ $detail->jumlah }})</li>
-                        @endforeach
-                    </ul>
+                <td class="col-barang">
+                    <div class="barang-text">
+                        @php
+                            $barangList = [];
+                            foreach($p->details as $detail) {
+                                $barangList[] = '<span class="barang-item">' . ($detail->barang->nama ?? '-') . ' (' . $detail->jumlah . ')</span>';
+                            }
+                            echo implode(', ', $barangList);
+                        @endphp
+                    </div>
                 </td>
             </tr>
             @endforeach
