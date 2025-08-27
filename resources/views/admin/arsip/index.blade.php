@@ -27,22 +27,15 @@
         </div>
         <div class="card-body">
             <form method="GET" class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label text-muted small">Cari Nama/Kode</label>
-                    <input type="text" name="search" class="form-control form-control-sm" 
-                           placeholder="Cari nama/kode..." value="{{ request('search') }}">
+                <div class="col-md-4">
+                    <label class="form-label text-muted small">Cari Kode Peminjaman</label>
+                    <input type="text" name="kode_peminjaman" class="form-control form-control-sm" 
+                           placeholder="Cari kode peminjaman..." value="{{ request('kode_peminjaman') }}">
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label text-muted small">Status</label>
-                    <select name="status" class="form-select form-select-sm">
-                        <option value="">Semua Status</option>
-                        <option value="menunggu" {{ request('status')=='menunggu'?'selected':'' }}>Menunggu</option>
-                        <option value="disetujui" {{ request('status')=='disetujui'?'selected':'' }}>Disetujui</option>
-                        <option value="pengembalian_diajukan" {{ request('status')=='pengembalian_diajukan'?'selected':'' }}>Pengembalian Diajukan</option>
-                        <option value="dikembalikan" {{ request('status')=='dikembalikan'?'selected':'' }}>Dikembalikan</option>
-                        <option value="ditolak" {{ request('status')=='ditolak'?'selected':'' }}>Ditolak</option>
-                        <option value="pengembalian ditolak" {{ request('status')=='pengembalian ditolak'?'selected':'' }}>Pengembalian Ditolak</option>
-                    </select>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small">Cari Nama Peminjam</label>
+                    <input type="text" name="nama" class="form-control form-control-sm" 
+                           placeholder="Cari nama peminjam..." value="{{ request('nama') }}">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label text-muted small">Tanggal Mulai</label>
@@ -116,9 +109,34 @@
     <!-- Table Section -->
     <div class="card shadow-sm border-0">
         <div class="card-header bg-white border-0">
-            <h6 class="mb-0 text-primary fw-semibold">
-                <i class="bi bi-table me-2"></i>Data Arsip Peminjaman
-            </h6>
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 text-primary fw-semibold">
+                    <i class="bi bi-table me-2"></i>Data Arsip Peminjaman
+                    @if($peminjamans->count() > 0)
+                        <span class="badge bg-primary ms-2">{{ $peminjamans->count() }} data</span>
+                    @endif
+                </h6>
+                @if(request('kode_peminjaman') || request('nama') || request('tanggal_mulai') || request('tanggal_selesai'))
+                <div class="text-muted small">
+                    <i class="bi bi-funnel me-1"></i>Filter Aktif:
+                    @if(request('kode_peminjaman'))
+                        <span class="badge bg-primary me-1">Kode: {{ request('kode_peminjaman') }}</span>
+                    @endif
+                    @if(request('nama'))
+                        <span class="badge bg-primary me-1">Nama: {{ request('nama') }}</span>
+                    @endif
+                    @if(request('tanggal_mulai'))
+                        <span class="badge bg-info me-1">Mulai: {{ request('tanggal_mulai') }}</span>
+                    @endif
+                    @if(request('tanggal_selesai'))
+                        <span class="badge bg-info me-1">Selesai: {{ request('tanggal_selesai') }}</span>
+                    @endif
+                    <a href="{{ route('admin.arsip.index') }}" class="btn btn-sm btn-outline-secondary ms-2">
+                        <i class="bi bi-x-circle me-1"></i>Reset Filter
+                    </a>
+                </div>
+                @endif
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -197,7 +215,18 @@
                             <td colspan="8" class="text-center py-5">
                                 <div class="text-muted">
                                     <i class="bi bi-inbox fs-1"></i>
-                                    <p class="mb-0 mt-2">Tidak ada data arsip</p>
+                                    <p class="mb-0 mt-2">
+                                        @if(request('kode_peminjaman') || request('nama') || request('tanggal_mulai') || request('tanggal_selesai'))
+                                            Tidak ada data yang sesuai dengan filter yang dipilih
+                                        @else
+                                            Tidak ada data arsip
+                                        @endif
+                                    </p>
+                                    @if(request('kode_peminjaman') || request('nama') || request('tanggal_mulai') || request('tanggal_selesai'))
+                                        <a href="{{ route('admin.arsip.index') }}" class="btn btn-sm btn-outline-primary mt-2">
+                                            <i class="bi bi-arrow-clockwise me-1"></i>Reset Filter
+                                        </a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

@@ -13,14 +13,14 @@ class ArsipController extends Controller
     {
         $query = Peminjaman::with(['details.barang']);
 
-        // Filter berdasarkan search
-        if ($request->filled('search')) {
-            $query->where('nama', 'like', '%' . $request->search . '%');
+        // Filter berdasarkan kode peminjaman
+        if ($request->filled('kode_peminjaman')) {
+            $query->where('kode_peminjaman', 'like', '%' . $request->kode_peminjaman . '%');
         }
 
-        // Filter berdasarkan status
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        // Filter berdasarkan nama peminjam
+        if ($request->filled('nama')) {
+            $query->where('nama', 'like', '%' . $request->nama . '%');
         }
 
         // Filter berdasarkan tanggal
@@ -69,14 +69,14 @@ class ArsipController extends Controller
     {
         $query = Peminjaman::with(['details.barang']);
 
-        // Filter berdasarkan search
-        if ($request->filled('search')) {
-            $query->where('nama', 'like', '%' . $request->search . '%');
+        // Filter berdasarkan kode peminjaman
+        if ($request->filled('kode_peminjaman')) {
+            $query->where('kode_peminjaman', 'like', '%' . $request->kode_peminjaman . '%');
         }
 
-        // Filter berdasarkan status
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        // Filter berdasarkan nama peminjam
+        if ($request->filled('nama')) {
+            $query->where('nama', 'like', '%' . $request->nama . '%');
         }
 
         // Filter berdasarkan tanggal
@@ -103,8 +103,8 @@ class ArsipController extends Controller
 
         // Filter info untuk ditampilkan di PDF
         $filterInfo = [];
-        if ($request->filled('search')) $filterInfo['search'] = $request->search;
-        if ($request->filled('status')) $filterInfo['status'] = $request->status;
+        if ($request->filled('kode_peminjaman')) $filterInfo['kode_peminjaman'] = $request->kode_peminjaman;
+        if ($request->filled('nama')) $filterInfo['nama'] = $request->nama;
         if ($request->filled('tanggal_mulai')) $filterInfo['tanggal_mulai'] = $request->tanggal_mulai;
         if ($request->filled('tanggal_selesai')) $filterInfo['tanggal_selesai'] = $request->tanggal_selesai;
 

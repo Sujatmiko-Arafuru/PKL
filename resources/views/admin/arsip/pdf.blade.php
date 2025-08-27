@@ -6,7 +6,7 @@
     <title>Arsip Peminjaman SarPras</title>
     <style>
         /* Import PDF optimization CSS */
-        @import url('{{ asset('assets/css/pdf-optimization.css') }}');
+        @import url('{{ asset('assets/css/pdf-optimization-v3.css') }}');
         
         body {
             font-family: 'Arial', sans-serif;
@@ -182,12 +182,12 @@
     <!-- Filter Information -->
     @if(!empty($filterInfo))
     <div class="filter-info">
-        <h3>📋 Informasi Filter</h3>
-        @if(isset($filterInfo['search']))
-            <p><strong>Pencarian:</strong> {{ $filterInfo['search'] }}</p>
+        <h3>📋 Filter yang Diterapkan</h3>
+        @if(isset($filterInfo['kode_peminjaman']))
+            <p><strong>Kode Peminjaman:</strong> {{ $filterInfo['kode_peminjaman'] }}</p>
         @endif
-        @if(isset($filterInfo['status']))
-            <p><strong>Status:</strong> {{ ucfirst($filterInfo['status']) }}</p>
+        @if(isset($filterInfo['nama']))
+            <p><strong>Nama Peminjam:</strong> {{ $filterInfo['nama'] }}</p>
         @endif
         @if(isset($filterInfo['tanggal_mulai']))
             <p><strong>Tanggal Mulai:</strong> {{ format_tanggal($filterInfo['tanggal_mulai']) }}</p>
@@ -204,9 +204,8 @@
         <thead>
             <tr>
                 <th class="col-no">No</th>
-                <th class="col-nama">Nama Peminjam</th>
+                <th class="col-nama">Nama & Jurusan/Ormawa</th>
                 <th class="col-hp">No HP</th>
-                <th class="col-jurusan">Jurusan/Ormawa</th>
                 <th class="col-kegiatan">Nama Kegiatan</th>
                 <th class="col-tanggal">Tanggal Pinjam</th>
                 <th class="col-status">Status</th>
@@ -219,10 +218,10 @@
                 <td class="col-no">{{ $index + 1 }}</td>
                 <td class="col-nama">
                     <div class="nama-peminjam">{{ $p->nama }}</div>
+                    <div class="jurusan-info">{{ $p->unit }}</div>
                     <div class="kode-peminjaman">Kode: {{ $p->kode_peminjaman }}</div>
                 </td>
                 <td class="col-hp">{{ $p->no_telp }}</td>
-                <td class="col-jurusan">{{ $p->unit }}</td>
                 <td class="col-kegiatan">{{ Str::limit($p->nama_kegiatan, 25) }}</td>
                 <td class="col-tanggal">
                     <div class="tanggal-info">
@@ -243,13 +242,9 @@
                 </td>
                 <td class="col-barang">
                     <div class="barang-text">
-                        @php
-                            $barangList = [];
-                            foreach($p->details as $detail) {
-                                $barangList[] = '<span class="barang-item">' . ($detail->barang->nama ?? '-') . ' (' . $detail->jumlah . ')</span>';
-                            }
-                            echo implode(', ', $barangList);
-                        @endphp
+                        @foreach($p->details as $detail)
+                        <div class="barang-item">• {{ $detail->barang->nama ?? '-' }} ({{ $detail->jumlah }})</div>
+                        @endforeach
                     </div>
                 </td>
             </tr>

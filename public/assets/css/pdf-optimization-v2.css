@@ -1,5 +1,5 @@
-/* ===== PDF OPTIMIZATION CSS ===== */
-/* File ini berisi styling khusus untuk optimasi tampilan PDF */
+/* ===== PDF OPTIMIZATION CSS V2 ===== */
+/* File ini berisi styling khusus untuk optimasi tampilan PDF dengan kolom barang yang lebih besar */
 
 /* ===== TABLE OPTIMIZATION ===== */
 .pdf-table {
@@ -29,26 +29,22 @@
     line-height: 1.2;
 }
 
-/* ===== COLUMN WIDTH OPTIMIZATION ===== */
+/* ===== COLUMN WIDTH OPTIMIZATION - BARANG DIPINJAM LEBIH BESAR ===== */
 .pdf-table .col-no {
-    width: 4%;
+    width: 3%;
     text-align: center;
 }
 
 .pdf-table .col-nama {
-    width: 15%;
+    width: 20%;
 }
 
 .pdf-table .col-hp {
     width: 10%;
 }
 
-.pdf-table .col-jurusan {
-    width: 12%;
-}
-
 .pdf-table .col-kegiatan {
-    width: 18%;
+    width: 15%;
 }
 
 .pdf-table .col-tanggal {
@@ -61,14 +57,14 @@
 }
 
 .pdf-table .col-barang {
-    width: 21%;
+    width: 32%;
     word-wrap: break-word;
     max-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: normal;
-    line-height: 1.1;
-    font-size: 8px;
+    line-height: 1.2;
+    font-size: 9px;
 }
 
 /* ===== STATUS BADGE OPTIMIZATION ===== */
@@ -147,22 +143,30 @@
     font-size: 8px;
 }
 
-/* ===== BARANG LIST OPTIMIZATION ===== */
-.barang-compact {
-    margin: 0;
-    padding: 0;
-    font-size: 8px;
-    line-height: 1.1;
+/* ===== BARANG FORMATTING - POINT POINT ===== */
+.barang-text {
+    font-size: 9px;
+    line-height: 1.2;
+    color: #333;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+.barang-text .barang-item {
+    margin: 2px 0;
+    padding: 1px 0;
+    line-height: 1.3;
+    font-size: 9px;
     color: #333;
 }
 
-.barang-compact .barang-item {
-    display: inline;
-    margin-right: 8px;
+.barang-text .barang-item:first-child {
+    margin-top: 0;
 }
 
-.barang-compact .barang-item:last-child {
-    margin-right: 0;
+.barang-text .barang-item:last-child {
+    margin-bottom: 0;
 }
 
 /* ===== PRINT OPTIMIZATION ===== */
@@ -198,19 +202,6 @@
     }
 }
 
-/* ===== RESPONSIVE OPTIMIZATION ===== */
-@media screen and (max-width: 1200px) {
-    .pdf-table {
-        font-size: 8px;
-    }
-    
-    .pdf-table th,
-    .pdf-table td {
-        padding: 3px 2px;
-        font-size: 8px;
-    }
-}
-
 /* ===== COMPACT MODE ===== */
 .pdf-table.compact th,
 .pdf-table.compact td {
@@ -220,41 +211,93 @@
 }
 
 .pdf-table.compact .col-barang {
+    font-size: 8px;
+    line-height: 1.1;
+}
+
+/* ===== ULTRA COMPACT MODE ===== */
+.pdf-table.ultra-compact th,
+.pdf-table.ultra-compact td {
+    padding: 1px 0px;
     font-size: 7px;
     line-height: 1.0;
 }
 
-/* ===== BARANG FORMATTING HELPERS ===== */
-.barang-text {
-    font-size: 9px;
-    line-height: 1.2;
-    color: #333;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    hyphens: auto;
+.pdf-table.ultra-compact .col-no {
+    width: 2%;
 }
 
-.barang-text .barang-item {
-    margin: 2px 0;
-    padding: 1px 0;
+.pdf-table.ultra-compact .col-nama {
+    width: 10%;
+}
+
+.pdf-table.ultra-compact .col-hp {
+    width: 6%;
+}
+
+.pdf-table.ultra-compact .col-jurusan {
+    width: 8%;
+}
+
+.pdf-table.ultra-compact .col-kegiatan {
+    width: 12%;
+}
+
+.pdf-table.ultra-compact .col-tanggal {
+    width: 8%;
+}
+
+.pdf-table.ultra-compact .col-status {
+    width: 5%;
+}
+
+.pdf-table.ultra-compact .col-barang {
+    width: 49%;
+    font-size: 7px;
+    line-height: 1.0;
+}
+
+/* ===== EXTREME MODE - BARANG DIPINJAM SANGAT BESAR ===== */
+.pdf-table.extreme .col-no {
+    width: 2%;
+}
+
+.pdf-table.extreme .col-nama {
+    width: 18%;
+}
+
+.pdf-table.extreme .col-hp {
+    width: 8%;
+}
+
+.pdf-table.extreme .col-kegiatan {
+    width: 12%;
+}
+
+.pdf-table.extreme .col-tanggal {
+    width: 10%;
+}
+
+.pdf-table.extreme .col-status {
+    width: 5%;
+}
+
+.pdf-table.extreme .col-barang {
+    width: 45%;
+    font-size: 9px;
     line-height: 1.3;
-    font-size: 9px;
-    color: #333;
 }
 
-.barang-text .barang-item:first-child {
-    margin-top: 0;
+.pdf-table.extreme th,
+.pdf-table.extreme td {
+    padding: 3px 2px;
+    font-size: 8px;
+    line-height: 1.1;
 }
 
-.barang-text .barang-item:last-child {
-    margin-bottom: 0;
-}
-
-.barang-text .barang-name {
-    font-weight: 500;
-}
-
-.barang-text .barang-count {
-    color: #666;
-    font-weight: normal;
+.pdf-table.extreme .barang-text .barang-item {
+    margin: 3px 0;
+    padding: 2px 0;
+    line-height: 1.4;
+    font-size: 8px;
 }
