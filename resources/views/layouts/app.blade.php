@@ -11,6 +11,7 @@
     <link href="{{ asset('assets/css/custom-theme.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/components.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/table-improvements.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/horizontal-scroll.css') }}" rel="stylesheet">
     @yield('head')
     <style>
         .dashboard-title {
@@ -127,6 +128,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('assets/js/horizontal-scroll.js') }}"></script>
     
     <script>
         // Debug script untuk memastikan logo loading

@@ -291,6 +291,45 @@
     overflow: hidden;
 }
 
+/* ===== PROGRESS PENGEMBALIAN TABLE SCROLL ===== */
+.progress-pengembalian-table {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #20B2AA #f8f9fa;
+}
+
+.progress-pengembalian-table::-webkit-scrollbar {
+    height: 8px;
+}
+
+.progress-pengembalian-table::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.progress-pengembalian-table::-webkit-scrollbar-thumb {
+    background: #20B2AA;
+    border-radius: 4px;
+}
+
+.progress-pengembalian-table::-webkit-scrollbar-thumb:hover {
+    background: #008B8B;
+}
+
+.progress-pengembalian-table .table {
+    min-width: 800px;
+    margin-bottom: 0;
+}
+
+.progress-pengembalian-table .table th,
+.progress-pengembalian-table .table td {
+    white-space: nowrap;
+    padding: 0.75rem 1rem;
+}
+
 /* ===== STATUS SPECIFIC IMPROVEMENTS ===== */
 /* Status Menunggu */
 .badge.bg-warning.text-dark {

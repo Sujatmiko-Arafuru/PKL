@@ -366,7 +366,7 @@ function generateDetailContent(peminjaman) {
             </div>
         </div>
         
-        <div class="table-responsive">
+        <div class="table-responsive progress-pengembalian-table">
             <table class="table table-sm table-hover">
                 <thead class="table-light">
                     <tr>
