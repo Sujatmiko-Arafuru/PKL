@@ -49,7 +49,7 @@ Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->nam
     Route::get('pengembalian/{id}', [PengembalianController::class, 'show'])->name('pengembalian.show');
     Route::post('pengembalian/input-kode', [PengembalianController::class, 'inputKodePengembalian'])->name('pengembalian.input-kode');
     Route::post('pengembalian/{id}/bulk-update', [PengembalianController::class, 'bulkUpdatePengembalian'])->name('pengembalian.bulk-update');
-    Route::get('pengembalian/api/returnable', [PengembalianController::class, 'getPeminjamanReturnable'])->name('pengembalian.api.returnable');
+    Route::get('pengembalian/api/returnable', [PengembalianController::class, 'getPeminjamanForReturn'])->name('pengembalian.api.returnable');
     // Arsip
     Route::get('arsip', [ArsipController::class, 'index'])->name('arsip.index');
     Route::get('arsip/{id}', [ArsipController::class, 'show'])->name('arsip.show');

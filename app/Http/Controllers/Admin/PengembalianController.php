@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Peminjaman;
 use App\Models\DetailPeminjaman;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PengembalianController extends Controller
 {
@@ -16,9 +17,7 @@ class PengembalianController extends Controller
             ->whereIn('status', ['disetujui', 'dipinjam', 'proses_pengembalian'])
             ->whereHas('details', function($query) {
                 $query->whereRaw('jumlah_dikembalikan < jumlah');
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
+            })->orderBy('created_at', 'desc')->get();
 
         return view('admin.pengembalian.index', compact('peminjamans'));
     }
@@ -33,7 +32,7 @@ class PengembalianController extends Controller
         }
         
         // Cek apakah masih ada barang yang bisa dikembalikan
-        if ($peminjaman->getTotalBelumDikembalianAttribute() <= 0) {
+        if ($peminjaman->total_belum_dikembalikan <= 0) {
             return redirect()->route('admin.pengembalian.index')->with('info', 'Semua barang untuk peminjaman ini sudah dikembalikan.');
         }
         
@@ -52,21 +51,21 @@ class PengembalianController extends Controller
         $query = Peminjaman::with(['details.barang']);
 
         // Filter berdasarkan input yang diberikan
-            if ($request->filled('kode_peminjaman')) {
-                $query->where('kode_peminjaman', 'like', '%' . $request->kode_peminjaman . '%');
-            }
-            
+        if ($request->filled('kode_peminjaman')) {
+            $query->where('kode_peminjaman', 'like', '%' . $request->kode_peminjaman . '%');
+        }
+        
         if ($request->filled('nama')) {
             $query->where('nama', 'like', '%' . $request->nama . '%');
-            }
-            
-            if ($request->filled('nama_kegiatan')) {
-                $query->where('nama_kegiatan', 'like', '%' . $request->nama_kegiatan . '%');
-            }
-            
-            if ($request->filled('no_telp')) {
-                $query->where('no_telp', 'like', '%' . $request->no_telp . '%');
-            }
+        }
+        
+        if ($request->filled('nama_kegiatan')) {
+            $query->where('nama_kegiatan', 'like', '%' . $request->nama_kegiatan . '%');
+        }
+        
+        if ($request->filled('no_telp')) {
+            $query->where('no_telp', 'like', '%' . $request->no_telp . '%');
+        }
 
         $peminjamans = $query->whereIn('status', ['disetujui', 'dipinjam', 'proses_pengembalian'])
             ->whereHas('details', function($subQuery) {
@@ -98,7 +97,7 @@ class PengembalianController extends Controller
         $peminjaman = Peminjaman::with(['details.barang'])->findOrFail($id);
         
         // Cek apakah masih ada barang yang bisa dikembalikan
-        if ($peminjaman->getTotalBelumDikembalianAttribute() <= 0) {
+        if ($peminjaman->total_belum_dikembalikan <= 0) {
             return redirect()->route('admin.pengembalian.index')->with('info', 'Semua barang untuk peminjaman ini sudah dikembalikan.');
         }
 
@@ -192,19 +191,84 @@ class PengembalianController extends Controller
     /**
      * Get peminjaman yang bisa dikembalikan untuk API
      */
-    public function getPeminjamanReturnable()
+    public function getPeminjamanForReturn()
     {
         $peminjamans = Peminjaman::with(['details.barang'])
             ->whereIn('status', ['disetujui', 'dipinjam', 'proses_pengembalian'])
             ->whereHas('details', function($query) {
                 $query->whereRaw('jumlah_dikembalikan < jumlah');
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
+            })->get();
 
-            return response()->json([
-                'success' => true,
+        return response()->json([
+            'success' => true,
             'data' => $peminjamans
         ]);
+    }
+
+    /**
+     * Get detail pengembalian untuk peminjaman tertentu
+     */
+    public function getDetailPengembalian($id)
+    {
+        $peminjaman = Peminjaman::with(['details.barang'])->findOrFail($id);
+        
+        return response()->json([
+            'success' => true,
+            'data' => $peminjaman
+        ]);
+    }
+
+    /**
+     * Update status pengembalian untuk item tertentu
+     */
+    public function updateItemReturnStatus(Request $request, $id)
+    {
+        $request->validate([
+            'detail_id' => 'required|exists:detail_peminjamans,id',
+            'jumlah_dikembalikan' => 'required|integer|min:0',
+        ]);
+
+        $detail = DetailPeminjaman::with(['peminjaman', 'barang'])->findOrFail($request->detail_id);
+        
+        if ($detail->peminjaman_id != $id) {
+            return back()->with('error', 'Detail tidak sesuai dengan peminjaman.');
+        }
+
+        $jumlahSebelumnya = $detail->jumlah_dikembalikan;
+        $jumlahBaru = (int) $request->jumlah_dikembalikan;
+        
+        if ($jumlahBaru > $detail->jumlah) {
+            return back()->with('error', 'Jumlah pengembalian tidak boleh melebihi jumlah yang dipinjam.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // Update jumlah dikembalikan
+            $detail->jumlah_dikembalikan = $jumlahBaru;
+            $detail->save();
+
+            // Update stok barang
+            $selisih = $jumlahBaru - $jumlahSebelumnya;
+            if ($selisih != 0) {
+                $detail->barang->stok += $selisih;
+                $detail->barang->save();
+            }
+
+            // Update status peminjaman
+            $this->updatePeminjamanStatus($detail->peminjaman);
+            
+            DB::commit();
+            
+            $message = 'Status pengembalian berhasil diupdate.';
+            if ($selisih > 0) {
+                $message .= " Stok barang telah diupdate (+{$selisih}).";
+            }
+            
+            return back()->with('success', $message);
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 } 
