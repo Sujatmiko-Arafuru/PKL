@@ -247,7 +247,7 @@
 
 <!-- Modal Detail Peminjaman -->
 <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-lg modal-responsive">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="detailModalLabel">
@@ -313,12 +313,12 @@
 }
 
 /* Modal specific styles */
-.modal-xl {
-    max-width: 1140px;
+.modal-lg {
+    max-width: 800px;
 }
 
 .modal-body {
-    max-height: 80vh;
+    max-height: 70vh;
     overflow-y: auto;
 }
 
@@ -350,49 +350,49 @@
 }
 
 .table {
-    min-width: 1200px; /* Ensure minimum width for all columns */
+    min-width: auto; /* Let table adjust to content */
     width: 100%;
 }
 
-/* Column widths */
+/* Column widths - More flexible */
 .table th:nth-child(1), .table td:nth-child(1) { /* KODE UNIK */
-    width: 150px;
-    min-width: 150px;
+    width: 120px;
+    min-width: 120px;
 }
 
 .table th:nth-child(2), .table td:nth-child(2) { /* NAMA & UNIT */
-    width: 180px;
-    min-width: 180px;
+    width: 160px;
+    min-width: 160px;
 }
 
 .table th:nth-child(3), .table td:nth-child(3) { /* KEGIATAN */
-    width: 200px;
-    min-width: 200px;
-}
-
-.table th:nth-child(4), .table td:nth-child(4) { /* PERIODE */
-    width: 200px;
-    min-width: 200px;
-}
-
-.table th:nth-child(5), .table td:nth-child(5) { /* TANGGAL PENGAJUAN */
     width: 180px;
     min-width: 180px;
 }
 
+.table th:nth-child(4), .table td:nth-child(4) { /* PERIODE */
+    width: 160px;
+    min-width: 160px;
+}
+
+.table th:nth-child(5), .table td:nth-child(5) { /* TANGGAL PENGAJUAN */
+    width: 160px;
+    min-width: 160px;
+}
+
 .table th:nth-child(6), .table td:nth-child(6) { /* STATUS */
-    width: 150px;
-    min-width: 150px;
+    width: 120px;
+    min-width: 120px;
 }
 
 .table th:nth-child(7), .table td:nth-child(7) { /* NO. HP */
-    width: 140px;
-    min-width: 140px;
+    width: 120px;
+    min-width: 120px;
 }
 
 .table th:nth-child(8), .table td:nth-child(8) { /* AKSI */
-    width: 120px;
-    min-width: 120px;
+    width: 100px;
+    min-width: 100px;
 }
 
 /* Modal improvements */
@@ -412,6 +412,25 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* Responsive modal improvements */
+.modal-responsive {
+    max-width: 90vw !important;
+}
+
+@media (max-width: 768px) {
+    .modal-responsive {
+        max-width: calc(100vw - 2rem) !important;
+        margin: 1rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-responsive {
+        max-width: calc(100vw - 1rem) !important;
+        margin: 0.5rem !important;
+    }
+}
+
 /* Table improvements */
 .table-hover tbody tr:hover {
     background-color: rgba(32, 178, 170, 0.05);
@@ -420,10 +439,35 @@
 .table th {
     background-color: #f8f9fa;
     border-bottom: 2px solid #dee2e6;
+    font-size: 0.875rem;
+    padding: 0.75rem 0.5rem;
 }
 
 .table td {
     border-bottom: 1px solid #f1f3f4;
+    font-size: 0.875rem;
+    padding: 0.75rem 0.5rem;
+}
+
+/* Responsive table improvements */
+@media (max-width: 1200px) {
+    .table th,
+    .table td {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.75rem;
+    }
+    
+    .table th,
+    .table td {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.25rem;
+    }
 }
 
 /* Badge improvements */

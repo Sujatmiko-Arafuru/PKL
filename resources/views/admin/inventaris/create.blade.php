@@ -143,10 +143,73 @@ function previewImage(input, previewId) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
         reader.onload = function(e) {
-            document.getElementById(previewId).src = e.target.result;
+            const previewElement = document.getElementById(previewId);
+            previewElement.src = e.target.result;
+            
+            // Add remove button if not exists and not Foto 1
+            if (previewId !== 'preview1') {
+                const photoContainer = previewElement.closest('.photo-preview-container');
+                if (!photoContainer.querySelector('.photo-actions')) {
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'photo-actions';
+                    actionsDiv.innerHTML = `
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePhoto('${previewId}', '${input.name}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    `;
+                    photoContainer.appendChild(actionsDiv);
+                }
+            }
         }
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+function removePhoto(previewId, inputName) {
+    // Reset preview to placeholder
+    const previewElement = document.getElementById(previewId);
+    previewElement.src = "{{ asset('assets/images/placeholder-image.svg') }}";
+    
+    // Clear file input
+    const inputElement = document.querySelector(`input[name="${inputName}"]`);
+    inputElement.value = '';
+    
+    // Remove remove button
+    const photoContainer = previewElement.closest('.photo-preview-container');
+    const actionsDiv = photoContainer.querySelector('.photo-actions');
+    if (actionsDiv) {
+        actionsDiv.remove();
+    }
+}
+
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const foto1Input = document.querySelector('input[name="foto1"]');
+        
+        // Check if Foto 1 is required
+        if (!foto1Input.files[0]) {
+            e.preventDefault();
+            alert('Foto 1 wajib diisi untuk identifikasi barang!');
+            foto1Input.focus();
+            return false;
+        }
+        
+        return true;
+    });
+    
+    // Add hover effects to photo previews
+    const photoPreviews = document.querySelectorAll('.photo-preview');
+    photoPreviews.forEach(preview => {
+        preview.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.02)';
+        });
+        
+        preview.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+});
 </script>
 @endsection 

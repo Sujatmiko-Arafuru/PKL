@@ -28,23 +28,23 @@
         opacity: 0.6 !important;
     }
 
-    /* Photo carousel styling */
-    .photo-carousel {
-        height: 300px;
+    /* Photo carousel styling - Override for this page - MUCH SMALLER */
+    .photo-carousel.detail-page {
+        height: 150px;
         border-radius: 0.5rem;
         overflow: hidden;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
 
-    .photo-placeholder {
-        height: 300px;
+    .photo-placeholder.detail-page {
+        height: 150px;
         border-radius: 0.5rem;
         background-color: #f8f9fa;
         display: flex;
         align-items: center;
         justify-content: center;
         border: 1px solid #dee2e6;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
 </style>
 
@@ -82,7 +82,7 @@
                             <!-- Photo Section -->
                             @if($barang->hasPhotos())
                                 @if($barang->photo_count > 1)
-                                    <div id="barangPhotoCarousel" class="carousel slide photo-carousel photo-gallery" data-bs-ride="carousel">
+                                    <div id="barangPhotoCarousel" class="carousel slide photo-carousel photo-gallery detail-page" data-bs-ride="carousel">
                                         <div class="carousel-indicators">
                                             @foreach($barang->photos as $index => $photo)
                                             <button type="button" data-bs-target="#barangPhotoCarousel" data-bs-slide-to="{{ $index }}" 
@@ -107,10 +107,10 @@
                                         </button>
                                     </div>
                                 @else
-                                    <img src="{{ Storage::url($barang->main_photo) }}" alt="{{ $barang->nama }}" class="photo-carousel" style="object-fit: cover;">
+                                    <img src="{{ Storage::url($barang->main_photo) }}" alt="{{ $barang->nama }}" class="photo-carousel detail-page">
                                 @endif
                             @else
-                                <div class="photo-placeholder">
+                                <div class="photo-placeholder detail-page">
                                     <i class="bi bi-box-seam text-primary" style="font-size: 3rem;"></i>
                                 </div>
                             @endif

@@ -10,6 +10,7 @@
     <link href="{{ asset('assets/css/components.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/table-improvements.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/modal-improvements.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/photo-gallery.css') }}" rel="stylesheet">
     <style>
         body { background: #E0FFFF; }
         .sidebar {

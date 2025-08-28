@@ -23,50 +23,52 @@
 
     <!-- Main Content -->
     <div class="row">
-        <!-- Photo Section -->
+        <!-- Photo Section - Shopee Style -->
         @if($barang->hasPhotos())
-        <div class="col-lg-12 mb-4">
+        <div class="col-lg-8 mb-4">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-0">
                     <h6 class="mb-0 text-primary fw-semibold">
-                        <i class="bi bi-images me-2"></i>Foto Barang ({{ $barang->photo_count }} foto)
+                        <i class="bi bi-camera me-2"></i>Foto Barang ({{ $barang->photo_count }} foto)
                     </h6>
                 </div>
-                <div class="card-body">
-                    <div id="barangPhotoCarousel" class="carousel slide photo-gallery" data-bs-ride="carousel">
-                        <div class="carousel-indicators">
-                            @foreach($barang->photos as $index => $photo)
-                            <button type="button" data-bs-target="#barangPhotoCarousel" data-bs-slide-to="{{ $index }}" 
-                                    class="{{ $index === 0 ? 'active' : '' }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}" 
-                                    aria-label="Slide {{ $index + 1 }}"></button>
-                            @endforeach
+                <div class="card-body p-0">
+                    <!-- Main Photo Display -->
+                    <div class="main-photo-container">
+                        <div id="mainPhotoDisplay" class="main-photo">
+                            <img src="{{ Storage::url($barang->photos[0]) }}" alt="Foto Utama" id="mainPhotoImage">
                         </div>
-                        <div class="carousel-inner">
-                            @foreach($barang->photos as $index => $photo)
-                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ Storage::url($photo) }}" class="d-block w-100" alt="Foto {{ $index + 1 }}" 
-                                     style="height: 400px; object-fit: cover;">
-                            </div>
-                            @endforeach
-                        </div>
+                        
+                        <!-- Navigation Arrows -->
                         @if($barang->photo_count > 1)
-                        <button class="carousel-control-prev" type="button" data-bs-target="#barangPhotoCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
+                        <button class="photo-nav-btn photo-nav-prev" onclick="changeMainPhoto('prev')">
+                            <i class="bi bi-chevron-left"></i>
                         </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#barangPhotoCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
+                        <button class="photo-nav-btn photo-nav-next" onclick="changeMainPhoto('next')">
+                            <i class="bi bi-chevron-right"></i>
                         </button>
                         @endif
                     </div>
+                    
+                    <!-- Thumbnail Navigation -->
+                    @if($barang->photo_count > 1)
+                    <div class="thumbnail-navigation">
+                        @foreach($barang->photos as $index => $photo)
+                        <div class="thumbnail-item {{ $index === 0 ? 'active' : '' }}" 
+                             onclick="changeMainPhoto({{ $index }})" 
+                             data-index="{{ $index }}">
+                            <img src="{{ Storage::url($photo) }}" alt="Thumbnail {{ $index + 1 }}">
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
         @endif
 
         <!-- Information Section -->
-        <div class="col-lg-12">
+        <div class="col-lg-{{ $barang->hasPhotos() ? '4' : '12' }}">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-0">
                     <h6 class="mb-0 text-primary fw-semibold">
@@ -167,4 +169,55 @@
         </div>
     </div>
 </div>
+
+@if($barang->hasPhotos())
+<script>
+    let currentPhotoIndex = 0;
+    const totalPhotos = {{ $barang->photo_count }};
+    const photos = @json($barang->photos);
+    
+    function changeMainPhoto(direction) {
+        if (typeof direction === 'number') {
+            // Direct index selection
+            currentPhotoIndex = direction;
+        } else if (direction === 'next') {
+            // Next photo
+            currentPhotoIndex = (currentPhotoIndex + 1) % totalPhotos;
+        } else if (direction === 'prev') {
+            // Previous photo
+            currentPhotoIndex = (currentPhotoIndex - 1 + totalPhotos) % totalPhotos;
+        }
+        
+        // Update main photo
+        const mainPhotoImage = document.getElementById('mainPhotoImage');
+        mainPhotoImage.src = '/storage/' + photos[currentPhotoIndex];
+        
+        // Update thumbnail active state
+        updateThumbnailActiveState();
+    }
+    
+    function updateThumbnailActiveState() {
+        // Remove active class from all thumbnails
+        document.querySelectorAll('.thumbnail-item').forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        
+        // Add active class to current thumbnail
+        const currentThumb = document.querySelector(`[data-index="${currentPhotoIndex}"]`);
+        if (currentThumb) {
+            currentThumb.classList.add('active');
+        }
+    }
+    
+    // Add click event listeners to thumbnails
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.thumbnail-item').forEach(thumb => {
+            thumb.addEventListener('click', function() {
+                const index = parseInt(this.dataset.index);
+                changeMainPhoto(index);
+            });
+        });
+    });
+</script>
+@endif
 @endsection 

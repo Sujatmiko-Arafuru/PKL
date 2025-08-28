@@ -251,7 +251,7 @@
                         <!-- Photo Section -->
                         @if($barang->hasPhotos())
                             @if($barang->photo_count > 1)
-                                <div id="photoCarousel{{ $barang->id }}" class="carousel slide photo-carousel photo-gallery" data-bs-ride="carousel">
+                                <div id="photoCarousel{{ $barang->id }}" class="carousel slide photo-carousel photo-gallery dashboard" data-bs-ride="carousel">
                                     <div class="carousel-indicators">
                                         @foreach($barang->photos as $index => $photo)
                                         <button type="button" data-bs-target="#photoCarousel{{ $barang->id }}" data-bs-slide-to="{{ $index }}" 
@@ -276,10 +276,10 @@
                                     </button>
                                 </div>
                             @else
-                                <img src="{{ Storage::url($barang->main_photo) }}" alt="{{ $barang->nama }}" class="photo-carousel" style="object-fit: cover;">
+                                <img src="{{ Storage::url($barang->main_photo) }}" alt="{{ $barang->nama }}" class="photo-carousel dashboard">
                             @endif
                         @else
-                            <div class="photo-placeholder">
+                            <div class="photo-placeholder dashboard">
                                 <i class="bi bi-box-seam text-secondary" style="font-size:2.5rem;"></i>
                             </div>
                         @endif

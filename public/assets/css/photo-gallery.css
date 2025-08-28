@@ -1,15 +1,35 @@
-/* Photo Gallery Styling */
-.photo-gallery {
+/* Photo Gallery Styling - MUCH SMALLER SIZE */
+.photo-gallery,
+.admin-inventaris .photo-gallery { /* ensure scope in admin */
     position: relative;
+    max-width: 100%;
+    overflow: hidden;
 }
 
-.photo-gallery .carousel {
+.photo-gallery .carousel,
+.admin-inventaris .photo-gallery .carousel {
     border-radius: 0.75rem;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 150px !important; /* enforce smaller height */
 }
 
-.photo-gallery .carousel-item img {
+.photo-gallery .carousel-item,
+.admin-inventaris .photo-gallery .carousel-item {
+    height: 150px !important; /* enforce smaller height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+}
+
+.photo-gallery .carousel-item img,
+.admin-inventaris .photo-gallery .carousel-item img {
+    max-width: 50% !important;
+    max-height: 50% !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
     transition: transform 0.3s ease;
 }
 
@@ -21,8 +41,8 @@
 .photo-gallery .carousel-control-next {
     background-color: rgba(0, 0, 0, 0.4);
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 30px; /* Smaller controls */
+    height: 30px; /* Smaller controls */
     top: 50%;
     transform: translateY(-50%);
     transition: all 0.3s ease;
@@ -35,14 +55,14 @@
 }
 
 .photo-gallery .carousel-indicators {
-    bottom: 20px;
+    bottom: 10px; /* Closer to bottom */
 }
 
 .photo-gallery .carousel-indicators button {
     background-color: rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.5);
-    width: 10px;
-    height: 10px;
+    width: 8px; /* Smaller indicators */
+    height: 8px; /* Smaller indicators */
     border-radius: 50%;
     transition: all 0.3s ease;
 }
@@ -52,7 +72,7 @@
     transform: scale(1.2);
 }
 
-/* Thumbnail styling */
+/* Thumbnail styling - Fixed size */
 .photo-thumbnail {
     position: relative;
     display: inline-block;
@@ -60,6 +80,8 @@
     border-radius: 0.5rem;
     overflow: hidden;
     transition: all 0.3s ease;
+    width: 80px; /* Smaller thumbnail */
+    height: 80px; /* Smaller thumbnail */
 }
 
 .photo-thumbnail:hover {
@@ -70,7 +92,7 @@
 .photo-thumbnail img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover; /* Cover thumbnail area */
 }
 
 .photo-count-badge {
@@ -80,12 +102,12 @@
     background: linear-gradient(135deg, #007bff, #0056b3);
     color: white;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
+    width: 20px; /* Smaller badge */
+    height: 20px; /* Smaller badge */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
+    font-size: 0.7rem; /* Smaller font */
     font-weight: bold;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -120,6 +142,8 @@
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    max-width: 150px; /* Smaller preview */
+    max-height: 150px; /* Smaller preview */
 }
 
 .photo-preview:hover {
@@ -127,28 +151,609 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive adjustments */
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Maintain aspect ratio */
+}
+
+/* Dashboard card photo styling - MUCH SMALLER */
+.dashboard .photo-carousel {
+    height: 100px; /* MUCH SMALLER - was 150px */
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.dashboard .photo-carousel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover card area */
+}
+
+.dashboard .photo-placeholder {
+    height: 100px; /* MUCH SMALLER - was 150px */
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+}
+
+/* Detail page photo styling - MUCH SMALLER */
+.detail-page .photo-carousel {
+    height: 150px; /* MUCH SMALLER - was 250px */
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-bottom: 1rem; /* Reduced margin */
+}
+
+.detail-page .photo-carousel img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Maintain aspect ratio */
+}
+
+.detail-page .photo-placeholder {
+    height: 150px; /* MUCH SMALLER - was 250px */
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dee2e6;
+    margin-bottom: 1rem; /* Reduced margin */
+}
+
+/* Admin inventaris photo styling - MUCH SMALLER */
+.admin-inventaris .photo-gallery .carousel {
+    max-height: 150px; /* MUCH SMALLER - was 250px */
+}
+
+.admin-inventaris .photo-gallery .carousel-item {
+    height: 150px; /* MUCH SMALLER - was 250px */
+}
+
+.admin-inventaris .photo-gallery .carousel-item img {
+    max-width: 50%; /* MUCH SMALLER - was 80% */
+    max-height: 50%; /* MUCH SMALLER - was 80% */
+    width: auto;
+    height: auto;
+    object-fit: contain; /* Maintain aspect ratio */
+}
+
+/* General photo styling - Prevent images from being too large */
+.photo-carousel {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.photo-carousel img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Force fixed dimensions for all photo elements */
+.photo-carousel,
+.photo-placeholder,
+.photo-gallery .carousel,
+.photo-gallery .carousel-item {
+    box-sizing: border-box;
+}
+
+/* Ensure images don't exceed container */
+.photo-carousel img,
+.photo-gallery .carousel-item img,
+.photo-thumbnail img,
+.photo-preview img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+/* Additional styling to make images look normal and not too large */
+.photo-gallery .carousel-item img,
+.admin-inventaris .photo-gallery .carousel-item img {
+    max-width: 50% !important; /* MUCH SMALLER - was 70% */
+    max-height: 50% !important; /* MUCH SMALLER - was 70% */
+    object-fit: contain !important;
+}
+
+/* Center images properly */
+.photo-gallery .carousel-item,
+.admin-inventaris .photo-gallery .carousel-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+}
+
+/* Responsive adjustments - MUCH SMALLER */
 @media (max-width: 768px) {
+    .photo-gallery .carousel {
+        max-height: 120px; /* MUCH SMALLER - was 200px */
+    }
+    
+    .photo-gallery .carousel-item {
+        height: 120px; /* MUCH SMALLER - was 200px */
+    }
+    
+    .dashboard .photo-carousel {
+        height: 80px; /* MUCH SMALLER - was 120px */
+    }
+    
+    .dashboard .photo-placeholder {
+        height: 80px; /* MUCH SMALLER - was 120px */
+    }
+    
+    .detail-page .photo-carousel {
+        height: 100px; /* MUCH SMALLER - was 200px */
+    }
+    
+    .detail-page .photo-placeholder {
+        height: 100px; /* MUCH SMALLER - was 200px */
+    }
+    
+    .admin-inventaris .photo-gallery .carousel {
+        max-height: 100px; /* MUCH SMALLER - was 180px */
+    }
+    
+    .admin-inventaris .photo-gallery .carousel-item {
+        height: 100px; /* MUCH SMALLER - was 180px */
+    }
+    
     .photo-gallery .carousel-control-prev,
     .photo-gallery .carousel-control-next {
-        width: 35px;
-        height: 35px;
+        width: 25px; /* Smaller controls */
+        height: 25px; /* Smaller controls */
     }
     
     .photo-gallery .carousel-indicators button {
-        width: 8px;
-        height: 8px;
+        width: 6px; /* Smaller indicators */
+        height: 6px; /* Smaller indicators */
+    }
+    
+    .photo-thumbnail {
+        width: 60px; /* Smaller thumbnail */
+        height: 60px; /* Smaller thumbnail */
     }
 }
 
 @media (max-width: 576px) {
+    .photo-gallery .carousel {
+        max-height: 80px; /* MUCH SMALLER - was 150px */
+    }
+    
+    .photo-gallery .carousel-item {
+        height: 80px; /* MUCH SMALLER - was 150px */
+    }
+    
+    .dashboard .photo-carousel {
+        height: 60px; /* MUCH SMALLER - was 100px */
+    }
+    
+    .dashboard .photo-placeholder {
+        height: 60px; /* MUCH SMALLER - was 100px */
+    }
+    
+    .detail-page .photo-carousel {
+        height: 80px; /* MUCH SMALLER - was 150px */
+    }
+    
+    .detail-page .photo-placeholder {
+        height: 80px; /* MUCH SMALLER - was 150px */
+    }
+    
+    .admin-inventaris .photo-gallery .carousel {
+        max-height: 70px; /* MUCH SMALLER - was 120px */
+    }
+    
+    .admin-inventaris .photo-gallery .carousel-item {
+        height: 70px; /* MUCH SMALLER - was 120px */
+    }
+    
     .photo-gallery .carousel-control-prev,
     .photo-gallery .carousel-control-next {
-        width: 30px;
-        height: 30px;
+        width: 20px; /* Even smaller controls */
+        height: 20px; /* Even smaller controls */
     }
     
     .photo-upload-section {
         padding: 1rem;
+    }
+    
+    .photo-thumbnail {
+        width: 50px; /* Even smaller thumbnail */
+        height: 50px; /* Even smaller thumbnail */
+    }
+    
+    .photo-preview {
+        max-width: 100px; /* Smaller preview */
+        max-height: 100px; /* Smaller preview */
+    }
+}
+
+/* ===== E-COMMERCE STYLE FOR ADMIN INVENTARIS ===== */
+/* Ukuran frame normal di admin detail (lebih ringkas) */
+.admin-inventaris .photo-gallery {
+    max-width: 100%;
+}
+
+.admin-inventaris .photo-gallery .carousel {
+    max-height: 180px !important; /* sebelumnya 260px */
+    border-radius: 10px;
+    background: #f7f9fb; /* sedikit kontras agar elegan */
+    border: 1px solid #e6eef4;
+}
+
+.admin-inventaris .photo-gallery .carousel-item {
+    height: 180px !important; /* sebelumnya 260px */
+}
+
+.admin-inventaris .photo-gallery .carousel-item img {
+    max-width: 42% !important;   /* tampil proporsional, tidak terlalu kecil */
+    max-height: 90% !important;
+    object-fit: contain !important;
+    transition: transform 0.2s ease;
+    cursor: zoom-in;
+}
+
+.admin-inventaris .photo-gallery .carousel-indicators {
+    bottom: 6px; /* rapikan posisi indikator */
+}
+
+/* Thumbnail bar */
+.admin-inventaris .gallery-thumbs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0 0 0; /* lebih rapat */
+    overflow-x: auto;
+}
+
+.admin-inventaris .gallery-thumb {
+    width: 56px; /* sedikit lebih kecil */
+    height: 56px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    overflow: hidden;
+    flex: 0 0 auto;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.admin-inventaris .gallery-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.admin-inventaris .gallery-thumb:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.admin-inventaris .gallery-thumb.active {
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 3px rgba(32,178,170,0.12);
+}
+
+/* Kontrol carousel lebih kecil */
+.admin-inventaris .photo-gallery .carousel-control-prev,
+.admin-inventaris .photo-gallery .carousel-control-next {
+    width: 28px; /* lebih kecil lagi */
+    height: 28px;
+    background: rgba(0,0,0,0.28);
+    border-radius: 50%;
+}
+
+/* ===== SHOPEE STYLE PHOTO GALLERY ===== */
+/* Main photo container */
+.main-photo-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+/* Main photo display */
+.main-photo {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.main-photo img {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: zoom-in;
+}
+
+.main-photo img:hover {
+    transform: scale(1.05);
+}
+
+/* Navigation buttons */
+.photo-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+
+.photo-nav-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.photo-nav-btn i {
+    font-size: 18px;
+    color: #333;
+}
+
+.photo-nav-prev {
+    left: 16px;
+}
+
+.photo-nav-next {
+    right: 16px;
+}
+
+/* Thumbnail navigation */
+.thumbnail-navigation {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    overflow-x: auto;
+    background: #fff;
+    border-top: 1px solid #e9ecef;
+}
+
+.thumbnail-item {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    overflow: hidden;
+    flex: 0 0 auto;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.thumbnail-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.thumbnail-item.active {
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.2);
+}
+
+.thumbnail-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.thumbnail-item.active img {
+    transform: scale(1.05);
+}
+
+/* ===== DYNAMIC PHOTO UPLOAD STYLING ===== */
+.dynamic-photo-upload {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 12px;
+    padding: 20px;
+    border: 2px dashed #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.dynamic-photo-upload:hover {
+    border-color: #20B2AA;
+    background: linear-gradient(135deg, #f0f8ff, #e6f3ff);
+}
+
+.photo-upload-item {
+    position: relative;
+}
+
+.photo-upload-wrapper {
+    background: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.photo-upload-wrapper:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.photo-input {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.photo-input:focus {
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
+    background: #fff;
+}
+
+.photo-preview-container {
+    position: relative;
+    display: inline-block;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.photo-preview {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.photo-preview:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.photo-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 5px;
+}
+
+.photo-actions .btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.photo-actions .btn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive design for Shopee style */
+@media (max-width: 768px) {
+    .main-photo-container {
+        height: 300px;
+    }
+    
+    .main-photo img {
+        max-width: 90%;
+        max-height: 90%;
+    }
+    
+    .photo-nav-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .photo-nav-btn i {
+        font-size: 16px;
+    }
+    
+    .thumbnail-item {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .thumbnail-navigation {
+        gap: 10px;
+        padding: 12px;
+    }
+    
+    .dynamic-photo-upload {
+        padding: 15px;
+    }
+    
+    .photo-preview {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+@media (max-width: 576px) {
+    .main-photo-container {
+        height: 250px;
+    }
+    
+    .main-photo img {
+        max-width: 95%;
+        max-height: 95%;
+    }
+    
+    .photo-nav-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .photo-nav-btn i {
+        font-size: 14px;
+    }
+    
+    .thumbnail-item {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .thumbnail-navigation {
+        gap: 8px;
+        padding: 10px;
+    }
+    
+    .photo-nav-prev {
+        left: 8px;
+    }
+    
+    .photo-nav-next {
+        right: 8px;
+    }
+    
+    .dynamic-photo-upload {
+        padding: 12px;
+    }
+    
+    .photo-preview {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .photo-upload-wrapper {
+        padding: 12px;
     }
 }

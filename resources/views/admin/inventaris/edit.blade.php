@@ -78,45 +78,76 @@
                             <h6 class="text-primary fw-semibold mb-3">
                                 <i class="bi bi-camera me-2"></i>Foto Barang (Maksimal 3 foto)
                             </h6>
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label fw-bold">Foto 1</label>
-                                    <input type="file" name="foto1" class="form-control" accept="image/jpg,image/jpeg,image/png" onchange="previewImage(this, 'preview1')">
-                                    <div class="mt-2">
-                                        @if($barang->foto1)
-                                            <img id="preview1" src="{{ Storage::url($barang->foto1) }}" alt="Foto 1" class="photo-preview" style="max-width: 100%; height: 150px; object-fit: cover;">
-                                        @else
-                                            <img id="preview1" src="{{ asset('assets/images/placeholder-image.svg') }}" alt="Preview Foto 1" class="photo-preview" style="max-width: 100%; height: 150px; object-fit: cover;">
-                                        @endif
+                            
+                            <!-- Dynamic Photo Upload -->
+                            <div class="dynamic-photo-upload">
+                                <div class="row" id="photoUploadContainer">
+                                    <!-- Foto 1 -->
+                                    <div class="col-md-4 mb-3 photo-upload-item">
+                                        <label class="form-label fw-bold">Foto 1 <span class="text-danger">*</span></label>
+                                        <div class="photo-upload-wrapper">
+                                            <input type="file" name="foto1" class="form-control photo-input" accept="image/jpg,image/jpeg,image/png" onchange="previewImage(this, 'preview1')">
+                                            <div class="photo-preview-container mt-2">
+                                                @if($barang->foto1)
+                                                    <img id="preview1" src="{{ Storage::url($barang->foto1) }}" alt="Foto 1" class="photo-preview">
+                                                    <div class="photo-actions">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePhoto('preview1', 'foto1')">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                @else
+                                                    <img id="preview1" src="{{ asset('assets/images/placeholder-image.svg') }}" alt="Preview Foto 1" class="photo-preview">
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label fw-bold">Foto 2</label>
-                                    <input type="file" name="foto2" class="form-control" accept="image/jpg,image/jpeg,image/png" onchange="previewImage(this, 'preview2')">
-                                    <div class="mt-2">
-                                        @if($barang->foto2)
-                                            <img id="preview2" src="{{ Storage::url($barang->foto2) }}" alt="Foto 2" class="photo-preview" style="max-width: 100%; height: 150px; object-fit: cover;">
-                                        @else
-                                            <img id="preview2" src="{{ asset('assets/images/placeholder-image.svg') }}" alt="Preview Foto 2" class="photo-preview" style="max-width: 100%; height: 150px; object-fit: cover;">
-                                        @endif
+                                    
+                                    <!-- Foto 2 -->
+                                    <div class="col-md-4 mb-3 photo-upload-item">
+                                        <label class="form-label fw-bold">Foto 2</label>
+                                        <div class="photo-upload-wrapper">
+                                            <input type="file" name="foto2" class="form-control photo-input" accept="image/jpg,image/jpeg,image/png" onchange="previewImage(this, 'preview2')">
+                                            <div class="photo-preview-container mt-2">
+                                                @if($barang->foto2)
+                                                    <img id="preview2" src="{{ Storage::url($barang->foto2) }}" alt="Foto 2" class="photo-preview">
+                                                    <div class="photo-actions">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePhoto('preview2', 'foto2')">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                @else
+                                                    <img id="preview2" src="{{ asset('assets/images/placeholder-image.svg') }}" alt="Preview Foto 2" class="photo-preview">
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label fw-bold">Foto 3</label>
-                                    <input type="file" name="foto3" class="form-control" accept="image/jpg,image/jpeg,image/png" onchange="previewImage(this, 'preview3')">
-                                    <div class="mt-2">
-                                        @if($barang->foto3)
-                                            <img id="preview3" src="{{ Storage::url($barang->foto3) }}" alt="Foto 3" class="photo-preview" style="max-width: 100%; height: 150px; object-fit: cover;">
-                                        @else
-                                            <img id="preview3" src="{{ asset('assets/images/placeholder-image.svg') }}" alt="Preview Foto 3" class="photo-preview" style="max-width: 100%; height: 150px; object-fit: cover;">
-                                        @endif
+                                    
+                                    <!-- Foto 3 -->
+                                    <div class="col-md-4 mb-3 photo-upload-item">
+                                        <label class="form-label fw-bold">Foto 3</label>
+                                        <div class="photo-upload-wrapper">
+                                            <input type="file" name="foto3" class="form-control photo-input" accept="image/jpg,image/jpeg,image/png" onchange="previewImage(this, 'preview3')">
+                                            <div class="photo-preview-container mt-2">
+                                                @if($barang->foto3)
+                                                    <img id="preview3" src="{{ Storage::url($barang->foto3) }}" alt="Foto 3" class="photo-preview">
+                                                    <div class="photo-actions">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePhoto('preview3', 'foto3')">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                @else
+                                                    <img id="preview3" src="{{ asset('assets/images/placeholder-image.svg') }}" alt="Preview Foto 3" class="photo-preview">
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            
                             <small class="text-muted">
                                 <i class="bi bi-info-circle me-1"></i>
                                 Format yang didukung: JPG, JPEG, PNG. Maksimal ukuran: 2MB per foto. 
-                                Kosongkan field jika tidak ingin mengubah foto.
+                                Foto 1 wajib diisi. Kosongkan field jika tidak ingin mengubah foto.
                             </small>
                         </div>
 

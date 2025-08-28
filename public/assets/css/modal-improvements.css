@@ -61,6 +61,20 @@
     padding: 1.5rem !important;
 }
 
+/* ===== MODAL SIZE OPTIMIZATION ===== */
+.modal-dialog {
+    max-width: 90vw !important;
+    margin: 1.75rem auto !important;
+}
+
+.modal-lg {
+    max-width: 800px !important;
+}
+
+.modal-xl {
+    max-width: 1000px !important;
+}
+
 /* ===== MODAL ANIMATION IMPROVEMENTS ===== */
 @keyframes modalFadeIn {
     from {
@@ -81,10 +95,27 @@
 @media (max-width: 768px) {
     .modal-dialog {
         margin: 0.5rem !important;
+        max-width: calc(100vw - 1rem) !important;
     }
     
     .modal-body {
         padding: 1rem !important;
+    }
+    
+    .modal-lg,
+    .modal-xl {
+        max-width: calc(100vw - 1rem) !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 0.25rem !important;
+        max-width: calc(100vw - 0.5rem) !important;
+    }
+    
+    .modal-body {
+        padding: 0.75rem !important;
     }
 }
 
@@ -228,4 +259,49 @@
 
 .modal-body::-webkit-scrollbar-thumb:hover {
     background: #008B8B !important;
+}
+
+/* ===== MODAL TABLE IMPROVEMENTS ===== */
+.modal .table {
+    font-size: 0.875rem !important;
+    margin-bottom: 0 !important;
+}
+
+.modal .table th {
+    font-size: 0.8rem !important;
+    padding: 0.5rem !important;
+    white-space: nowrap !important;
+}
+
+.modal .table td {
+    padding: 0.5rem !important;
+    vertical-align: middle !important;
+}
+
+.modal .table-responsive {
+    max-height: 50vh !important;
+    overflow-y: auto !important;
+}
+
+/* ===== MODAL FORM IMPROVEMENTS ===== */
+.modal .form-control {
+    font-size: 0.875rem !important;
+}
+
+.modal .form-label {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+}
+
+/* ===== MODAL SPACING IMPROVEMENTS ===== */
+.modal .row {
+    margin-left: -0.5rem !important;
+    margin-right: -0.5rem !important;
+}
+
+.modal .col,
+.modal .col-md-6,
+.modal .col-lg-4 {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
 }
