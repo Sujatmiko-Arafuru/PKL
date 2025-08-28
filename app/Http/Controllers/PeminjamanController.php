@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Peminjaman;
 use App\Models\DetailPeminjaman;
 use App\Models\Barang;
+use App\Services\NotificationService;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OtpMail;
@@ -166,6 +167,9 @@ class PeminjamanController extends Controller
                 
                 // Commit transaction jika semua berhasil
                 DB::commit();
+                
+                // Create notification for new peminjaman
+                NotificationService::notifyNewPeminjaman($peminjaman);
                 
                 // Hapus session cart
                 session()->forget('cart');

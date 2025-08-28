@@ -177,4 +177,78 @@
     font-size: 0.875rem;
 }
 </style>
-@endsection 
+@endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load notifications for dashboard
+    loadDashboardNotifications();
+    
+    // Update every 30 seconds
+    setInterval(loadDashboardNotifications, 30000);
+});
+
+async function loadDashboardNotifications() {
+    try {
+        const response = await fetch('/admin/notifications/peminjaman');
+        const data = await response.json();
+        
+        // Update notification count
+        const countBadge = document.getElementById('dashboardNotificationCount');
+        if (countBadge) {
+            countBadge.textContent = data.peminjaman_unread_count || 0;
+        }
+        
+        // Update notifications list
+        const notificationsList = document.getElementById('notificationsList');
+        if (notificationsList && data.recent_peminjaman) {
+            if (data.recent_peminjaman.length > 0) {
+                let html = '';
+                data.recent_peminjaman.forEach(notification => {
+                    const timeAgo = new Date(notification.created_at).toLocaleString('id-ID', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    html += `
+                        <div class="d-flex align-items-start p-3 border-bottom">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <i class="bi bi-bell text-primary"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 fw-semibold">${notification.title}</h6>
+                                <p class="mb-1 text-muted small">${notification.message}</p>
+                                <span class="text-muted small">${timeAgo}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                notificationsList.innerHTML = html;
+            } else {
+                notificationsList.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-check-circle text-success fs-1"></i>
+                        <p class="text-muted mt-2 mb-0">Tidak ada notifikasi baru</p>
+                    </div>
+                `;
+            }
+        }
+    } catch (error) {
+        console.error('Error loading notifications:', error);
+        const notificationsList = document.getElementById('notificationsList');
+        if (notificationsList) {
+            notificationsList.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="bi bi-exclamation-triangle text-warning fs-1"></i>
+                    <p class="text-muted mt-2 mb-0">Gagal memuat notifikasi</p>
+                </div>
+            `;
+        }
+    }
+}
+</script>
+@endpush 

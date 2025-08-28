@@ -11,6 +11,7 @@
     <link href="{{ asset('assets/css/table-improvements.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/modal-improvements.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/photo-gallery.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/notification-system.css') }}" rel="stylesheet">
     <style>
         body { background: #E0FFFF; }
         .sidebar {
@@ -59,6 +60,31 @@
             padding: 0.5rem 0.75rem;
         }
         
+        .nav-item {
+            position: relative;
+        }
+        
+        /* Fallback notification badge styling if CSS file fails to load */
+        .notification-badge {
+            position: absolute !important;
+            top: -8px !important;
+            right: -8px !important;
+            background: #dc3545 !important;
+            color: white !important;
+            border-radius: 50% !important;
+            width: 22px !important;
+            height: 22px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 0.75rem !important;
+            font-weight: bold !important;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4) !important;
+            border: 2px solid #fff !important;
+            z-index: 1000 !important;
+            transition: all 0.3s ease !important;
+        }
+        
         @media (max-width: 991px) {
             .sidebar, .main-content, .topbar { margin-left: 0 !important; }
             .sidebar { position: static; width: 100%; min-height: auto; }
@@ -72,7 +98,12 @@
         <ul class="nav nav-pills flex-column mb-auto">
             <li><a href="{{ route('admin.dashboard') }}" class="nav-link{{ request()->routeIs('admin.dashboard') ? ' active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
             <li><a href="{{ route('admin.inventaris.index') }}" class="nav-link{{ request()->routeIs('admin.inventaris.*') ? ' active' : '' }}"><i class="bi bi-box-seam"></i> Inventaris</a></li>
-            <li><a href="{{ route('admin.peminjaman.index') }}" class="nav-link{{ request()->routeIs('admin.peminjaman.*') ? ' active' : '' }}"><i class="bi bi-journal-plus"></i> Peminjaman</a></li>
+            <li class="nav-item">
+                <a href="{{ route('admin.peminjaman.index') }}" class="nav-link{{ request()->routeIs('admin.peminjaman.*') ? ' active' : '' }}">
+                    <i class="bi bi-journal-plus"></i> Peminjaman
+                    <span id="peminjamanNotificationBadge" class="notification-badge" style="display: none;">0</span>
+                </a>
+            </li>
             <li><a href="{{ route('admin.pengembalian.index') }}" class="nav-link{{ request()->routeIs('admin.pengembalian.*') ? ' active' : '' }}"><i class="bi bi-arrow-repeat"></i> Pengembalian</a></li>
             <li><a href="{{ route('admin.arsip.index') }}" class="nav-link{{ request()->routeIs('admin.arsip.*') ? ' active' : '' }}"><i class="bi bi-archive"></i> Arsip</a></li>
             <li>
@@ -90,5 +121,147 @@
         @yield('content')
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Notification System Script -->
+    <script>
+        class NotificationSystem {
+            constructor() {
+                this.badge = document.getElementById('peminjamanNotificationBadge');
+                this.updateInterval = 30000; // Update every 30 seconds
+                this.init();
+            }
+            
+            init() {
+                console.log('NotificationSystem initialized');
+                console.log('Badge element:', this.badge);
+                this.updateNotificationCount();
+                this.startAutoUpdate();
+                this.setupEventListeners();
+            }
+            
+            async updateNotificationCount() {
+                try {
+                    console.log('Updating notification count...');
+                    const response = await fetch('/admin/notifications/peminjaman');
+                    const data = await response.json();
+                    
+                    console.log('Notification data:', data);
+                    
+                    if (data.peminjaman_unread_count > 0) {
+                        console.log('Setting badge to show with count:', data.peminjaman_unread_count);
+                        this.badge.textContent = data.peminjaman_unread_count;
+                        this.badge.style.display = 'flex';
+                        
+                        // Add sound notification for new notifications
+                        if (data.peminjaman_unread_count > parseInt(this.badge.textContent || 0)) {
+                            this.playNotificationSound();
+                        }
+                    } else {
+                        console.log('Hiding badge - no unread notifications');
+                        this.badge.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error updating notification count:', error);
+                }
+            }
+            
+            startAutoUpdate() {
+                console.log('Starting auto-update with interval:', this.updateInterval);
+                setInterval(() => {
+                    this.updateNotificationCount();
+                }, this.updateInterval);
+            }
+            
+            setupEventListeners() {
+                // Update count when clicking on peminjaman menu
+                const peminjamanLink = document.querySelector('a[href*="peminjaman"]');
+                if (peminjamanLink) {
+                    peminjamanLink.addEventListener('click', () => {
+                        console.log('Peminjaman menu clicked, marking notifications as read');
+                        // Mark peminjaman notifications as read when visiting the page
+                        this.markPeminjamanNotificationsAsRead();
+                    });
+                }
+                
+                // Update count when page becomes visible
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden) {
+                        console.log('Page became visible, updating notifications');
+                        this.updateNotificationCount();
+                    }
+                });
+            }
+            
+            async markPeminjamanNotificationsAsRead() {
+                try {
+                    console.log('Marking peminjaman notifications as read...');
+                    await fetch('/admin/notifications/mark-all-read', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    });
+                    
+                    // Update badge immediately
+                    this.badge.style.display = 'none';
+                    console.log('Notifications marked as read, badge hidden');
+                } catch (error) {
+                    console.error('Error marking notifications as read:', error);
+                }
+            }
+            
+            playNotificationSound() {
+                // Create audio context for notification sound
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+                    
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                } catch (error) {
+                    console.log('Audio notification not supported');
+                }
+            }
+            
+            // Method to manually update count (can be called from other parts of the app)
+            forceUpdate() {
+                console.log('Force updating notification count...');
+                this.updateNotificationCount();
+            }
+        }
+        
+        // Initialize notification system when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing NotificationSystem...');
+            window.notificationSystem = new NotificationSystem();
+            
+            // Test: Force show badge for testing
+            setTimeout(() => {
+                console.log('Testing badge visibility...');
+                const badge = document.getElementById('peminjamanNotificationBadge');
+                if (badge) {
+                    badge.textContent = '1';
+                    badge.style.display = 'flex';
+                    console.log('Badge should now be visible with count 1');
+                } else {
+                    console.error('Badge element not found!');
+                }
+            }, 2000);
+        });
+        
+        // Expose to global scope for external access
+        window.NotificationSystem = NotificationSystem;
+    </script>
 </body>
 </html> 

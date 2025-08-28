@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Peminjaman;
 use App\Models\DetailPeminjaman;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -53,25 +54,26 @@ class PeminjamanController extends Controller
     public function approve($id): \Illuminate\Http\RedirectResponse
     {
         try {
-        $peminjaman = Peminjaman::with('details.barang')->findOrFail($id);
-        
-        // Validasi stok sebelum approve
-        foreach ($peminjaman->details as $detail) {
-            $barang = $detail->barang;
+            $peminjaman = Peminjaman::with('details.barang')->findOrFail($id);
+            $oldStatus = $peminjaman->status;
+            
+            // Validasi stok sebelum approve
+            foreach ($peminjaman->details as $detail) {
+                $barang = $detail->barang;
                 if (!$barang) {
                     return redirect()->route('admin.peminjaman.index')->with('error', 'Data barang tidak ditemukan.');
                 }
                 
-            $availableStock = $barang->stok_tersedia;
-            
-            if ($availableStock < $detail->jumlah) {
+                $availableStock = $barang->stok_tersedia;
+                
+                if ($availableStock < $detail->jumlah) {
                     return redirect()->route('admin.peminjaman.index')->with('error', 'Stok barang "' . $barang->nama . '" tidak mencukupi untuk approve peminjaman ini. Stok tersedia: ' . $availableStock . ', diminta: ' . $detail->jumlah);
                 }
-        }
-        
-        // Mulai transaction
-        DB::beginTransaction();
-        
+            }
+            
+            // Mulai transaction
+            DB::beginTransaction();
+            
             // Update status peminjaman
             $peminjaman->status = 'disetujui';
             $peminjaman->saveQuietly(); // Gunakan saveQuietly untuk performa
@@ -101,6 +103,10 @@ class PeminjamanController extends Controller
             }
             
             DB::commit();
+            
+            // Create notification for status change
+            NotificationService::notifyPeminjamanStatusChange($peminjaman, $oldStatus, 'disetujui');
+            
             return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman disetujui dan stok barang berhasil diupdate.');
             
         } catch (\Exception $e) {
@@ -116,9 +122,15 @@ class PeminjamanController extends Controller
     public function reject($id): \Illuminate\Http\RedirectResponse
     {
         try {
-        $peminjaman = Peminjaman::findOrFail($id);
-        $peminjaman->status = 'ditolak';
+            $peminjaman = Peminjaman::findOrFail($id);
+            $oldStatus = $peminjaman->status;
+            
+            $peminjaman->status = 'ditolak';
             $peminjaman->saveQuietly();
+            
+            // Create notification for status change
+            NotificationService::notifyPeminjamanStatusChange($peminjaman, $oldStatus, 'ditolak');
+            
             return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman berhasil ditolak.');
         } catch (\Exception $e) {
             Log::error('Error saat reject peminjaman: ' . $e->getMessage(), [

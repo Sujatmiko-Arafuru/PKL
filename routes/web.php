@@ -54,6 +54,26 @@ Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->nam
     Route::get('arsip', [ArsipController::class, 'index'])->name('arsip.index');
     Route::get('arsip/{id}', [ArsipController::class, 'show'])->name('arsip.show');
     Route::get('arsip/export/pdf', [ArsipController::class, 'exportPdf'])->name('arsip.export.pdf');
+    
+    // Notifikasi API
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/unread-count', [\App\Http\Controllers\Admin\NotificationController::class, 'getUnreadCount'])->name('unread-count');
+        Route::get('/recent', [\App\Http\Controllers\Admin\NotificationController::class, 'getRecentNotifications'])->name('recent');
+        Route::post('/mark-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('mark-read');
+        Route::post('/mark-all-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::get('/statistics', [\App\Http\Controllers\Admin\NotificationController::class, 'getStatistics'])->name('statistics');
+        Route::get('/peminjaman', [\App\Http\Controllers\Admin\NotificationController::class, 'getPeminjamanNotifications'])->name('peminjaman');
+        
+        // Test route
+        Route::get('/test', function() {
+            return response()->json([
+                'message' => 'Notification system is working',
+                'notifications_count' => \App\Models\Notification::count(),
+                'unread_count' => \App\Models\Notification::where('status', 'unread')->count(),
+                'peminjaman_unread' => \App\Models\Notification::where('status', 'unread')->where('type', 'peminjaman_baru')->count()
+            ]);
+        })->name('test');
+    });
 });
 
 
