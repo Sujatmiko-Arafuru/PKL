@@ -10,6 +10,12 @@ class KeranjangController extends Controller
     public function tambah(Request $request)
     {
         try {
+            // Validasi input
+            $request->validate([
+                'barang_id' => 'required|integer|exists:barangs,id',
+                'jumlah' => 'required|integer|min:1'
+            ]);
+
             $id = $request->input('barang_id');
             $barang = Barang::findOrFail($id);
             $jumlah = (int) $request->input('jumlah', 1);
@@ -18,7 +24,7 @@ class KeranjangController extends Controller
             if (!$barang->bisaDipinjam($jumlah)) {
                 return response()->json([
                     'success' => false, 
-                    'message' => 'Barang "' . $barang->nama . '" tidak tersedia atau stok tidak mencukupi. Stok tersedia: ' . $barang->stok_tersedia
+                    'message' => 'Jumlah melebihi stok tersedia untuk barang "' . $barang->nama . '". Stok tersedia: ' . $barang->stok_tersedia
                 ], 400);
             }
             
@@ -54,6 +60,11 @@ class KeranjangController extends Controller
                 'message' => 'Barang "' . $barang->nama . '" (' . $jumlah . ') berhasil ditambahkan ke keranjang!'
             ]);
             
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak valid: ' . $e->getMessage()
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

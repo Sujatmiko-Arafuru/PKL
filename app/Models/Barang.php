@@ -85,9 +85,9 @@ class Barang extends Model
         $this->updateStatusOtomatis();
     }
 
-    public function bisaDipinjam()
+    public function bisaDipinjam($jumlah = 1)
     {
-        return $this->status === 'tersedia' && $this->stok_tersedia > 0;
+        return $this->status === 'tersedia' && $this->stok_tersedia >= $jumlah;
     }
 
     /**

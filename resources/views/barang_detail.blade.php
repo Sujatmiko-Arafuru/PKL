@@ -222,6 +222,83 @@ document.addEventListener('DOMContentLoaded', function() {
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
+    // Handle form submission untuk tambah ke keranjang
+    const form = document.querySelector('form[action*="keranjang/tambah"]');
+    if (form) {
+        console.log('Form found:', form);
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submitted via AJAX');
+            
+            const formData = new FormData(form);
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            
+            // Disable button dan ubah text
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Menambahkan...';
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]')?.value
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    // Tampilkan notifikasi sukses
+                    const toast = document.getElementById('toastKeranjang');
+                    const toastMsg = document.getElementById('toastKeranjangMsg');
+                    toastMsg.textContent = data.message;
+                    toast.classList.remove('text-bg-danger');
+                    toast.classList.add('text-bg-success');
+                    
+                    const bsToast = new bootstrap.Toast(toast);
+                    bsToast.show();
+                    
+                    // Reset form
+                    form.reset();
+                    form.querySelector('input[name="jumlah"]').value = '1';
+                    
+                    // Update cart count jika ada
+                    const cartCountElement = document.getElementById('cart-count');
+                    if (cartCountElement && data.cart_count !== undefined) {
+                        cartCountElement.innerText = data.cart_count;
+                    }
+                } else {
+                    throw new Error(data.message || 'Gagal menambahkan ke keranjang');
+                }
+            })
+            .catch(error => {
+                // Tampilkan notifikasi error
+                const toast = document.getElementById('toastKeranjang');
+                const toastMsg = document.getElementById('toastKeranjangMsg');
+                toastMsg.textContent = error.message || 'Terjadi kesalahan saat menambahkan ke keranjang';
+                toast.classList.remove('text-bg-success');
+                toast.classList.add('text-bg-danger');
+                
+                const bsToast = new bootstrap.Toast(toast);
+                bsToast.show();
+            })
+            .finally(() => {
+                // Re-enable button dan kembalikan text
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+            });
+        });
+    }
 });
 </script>
 @endsection 
