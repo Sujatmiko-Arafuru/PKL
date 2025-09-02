@@ -13,10 +13,12 @@ class PengembalianController extends Controller
 {
     public function index()
     {
-        $peminjamans = Peminjaman::with(['details.barang'])
+        $peminjamans = Peminjaman::with(['details.barang', 'detailsRuangan.ruangan'])
             ->whereIn('status', ['disetujui', 'dipinjam', 'proses_pengembalian'])
-            ->whereHas('details', function($query) {
-                $query->whereRaw('jumlah_dikembalikan < jumlah');
+            ->where(function($query) {
+                $query->whereHas('details', function($q) {
+                    $q->whereRaw('jumlah_dikembalikan < jumlah');
+                })->orWhereHas('detailsRuangan');
             })->orderBy('created_at', 'desc')->get();
 
         return view('admin.pengembalian.index', compact('peminjamans'));
@@ -24,16 +26,19 @@ class PengembalianController extends Controller
 
     public function show($id)
     {
-        $peminjaman = Peminjaman::with(['details.barang'])->findOrFail($id);
+        $peminjaman = Peminjaman::with(['details.barang', 'detailsRuangan.ruangan'])->findOrFail($id);
         
         // Cek apakah status sudah dikembalikan
         if ($peminjaman->status === 'dikembalikan') {
             return redirect()->route('admin.pengembalian.index')->with('info', 'Peminjaman ini sudah selesai dikembalikan.');
         }
         
-        // Cek apakah masih ada barang yang bisa dikembalikan
-        if ($peminjaman->total_belum_dikembalikan <= 0) {
-            return redirect()->route('admin.pengembalian.index')->with('info', 'Semua barang untuk peminjaman ini sudah dikembalikan.');
+        // Cek apakah masih ada barang atau ruangan yang bisa dikembalikan
+        $hasUnreturnedItems = $peminjaman->total_belum_dikembalikan > 0;
+        $hasUnreturnedRooms = $peminjaman->detailsRuangan->count() > 0;
+        
+        if (!$hasUnreturnedItems && !$hasUnreturnedRooms) {
+            return redirect()->route('admin.pengembalian.index')->with('info', 'Semua item untuk peminjaman ini sudah dikembalikan.');
         }
         
         return view('admin.pengembalian.show', compact('peminjaman'));
@@ -162,6 +167,46 @@ class PengembalianController extends Controller
     }
 
     /**
+     * Handle room return
+     */
+    public function returnRoom(Request $request, $id)
+    {
+        $request->validate([
+            'ruangan_id' => 'required|integer|exists:ruangans,id'
+        ]);
+
+        $peminjaman = Peminjaman::with(['detailsRuangan.ruangan'])->findOrFail($id);
+        $ruanganId = $request->ruangan_id;
+
+        // Find the room detail for this loan
+        $roomDetail = $peminjaman->detailsRuangan->where('ruangan_id', $ruanganId)->first();
+        
+        if (!$roomDetail) {
+            return back()->with('error', 'Ruangan tidak ditemukan dalam peminjaman ini.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // Update room status to available
+            $roomDetail->ruangan->setAvailable();
+            
+            // Delete the room detail (since rooms are returned as whole units)
+            $roomDetail->delete();
+            
+            // Update loan status
+            $this->updatePeminjamanStatus($peminjaman);
+            
+            DB::commit();
+            
+            return back()->with('success', 'Ruangan "' . $roomDetail->ruangan->nama . '" berhasil dikembalikan dan status diupdate menjadi tersedia.');
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Update status peminjaman berdasarkan jumlah barang yang dikembalikan
      */
     private function updatePeminjamanStatus(Peminjaman $peminjaman)
@@ -171,17 +216,20 @@ class PengembalianController extends Controller
             ->sum('jumlah');
         $totalDikembalikan = \App\Models\DetailPeminjaman::where('peminjaman_id', $peminjaman->id)
             ->sum('jumlah_dikembalikan');
+        
+        // Check if there are any rooms still borrowed
+        $hasRooms = \App\Models\DetailPeminjamanRuangan::where('peminjaman_id', $peminjaman->id)->exists();
 
-        if ($totalDikembalikan == 0) {
-            // Jika belum ada yang dikembalikan, status tetap seperti semula
+        if ($totalDikembalikan == 0 && !$hasRooms) {
+            // Jika belum ada yang dikembalikan dan tidak ada ruangan, status tetap seperti semula
             if ($peminjaman->status === 'disetujui') {
                 $peminjaman->status = 'dipinjam';
             }
-        } elseif ($totalDikembalikan < $totalBarang) {
-            // Jika sebagian dikembalikan, status menjadi proses pengembalian
+        } elseif ($totalDikembalikan < $totalBarang || $hasRooms) {
+            // Jika sebagian dikembalikan atau masih ada ruangan, status menjadi proses pengembalian
             $peminjaman->status = 'proses_pengembalian';
         } else {
-            // Jika semua dikembalikan, status menjadi dikembalikan
+            // Jika semua dikembalikan dan tidak ada ruangan, status menjadi dikembalikan
             $peminjaman->status = 'dikembalikan';
         }
 

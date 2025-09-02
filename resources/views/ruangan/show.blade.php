@@ -38,7 +38,7 @@
         <div class="col-md-9 col-lg-10">
             
             <div class="mb-4">
-                <a href="{{ route('dashboard') }}" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Kembali ke Dashboard</a>
+                <a href="{{ route('ruangan.index') }}" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Kembali ke List Ruangan</a>
             </div>
             
             <div class="alert alert-info mb-3">
@@ -50,23 +50,23 @@
                 <div class="card-body p-4">
                     <div class="row">
                         <!-- Photo Section - Shopee Style -->
-                        @if($barang->hasPhotos())
+                        @if($ruangan->hasPhotos())
                         <div class="col-lg-8 mb-4">
                             <div class="card border-0 shadow-sm">
                                 <div class="card-header bg-white border-0">
                                     <h6 class="mb-0 text-primary fw-semibold">
-                                        <i class="bi bi-camera me-2"></i>Foto Barang ({{ $barang->photo_count }} foto)
+                                        <i class="bi bi-camera me-2"></i>Foto Ruangan ({{ $ruangan->photo_count }} foto)
                                     </h6>
                                 </div>
                                 <div class="card-body p-0">
                                     <!-- Main Photo Display -->
                                     <div class="main-photo-container">
                                         <div id="mainPhotoDisplay" class="main-photo">
-                                            <img src="{{ Storage::url($barang->photos[0]) }}" alt="Foto Utama" id="mainPhotoImage">
+                                            <img src="{{ Storage::url($ruangan->photos[0]) }}" alt="Foto Utama" id="mainPhotoImage">
                                         </div>
                                         
                                         <!-- Navigation Arrows -->
-                                        @if($barang->photo_count > 1)
+                                        @if($ruangan->photo_count > 1)
                                         <button class="photo-nav-btn photo-nav-prev" onclick="changeMainPhoto('prev')">
                                             <i class="bi bi-chevron-left"></i>
                                         </button>
@@ -77,9 +77,9 @@
                                     </div>
                                     
                                     <!-- Thumbnail Navigation -->
-                                    @if($barang->photo_count > 1)
+                                    @if($ruangan->photo_count > 1)
                                     <div class="thumbnail-navigation">
-                                        @foreach($barang->photos as $index => $photo)
+                                        @foreach($ruangan->photos as $index => $photo)
                                         <div class="thumbnail-item {{ $index === 0 ? 'active' : '' }}" 
                                              onclick="changeMainPhoto({{ $index }})" 
                                              data-index="{{ $index }}">
@@ -94,84 +94,126 @@
                         @endif
 
                         <!-- Information Section -->
-                        <div class="col-lg-{{ $barang->hasPhotos() ? '4' : '12' }}">
+                        <div class="col-lg-{{ $ruangan->hasPhotos() ? '4' : '12' }}">
                             <div class="text-center mb-4">
-                                <h2 class="text-primary mb-3">{{ $barang->nama }}</h2>
+                                <h2 class="text-primary mb-3">{{ $ruangan->nama }}</h2>
                             </div>
                             
                             <div class="row mb-4">
-                                <div class="col-md-6 mb-3">
-                                    <div class="card border-0 bg-primary bg-opacity-10">
+                                <div class="col-md-12 mb-3">
+                                    <div class="card border-0 
+                                        @if($ruangan->status == 'tersedia') bg-success bg-opacity-10
+                                        @elseif($ruangan->status == 'maintenance') bg-warning bg-opacity-10
+                                        @elseif($ruangan->status == 'dipinjam') bg-danger bg-opacity-10
+                                        @else bg-secondary bg-opacity-10
+                                        @endif">
                                         <div class="card-body text-center py-3">
-                                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
+                                            <div class="
+                                                @if($ruangan->status == 'tersedia') bg-success bg-opacity-10
+                                                @elseif($ruangan->status == 'maintenance') bg-warning bg-opacity-10
+                                                @elseif($ruangan->status == 'dipinjam') bg-danger bg-opacity-10
+                                                @else bg-secondary bg-opacity-10
+                                                @endif rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
                                                  style="width: 40px; height: 40px;">
-                                                <i class="bi bi-boxes text-primary"></i>
+                                                @if($ruangan->status == 'tersedia')
+                                                    <i class="bi bi-check-circle text-success"></i>
+                                                @elseif($ruangan->status == 'maintenance')
+                                                    <i class="bi bi-tools text-warning"></i>
+                                                @elseif($ruangan->status == 'dipinjam')
+                                                    <i class="bi bi-x-circle text-danger"></i>
+                                                @else
+                                                    <i class="bi bi-question-circle text-secondary"></i>
+                                                @endif
                                             </div>
-                                            <h6 class="mb-0 text-primary fw-semibold">Stok Tersedia</h6>
-                                            <p class="mb-0 text-muted small">{{ $barang->stok_tersedia }} unit</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="card border-0 bg-warning bg-opacity-10">
-                                        <div class="card-body text-center py-3">
-                                            <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                                                 style="width: 40px; height: 40px;">
-                                                <i class="bi bi-arrow-repeat text-warning"></i>
-                                            </div>
-                                            <h6 class="mb-0 text-warning fw-semibold">Stok Dipinjam</h6>
-                                            <p class="mb-0 text-muted small">{{ $barang->stok_dipinjam }} unit</p>
+                                            <h6 class="mb-0 
+                                                @if($ruangan->status == 'tersedia') text-success
+                                                @elseif($ruangan->status == 'maintenance') text-warning
+                                                @elseif($ruangan->status == 'dipinjam') text-danger
+                                                @else text-secondary
+                                                @endif fw-semibold">Status Ruangan</h6>
+                                            <p class="mb-0 text-muted small">
+                                                @if($ruangan->status == 'tersedia') Tersedia untuk dipinjam
+                                                @elseif($ruangan->status == 'maintenance') Sedang dalam perawatan
+                                                @elseif($ruangan->status == 'dipinjam') Sedang dipinjam
+                                                @else {{ ucfirst($ruangan->status) }}
+                                                @endif
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
+                            @if($ruangan->deskripsi)
                             <div class="mb-4">
                                 <h6 class="text-muted small mb-2">Deskripsi</h6>
                                 <div class="bg-light rounded p-3">
-                                    @if($barang->deskripsi)
-                                        <p class="mb-0">{{ $barang->deskripsi }}</p>
-                                    @else
-                                        <p class="mb-0 text-muted">Tidak ada deskripsi</p>
-                                    @endif
+                                    <p class="mb-0">{{ $ruangan->deskripsi }}</p>
                                 </div>
                             </div>
-                            
+                            @endif
+
+                            @if($ruangan->fasilitas)
                             <div class="mb-4">
-                                <h6 class="text-muted small mb-2">Status</h6>
-                                <span class="badge rounded-pill fs-6
-                                    {{ $barang->status == 'tersedia' ? 'bg-success' : 'bg-secondary' }}">
-                                    <i class="bi bi-{{ $barang->status == 'tersedia' ? 'check-circle' : 'right' }} me-1"></i>
-                                    {{ ucfirst($barang->status) }}
-                                </span>
+                                <h6 class="text-muted small mb-2">Fasilitas</h6>
+                                <div class="bg-light rounded p-3">
+                                    <p class="mb-0">{{ $ruangan->fasilitas }}</p>
+                                </div>
                             </div>
+                            @endif
+
+                            @if($ruangan->lokasi)
+                            <div class="mb-4">
+                                <h6 class="text-muted small mb-2">Lokasi</h6>
+                                <div class="bg-light rounded p-3">
+                                    <p class="mb-0">
+                                        <i class="bi bi-geo-alt me-2"></i>{{ $ruangan->lokasi }}
+                                        @if($ruangan->lantai)
+                                            <br><i class="bi bi-layers me-2"></i>Lantai {{ $ruangan->lantai }}
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                            @endif
                             
                             <div class="mt-4">
-                                <form action="{{ route('keranjang.tambah') }}" method="POST" class="d-flex flex-column align-items-start gap-2">
+                                <form action="{{ route('keranjang.tambah-ruangan') }}" method="POST" class="d-flex flex-column align-items-start gap-2">
                                     @csrf
-                                    <div class="input-group mb-2" style="max-width:200px;">
-                                        <span class="input-group-text">Jumlah</span>
-                                        <input type="number" name="jumlah" class="form-control" min="1" max="{{ $barang->stok_tersedia }}" value="1" required {{ $barang->status !== 'tersedia' ? 'disabled' : '' }}>
-                                    </div>
-                                    <input type="hidden" name="barang_id" value="{{ $barang->id }}">
-                                    <button type="submit" class="btn btn-lg {{ $barang->status === 'tersedia' ? 'btn-primary' : 'btn-secondary' }}" {{ $barang->status !== 'tersedia' ? 'disabled' : '' }} style="{{ $barang->status !== 'tersedia' ? 'opacity: 0.6; cursor: not-allowed;' : '' }}" title="{{ $barang->status !== 'tersedia' ? 'Barang tidak tersedia untuk dipinjam (Stok: ' . $barang->stok_tersedia . ')' : 'Klik untuk menambah ke keranjang' }}">
+                                    <input type="hidden" name="ruangan_id" value="{{ $ruangan->id }}">
+                                    <button type="submit" class="btn btn-lg {{ $ruangan->status === 'tersedia' ? 'btn-primary' : 'btn-secondary' }}" {{ $ruangan->status !== 'tersedia' ? 'disabled' : '' }} style="{{ $ruangan->status !== 'tersedia' ? 'opacity: 0.6; cursor: not-allowed;' : '' }}" title="{{ $ruangan->status !== 'tersedia' ? 'Ruangan tidak tersedia untuk dipinjam. Status: ' . ucfirst($ruangan->status) : 'Klik untuk menambah ke keranjang' }}">
                                         <i class="bi bi-cart-plus me-2"></i>
-                                        @if($barang->status === 'tersedia')
+                                        @if($ruangan->status === 'tersedia')
                                             Tambah ke Keranjang
                                         @else
                                             Tidak Tersedia
                                         @endif
                                     </button>
                                 </form>
-                                @if($barang->status !== 'tersedia')
+                                @if($ruangan->status !== 'tersedia')
                                     <small class="text-muted mt-1">
                                         <i class="bi bi-exclamation-triangle me-1"></i>
-                                        Barang tidak tersedia untuk dipinjam saat ini
+                                        @if($ruangan->status == 'maintenance')
+                                            Ruangan sedang dalam perawatan
+                                        @elseif($ruangan->status == 'dipinjam')
+                                            Ruangan sedang dipinjam
+                                        @else
+                                            Ruangan tidak tersedia untuk dipinjam
+                                        @endif
                                     </small>
                                     <div class="alert alert-warning mt-2" role="alert">
                                         <i class="bi bi-info-circle me-2"></i>
-                                        <strong>Informasi:</strong> Barang ini sedang tidak tersedia untuk dipinjam. 
-                                        Stok tersedia: <strong>{{ $barang->stok_tersedia }}</strong> dari total <strong>{{ $barang->stok }}</strong>.
+                                        <strong>Informasi:</strong> 
+                                        @if($ruangan->status == 'maintenance')
+                                            Ruangan ini sedang dalam perawatan dan tidak dapat dipinjam.
+                                        @elseif($ruangan->status == 'dipinjam')
+                                            Ruangan ini sedang dipinjam oleh pengguna lain.
+                                        @else
+                                            Ruangan ini tidak tersedia untuk dipinjam.
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="alert alert-info mt-2" role="alert">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        <strong>Info:</strong> Ruangan dipinjam sebagai satu kesatuan (seluruh ruangan).
                                     </div>
                                 @endif
                             </div>
@@ -188,18 +230,18 @@
   <div id="toastKeranjang" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="d-flex">
       <div class="toast-body" id="toastKeranjangMsg">
-        Barang berhasil ditambahkan ke keranjang!
+        Ruangan berhasil ditambahkan ke keranjang!
       </div>
       <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
   </div>
 </div>
 
-@if($barang->hasPhotos())
+@if($ruangan->hasPhotos())
 <script>
     let currentPhotoIndex = 0;
-    const totalPhotos = {{ $barang->photo_count }};
-    const photos = @json($barang->photos);
+    const totalPhotos = {{ $ruangan->photo_count }};
+    const photos = @json($ruangan->photos);
     
     function changeMainPhoto(direction) {
         if (typeof direction === 'number') {
@@ -255,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Handle form submission untuk tambah ke keranjang
-    const form = document.querySelector('form[action*="keranjang/tambah"]');
+    const form = document.querySelector('form[action*="keranjang/tambah-ruangan"]');
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -297,7 +339,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Reset form
                     form.reset();
-                    form.querySelector('input[name="jumlah"]').value = '1';
                     
                     // Update cart count jika ada
                     const cartCountElement = document.getElementById('cart-count');
@@ -328,4 +369,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endsection 
+@endsection

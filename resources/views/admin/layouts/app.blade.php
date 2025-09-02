@@ -97,7 +97,8 @@
         <h4 class="mb-4">SarPras Admin</h4>
         <ul class="nav nav-pills flex-column mb-auto">
             <li><a href="{{ route('admin.dashboard') }}" class="nav-link{{ request()->routeIs('admin.dashboard') ? ' active' : '' }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-            <li><a href="{{ route('admin.inventaris.index') }}" class="nav-link{{ request()->routeIs('admin.inventaris.*') ? ' active' : '' }}"><i class="bi bi-box-seam"></i> Inventaris</a></li>
+            <li><a href="{{ route('admin.inventaris.index') }}" class="nav-link{{ request()->routeIs('admin.inventaris.*') ? ' active' : '' }}"><i class="bi bi-box-seam"></i> Inventaris Barang</a></li>
+            <li><a href="{{ route('admin.inventaris-ruangan.index') }}" class="nav-link{{ request()->routeIs('admin.inventaris-ruangan.*') ? ' active' : '' }}"><i class="bi bi-building"></i> Inventaris Ruangan</a></li>
             <li class="nav-item">
                 <a href="{{ route('admin.peminjaman.index') }}" class="nav-link{{ request()->routeIs('admin.peminjaman.*') ? ' active' : '' }}">
                     <i class="bi bi-journal-plus"></i> Peminjaman

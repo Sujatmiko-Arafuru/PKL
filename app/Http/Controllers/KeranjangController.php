@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Barang;
+use App\Models\Ruangan;
 
 class KeranjangController extends Controller
 {
@@ -49,7 +50,8 @@ class KeranjangController extends Controller
                     'stok_tersedia' => $barang->stok_tersedia,
                     'stok_dipinjam' => $barang->stok_dipinjam,
                     'status' => $barang->status,
-                    'qty' => $jumlah
+                    'qty' => $jumlah,
+                    'type' => 'barang'
                 ];
             }
             session(['cart' => $cart]);
@@ -65,6 +67,66 @@ class KeranjangController extends Controller
                 'success' => false,
                 'message' => 'Data tidak valid: ' . $e->getMessage()
             ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function tambahRuangan(Request $request)
+    {
+        try {
+            // Validasi input
+            $request->validate([
+                'ruangan_id' => 'required|integer|exists:ruangans,id'
+            ]);
+
+            $ruanganId = $request->ruangan_id;
+            $ruangan = Ruangan::findOrFail($ruanganId);
+            
+            if (!$ruangan->bisaDipinjam()) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Ruangan "' . $ruangan->nama . '" tidak tersedia untuk dipinjam. Status: ' . ucfirst($ruangan->status)
+                ], 400);
+            }
+            
+            $cart = session()->get('cart', []);
+            $cartKey = 'ruangan_' . $ruanganId;
+            
+            // Check if room is already in cart
+            if (isset($cart[$cartKey])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ruangan "' . $ruangan->nama . '" sudah ada di keranjang!'
+                ], 400);
+            }
+            
+            // Add room to cart (only one room per booking)
+            $cart[$cartKey] = [
+                'id' => $ruangan->id,
+                'nama' => $ruangan->nama,
+                'deskripsi' => $ruangan->deskripsi,
+                'kode' => $ruangan->kode,
+                'kategori' => $ruangan->kategori,
+                'lokasi' => $ruangan->lokasi,
+                'lantai' => $ruangan->lantai,
+                'fasilitas' => $ruangan->fasilitas,
+                'status' => $ruangan->status,
+                'foto' => $ruangan->foto1,
+                'type' => 'ruangan'
+            ];
+            
+            session(['cart' => $cart]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Ruangan berhasil ditambahkan ke keranjang!',
+                'cart_count' => count($cart)
+            ]);
+            
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -94,54 +156,55 @@ class KeranjangController extends Controller
                 ], 404);
             }
             
-            $barang = Barang::find($id);
-            if (!$barang) {
-                return response()->json([
-                    'success' => false, 
-                    'message' => 'Barang tidak ditemukan'
-                ], 404);
-            }
+            $item = $cart[$id];
             
-            // Cek apakah barang masih tersedia
-            if (!$barang->bisaDipinjam(1)) {
-                return response()->json([
-                    'success' => false, 
-                    'message' => 'Barang tidak tersedia'
-                ], 400);
-            }
-            
-            $currentQty = $cart[$id]['qty'];
-            
-            if ($action === 'increase') {
-                // Check if we can increase quantity (not exceed available stock)
-                $availableStock = $barang->stok_tersedia;
-                if ($currentQty < $availableStock) {
-                    $cart[$id]['qty'] = $currentQty + 1;
-                } else {
+            if ($item['type'] === 'barang') {
+                $barang = Barang::find($item['id']);
+                if (!$barang) {
                     return response()->json([
                         'success' => false, 
-                        'message' => 'Stok tidak mencukupi. Stok tersedia: ' . $availableStock
+                        'message' => 'Barang tidak ditemukan'
+                    ], 404);
+                }
+                
+                if (!$barang->bisaDipinjam(1)) {
+                    return response()->json([
+                        'success' => false, 
+                        'message' => 'Barang tidak tersedia'
                     ], 400);
                 }
-            } elseif ($action === 'decrease') {
-                // Check if we can decrease quantity
-                if ($currentQty > 1) {
-                    $cart[$id]['qty'] = $currentQty - 1;
-                } else {
-                    // Jika jumlah akan menjadi 0, hapus item dari keranjang
-                    unset($cart[$id]);
-                    session(['cart' => $cart]);
-                    
-                    return response()->json([
-                        'success' => true,
-                        'removed' => true,
-                        'message' => 'Item dihapus dari keranjang'
-                    ]);
+                
+                $currentQty = $item['qty'];
+                
+                if ($action === 'increase') {
+                    $availableStock = $barang->stok_tersedia;
+                    if ($currentQty < $availableStock) {
+                        $cart[$id]['qty'] = $currentQty + 1;
+                    } else {
+                        return response()->json([
+                            'success' => false, 
+                            'message' => 'Stok tidak mencukupi. Stok tersedia: ' . $availableStock
+                        ], 400);
+                    }
+                } elseif ($action === 'decrease') {
+                    if ($currentQty > 1) {
+                        $cart[$id]['qty'] = $currentQty - 1;
+                    } else {
+                        unset($cart[$id]);
+                        session(['cart' => $cart]);
+                        
+                        return response()->json([
+                            'success' => true,
+                            'removed' => true,
+                            'message' => 'Item dihapus dari keranjang'
+                        ]);
+                    }
                 }
-            } else {
+            } elseif ($item['type'] === 'ruangan') {
+                // For rooms, we don't allow quantity changes since rooms are booked as whole units
                 return response()->json([
                     'success' => false, 
-                    'message' => 'Action tidak valid'
+                    'message' => 'Ruangan dipinjam sebagai satu kesatuan, tidak dapat mengubah jumlah'
                 ], 400);
             }
             
@@ -150,7 +213,6 @@ class KeranjangController extends Controller
             return response()->json([
                 'success' => true,
                 'newQty' => $cart[$id]['qty'],
-                'stock' => $barang->stok_tersedia,
                 'message' => 'Jumlah berhasil diperbarui'
             ]);
             
@@ -162,6 +224,23 @@ class KeranjangController extends Controller
         }
     }
 
+
+
+    public function kosongkanRuangan(): \Illuminate\Http\RedirectResponse
+    {
+        $cart = session()->get('cart', []);
+        
+        // Remove only room items
+        foreach ($cart as $key => $item) {
+            if ($item['type'] === 'ruangan') {
+                unset($cart[$key]);
+            }
+        }
+        
+        session(['cart' => $cart]);
+        return redirect()->route('keranjang.index')->with('success', 'Keranjang ruangan berhasil dikosongkan');
+    }
+
     public function index(): \Illuminate\View\View
     {
         // Hapus session kode peminjaman jika user melihat keranjang
@@ -169,28 +248,62 @@ class KeranjangController extends Controller
         
         $cart = session()->get('cart', []);
         
-        // Bersihkan cart dari barang yang sudah tidak ada atau tidak tersedia
-        $cleanedCart = [];
-        foreach ($cart as $itemId => $item) {
-            $barang = Barang::find($item['id']);
-            if ($barang && $barang->bisaDipinjam($item['qty'])) {
-                // Update data barang dengan informasi terbaru
-                
-                $cleanedCart[$itemId] = [
-                    'id' => $barang->id,
-                    'nama' => $barang->nama,
-                    'stok' => $barang->stok,
-                    'stok_tersedia' => $barang->stok_tersedia,
-                    'stok_dipinjam' => $barang->stok_dipinjam,
-                    'status' => $barang->status,
-                    'qty' => $item['qty']
-                ];
+        // Separate items and rooms
+        $barangItems = [];
+        $ruanganItems = [];
+        
+        foreach ($cart as $key => $item) {
+            // Handle legacy cart items that don't have 'type' field
+            if (!isset($item['type'])) {
+                // Check if it's a barang by trying to find it in barang table
+                $barang = Barang::find($item['id']);
+                if ($barang) {
+                    // It's a barang, add the type and process
+                    $item['type'] = 'barang';
+                    $cart[$key] = $item; // Update the cart with type
+                } else {
+                    // Check if it's a ruangan by trying to find it in ruangan table
+                    $ruangan = Ruangan::find($item['id']);
+                    if ($ruangan) {
+                        // It's a ruangan, add the type and process
+                        $item['type'] = 'ruangan';
+                        $cart[$key] = $item; // Update the cart with type
+                    } else {
+                        // Item not found in either table, skip it
+                        continue;
+                    }
+                }
+            }
+            
+            if ($item['type'] === 'barang') {
+                $barang = Barang::find($item['id']);
+                if ($barang && $barang->bisaDipinjam($item['qty'])) {
+                    $barangItems[$key] = array_merge($item, [
+                        'stok_tersedia' => $barang->stok_tersedia,
+                        'stok_dipinjam' => $barang->stok_dipinjam,
+                        'status' => $barang->status
+                    ]);
+                }
+            } elseif ($item['type'] === 'ruangan') {
+                $ruangan = Ruangan::find($item['id']);
+                if ($ruangan && $ruangan->bisaDipinjam($item['qty'])) {
+                    $ruanganItems[$key] = array_merge($item, [
+                        'kapasitas_tersedia' => $ruangan->kapasitas_tersedia,
+                        'kapasitas_dipinjam' => $ruangan->kapasitas_dipinjam,
+                        'status' => $ruangan->status,
+                        'kode' => $ruangan->kode,
+                        'kategori' => $ruangan->kategori,
+                        'lokasi' => $ruangan->lokasi,
+                        'lantai' => $ruangan->lantai
+                    ]);
+                }
             }
         }
         
-        // Update session cart dengan data yang sudah dibersihkan
+        // Update session cart with cleaned data
+        $cleanedCart = array_merge($barangItems, $ruanganItems);
         session(['cart' => $cleanedCart]);
         
-        return view('keranjang', compact('cleanedCart'));
+        return view('keranjang', compact('barangItems', 'ruanganItems'));
     }
 } 

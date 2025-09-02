@@ -41,5 +41,43 @@
             </div>
         </div>
     </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-primary">Ruangan yang Dipinjam</h5>
+                @if($peminjaman->detailsRuangan->count() > 0)
+                    <ul class="list-group">
+                        @foreach($peminjaman->detailsRuangan as $detail)
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ $detail->ruangan->nama ?? '-' }}</strong>
+                                @if($detail->ruangan->kode)
+                                    <br><small class="text-muted">{{ $detail->ruangan->kode }}</small>
+                                @endif
+                            </div>
+                            <span class="badge 
+                                @if($detail->ruangan->status == 'tersedia') bg-success
+                                @elseif($detail->ruangan->status == 'maintenance') bg-warning
+                                @elseif($detail->ruangan->status == 'dipinjam') bg-danger
+                                @else bg-secondary
+                                @endif">
+                                @if($detail->ruangan->status == 'tersedia') Tersedia
+                                @elseif($detail->ruangan->status == 'maintenance') Maintenance
+                                @elseif($detail->ruangan->status == 'dipinjam') Dipinjam
+                                @else {{ ucfirst($detail->ruangan->status) }}
+                                @endif
+                            </span>
+                        </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Tidak ada ruangan yang dipinjam.
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
 </div>
 @endsection 

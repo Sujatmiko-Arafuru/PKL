@@ -47,17 +47,17 @@ class PeminjamanController extends Controller
 
     public function show($id): \Illuminate\View\View
     {
-        $peminjaman = Peminjaman::with('details.barang')->findOrFail($id);
+        $peminjaman = Peminjaman::with(['details.barang', 'detailsRuangan.ruangan'])->findOrFail($id);
         return view('admin.peminjaman.show', compact('peminjaman'));
     }
 
     public function approve($id): \Illuminate\Http\RedirectResponse
     {
         try {
-            $peminjaman = Peminjaman::with('details.barang')->findOrFail($id);
+            $peminjaman = Peminjaman::with(['details.barang', 'detailsRuangan.ruangan'])->findOrFail($id);
             $oldStatus = $peminjaman->status;
             
-            // Validasi stok sebelum approve
+            // Validasi stok barang sebelum approve
             foreach ($peminjaman->details as $detail) {
                 $barang = $detail->barang;
                 if (!$barang) {
@@ -68,6 +68,18 @@ class PeminjamanController extends Controller
                 
                 if ($availableStock < $detail->jumlah) {
                     return redirect()->route('admin.peminjaman.index')->with('error', 'Stok barang "' . $barang->nama . '" tidak mencukupi untuk approve peminjaman ini. Stok tersedia: ' . $availableStock . ', diminta: ' . $detail->jumlah);
+                }
+            }
+            
+            // Validasi ruangan sebelum approve
+            foreach ($peminjaman->detailsRuangan as $detail) {
+                $ruangan = $detail->ruangan;
+                if (!$ruangan) {
+                    return redirect()->route('admin.peminjaman.index')->with('error', 'Data ruangan tidak ditemukan.');
+                }
+                
+                if (!$ruangan->bisaDipinjam()) {
+                    return redirect()->route('admin.peminjaman.index')->with('error', 'Ruangan "' . $ruangan->nama . '" tidak tersedia untuk dipinjam. Status: ' . ucfirst($ruangan->status));
                 }
             }
             
@@ -102,12 +114,23 @@ class PeminjamanController extends Controller
                 }
             }
             
+            // Update status ruangan menjadi dipinjam
+            foreach ($peminjaman->detailsRuangan as $detail) {
+                $ruangan = $detail->ruangan;
+                $ruangan->setBorrowed();
+            }
+            
             DB::commit();
             
             // Create notification for status change
             NotificationService::notifyPeminjamanStatusChange($peminjaman, $oldStatus, 'disetujui');
             
-            return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman disetujui dan stok barang berhasil diupdate.');
+            $message = 'Peminjaman disetujui dan stok barang berhasil diupdate.';
+            if ($peminjaman->detailsRuangan->count() > 0) {
+                $message .= ' Status ruangan telah diupdate menjadi dipinjam.';
+            }
+            
+            return redirect()->route('admin.peminjaman.index')->with('success', $message);
             
         } catch (\Exception $e) {
             DB::rollback();

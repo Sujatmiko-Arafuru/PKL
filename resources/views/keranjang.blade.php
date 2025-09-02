@@ -15,17 +15,6 @@
                 <strong>Format Kode:</strong> NAMA-TANGGAL-URUTAN (Contoh: JOH-20241201-0001)
             </div>
             
-            @if(session('kode_peminjaman'))
-                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-                    <i class="bi bi-receipt me-2"></i>
-                    <strong>Kode Peminjaman Anda:</strong> 
-                    <span class="badge bg-dark ms-2">{{ session('kode_peminjaman') }}</span>
-                    <br><small class="text-muted">Format: NAMA-TANGGAL-URUTAN</small>
-                    <br><small class="text-muted">Contoh: JOH-20241201-0001, SAR-20241201-0002, MIK-20241201-0003, ANA-20241201-0004, DAV-20241201-0005, EMM-20241201-0006, JAM-20241201-0007</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-            
             @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
@@ -33,10 +22,11 @@
             </div>
             @endif
             
-            @if(count($cleanedCart) > 0)
-            <div class="card shadow-sm border-0">
+            <!-- Barang Section -->
+            @if(count($barangItems) > 0)
+            <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Daftar Barang di Keranjang</h5>
+                    <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i>Daftar Barang di Keranjang</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -53,7 +43,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($cleanedCart as $item)
+                                @foreach($barangItems as $key => $item)
                                 <tr>
                                     <td style="width:80px">
                                         @php
@@ -78,17 +68,17 @@
                                     <td><span class="badge {{ $item['status'] == 'tersedia' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($item['status']) }}</span></td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <button class="btn btn-outline-secondary btn-sm me-2" onclick="updateQty({{ $item['id'] }}, 'decrease')" {{ $item['qty'] <= 1 ? 'disabled' : '' }}>
+                                            <button class="btn btn-outline-secondary btn-sm me-2" onclick="updateQty('{{ $key }}', 'decrease')" {{ $item['qty'] <= 1 ? 'disabled' : '' }}>
                                                 <i class="bi bi-dash"></i>
                                             </button>
-                                            <span class="fw-bold" id="qty-{{ $item['id'] }}">{{ $item['qty'] }}</span>
-                                                                                         <button class="btn btn-outline-secondary btn-sm ms-2" onclick="updateQty({{ $item['id'] }}, 'increase')" {{ $item['qty'] >= ($item['stok_tersedia'] ?? $item['stok']) ? 'disabled' : '' }}>
+                                            <span class="fw-bold" id="qty-{{ $key }}">{{ $item['qty'] }}</span>
+                                            <button class="btn btn-outline-secondary btn-sm ms-2" onclick="updateQty('{{ $key }}', 'increase')" {{ $item['qty'] >= ($item['stok_tersedia'] ?? $item['stok']) ? 'disabled' : '' }}>
                                                 <i class="bi bi-plus"></i>
                                             </button>
                                         </div>
                                     </td>
                                     <td>
-                                        <form action="{{ route('keranjang.hapus', $item['id']) }}" method="POST" onsubmit="return confirm('Hapus barang dari keranjang?')">
+                                        <form action="{{ route('keranjang.hapus', $key) }}" method="POST" onsubmit="return confirm('Hapus barang dari keranjang?')">
                                             @csrf
                                             <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Hapus</button>
                                         </form>
@@ -98,16 +88,127 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="d-flex justify-content-end mt-3">
-                        <a href="{{ route('peminjaman.form') }}" class="btn btn-success"><i class="bi bi-arrow-right-circle"></i> Lanjutkan Peminjaman</a>
+                </div>
+            </div>
+            @endif
+
+            <!-- Ruangan Section -->
+            @if(count($ruanganItems) > 0)
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-building me-2"></i>Daftar Ruangan di Keranjang</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Nama Ruangan</th>
+                                    <th>Lokasi</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($ruanganItems as $key => $item)
+                                <tr>
+                                    <td>
+                                        @if(isset($item['foto']))
+                                            <img src="{{ Storage::url($item['foto']) }}" 
+                                                 alt="{{ $item['nama'] }}" 
+                                                 class="rounded" 
+                                                 style="width: 60px; height: 60px; object-fit: cover;">
+                                        @else
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                 style="width: 60px; height: 60px;">
+                                                <i class="bi bi-building text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ $item['nama'] }}</strong>
+                                            @if($item['kode'])
+                                                <br><small class="text-muted">{{ $item['kode'] }}</small>
+                                            @endif
+                                            @if($item['kategori'])
+                                                <br><span class="badge bg-info">{{ $item['kategori'] }}</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <small>{{ $item['lokasi'] ?? '-' }}</small>
+                                        @if($item['lantai'])
+                                            <br><small class="text-muted">Lantai {{ $item['lantai'] }}</small>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            @if($item['status'] == 'tersedia') bg-success
+                                            @elseif($item['status'] == 'maintenance') bg-warning
+                                            @elseif($item['status'] == 'dipinjam') bg-danger
+                                            @else bg-secondary
+                                            @endif">
+                                            @if($item['status'] == 'tersedia') Tersedia
+                                            @elseif($item['status'] == 'maintenance') Maintenance
+                                            @elseif($item['status'] == 'dipinjam') Dipinjam
+                                            @else {{ ucfirst($item['status']) }}
+                                            @endif
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <form action="{{ route('keranjang.hapus', $key) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="return confirm('Yakin ingin menghapus ruangan ini dari keranjang?')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <form action="{{ route('keranjang.kosongkan-ruangan') }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-secondary" 
+                                        onclick="return confirm('Yakin ingin mengosongkan keranjang ruangan?')">
+                                    <i class="bi bi-trash me-2"></i>Kosongkan Keranjang Ruangan
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-            @else
+            @endif
+
+            @if(count($barangItems) == 0 && count($ruanganItems) == 0)
             <div class="alert alert-info">
                 <i class="bi bi-info-circle me-2"></i> Keranjang masih kosong.
             </div>
+            @else
+            <div class="d-flex justify-content-end mt-3">
+                <a href="{{ route('peminjaman.form') }}" class="btn btn-success"><i class="bi bi-arrow-right-circle"></i> Lanjutkan Peminjaman</a>
+            </div>
             @endif
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notifikasi -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+    <div id="toastKeranjang" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastKeranjangMsg">
+                Jumlah berhasil diperbarui!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     </div>
 </div>
@@ -162,8 +263,8 @@ function updateQty(itemId, action) {
             document.getElementById(`qty-${itemId}`).textContent = data.newQty;
             
             // Update button states
-            const decreaseBtn = document.querySelector(`button[onclick="updateQty(${itemId}, 'decrease')"]`);
-            const increaseBtn = document.querySelector(`button[onclick="updateQty(${itemId}, 'increase')"]`);
+            const decreaseBtn = document.querySelector(`button[onclick="updateQty('${itemId}', 'decrease')"]`);
+            const increaseBtn = document.querySelector(`button[onclick="updateQty('${itemId}', 'increase')"]`);
             
             // Disable/enable decrease button
             if (data.newQty <= 1) {
@@ -172,11 +273,15 @@ function updateQty(itemId, action) {
                 decreaseBtn.disabled = false;
             }
             
-            // Disable/enable increase button based on stock
-            if (data.newQty >= data.stock) {
+            // Disable/enable increase button based on stock/capacity
+            const item = document.querySelector(`[data-cart-key="${itemId}"]`);
+            if (item) {
+                const maxValue = item.getAttribute('max');
+                if (data.newQty >= maxValue) {
                 increaseBtn.disabled = true;
             } else {
                 increaseBtn.disabled = false;
+                }
             }
             
             // Show success message
@@ -204,6 +309,8 @@ function updateQty(itemId, action) {
         button.innerHTML = originalContent;
     });
 }
+
+
 
 function showAlert(type, message) {
     const alertDiv = document.createElement('div');

@@ -11,7 +11,7 @@ class ArsipController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Peminjaman::with(['details.barang']);
+        $query = Peminjaman::with(['details.barang', 'detailsRuangan.ruangan']);
 
         // Filter berdasarkan kode peminjaman
         if ($request->filled('kode_peminjaman')) {
@@ -61,13 +61,13 @@ class ArsipController extends Controller
 
     public function show($id)
     {
-        $peminjaman = Peminjaman::with(['details.barang'])->findOrFail($id);
+        $peminjaman = Peminjaman::with(['details.barang', 'detailsRuangan.ruangan'])->findOrFail($id);
         return view('admin.arsip.show', compact('peminjaman'));
     }
 
     public function exportPdf(Request $request)
     {
-        $query = Peminjaman::with(['details.barang']);
+        $query = Peminjaman::with(['details.barang', 'detailsRuangan.ruangan']);
 
         // Filter berdasarkan kode peminjaman
         if ($request->filled('kode_peminjaman')) {

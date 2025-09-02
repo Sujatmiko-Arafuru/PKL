@@ -144,6 +144,55 @@
             </div>
         </div>
     </div>
+    
+    <!-- Ruangan yang Dipinjam -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-building me-2"></i>Ruangan yang Dipinjam</h5>
+            </div>
+            <div class="card-body">
+                @if($peminjaman->detailsRuangan->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nama Ruangan</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($peminjaman->detailsRuangan as $detail)
+                                    <tr>
+                                        <td>{{ $detail->ruangan->nama ?? '-' }}</td>
+                                        <td class="text-center">
+                                            <span class="badge 
+                                                @if($detail->ruangan->status == 'tersedia') bg-success
+                                                @elseif($detail->ruangan->status == 'maintenance') bg-warning
+                                                @elseif($detail->ruangan->status == 'dipinjam') bg-danger
+                                                @else bg-secondary
+                                                @endif">
+                                                @if($detail->ruangan->status == 'tersedia') Tersedia
+                                                @elseif($detail->ruangan->status == 'maintenance') Maintenance
+                                                @elseif($detail->ruangan->status == 'dipinjam') Dipinjam
+                                                @else {{ ucfirst($detail->ruangan->status) }}
+                                                @endif
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="alert alert-warning mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Tidak ada ruangan yang dipinjam.
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Action Buttons -->

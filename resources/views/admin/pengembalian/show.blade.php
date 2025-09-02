@@ -261,6 +261,90 @@
         </div>
     </div>
 
+    <!-- Ruangan yang Dipinjam -->
+    @if($peminjaman->detailsRuangan->count() > 0)
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-info text-white">
+            <h6 class="mb-0">
+                <i class="bi bi-building me-2"></i>Ruangan yang Dipinjam
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nama Ruangan</th>
+                            <th>Kode</th>
+                            <th>Lokasi</th>
+                            <th>Status</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($peminjaman->detailsRuangan as $detail)
+                        <tr>
+                            <td>
+                                <strong>{{ $detail->ruangan->nama }}</strong>
+                                @if($detail->ruangan->kategori)
+                                    <br><span class="badge bg-info">{{ $detail->ruangan->kategori }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($detail->ruangan->kode)
+                                    <span class="badge bg-dark">{{ $detail->ruangan->kode }}</span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($detail->ruangan->lokasi)
+                                    <small>{{ $detail->ruangan->lokasi }}</small>
+                                    @if($detail->ruangan->lantai)
+                                        <br><small class="text-muted">Lantai {{ $detail->ruangan->lantai }}</small>
+                                    @endif
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    @if($detail->ruangan->status == 'tersedia') bg-success
+                                    @elseif($detail->ruangan->status == 'maintenance') bg-warning
+                                    @elseif($detail->ruangan->status == 'dipinjam') bg-danger
+                                    @else bg-secondary
+                                    @endif">
+                                    @if($detail->ruangan->status == 'tersedia') Tersedia
+                                    @elseif($detail->ruangan->status == 'maintenance') Maintenance
+                                    @elseif($detail->ruangan->status == 'dipinjam') Dipinjam
+                                    @else {{ ucfirst($detail->ruangan->status) }}
+                                    @endif
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <form action="{{ route('pengembalian.return-room', $peminjaman->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <input type="hidden" name="ruangan_id" value="{{ $detail->ruangan->id }}">
+                                    <button type="submit" class="btn btn-success btn-sm" 
+                                            onclick="return confirm('Yakin ingin mengembalikan ruangan {{ $detail->ruangan->nama }}?')">
+                                        <i class="bi bi-check-circle me-1"></i>Kembalikan
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="alert alert-info mt-3">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Info:</strong> Ruangan dikembalikan sebagai satu kesatuan. Status ruangan akan otomatis berubah menjadi "Tersedia" setelah dikembalikan.
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Informasi Status Pengembalian -->
     <div class="card border-0 shadow-sm mt-4">
         <div class="card-header bg-white border-0">

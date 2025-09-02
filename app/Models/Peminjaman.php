@@ -21,6 +21,11 @@ class Peminjaman extends Model
         return $this->hasMany(DetailPeminjaman::class);
     }
 
+    public function detailsRuangan()
+    {
+        return $this->hasMany(DetailPeminjamanRuangan::class);
+    }
+
     /**
      * Get status pengembalian berdasarkan jumlah barang yang dikembalikan
      */

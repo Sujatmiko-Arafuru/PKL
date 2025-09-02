@@ -19,12 +19,26 @@ class PeminjamanController extends Controller
     public function form(): \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
     {
         $cart = session()->get('cart', []);
+        
         if (empty($cart)) {
-            return redirect()->route('keranjang.index')->with('error', 'Keranjang masih kosong.');
+            return redirect()->route('dashboard')->with('error', 'Keranjang masih kosong.');
         }
+        
+        // Separate items and rooms from unified cart
+        $barangItems = [];
+        $ruanganItems = [];
+        
+        foreach ($cart as $key => $item) {
+            if ($item['type'] === 'barang') {
+                $barangItems[$key] = $item;
+            } elseif ($item['type'] === 'ruangan') {
+                $ruanganItems[$key] = $item;
+            }
+        }
+        
         // Hapus session kode peminjaman jika user mulai peminjaman baru
         session()->forget('kode_peminjaman');
-        return view('peminjaman_form', compact('cart'));
+        return view('peminjaman_form', compact('barangItems', 'ruanganItems'));
     }
 
     public function ajukan(Request $request): \Illuminate\Http\RedirectResponse
@@ -77,22 +91,32 @@ class PeminjamanController extends Controller
             }
             $cart = session()->get('cart', []);
             
-            // Filter cart untuk memastikan semua barang masih ada
-            $validCart = [];
-            foreach ($cart as $item) {
-                $barang = \App\Models\Barang::find($item['id']);
-                if ($barang && $barang->stok_tersedia >= $item['qty']) {
-                    $validCart[] = $item;
+            // Separate and filter items and rooms from unified cart
+            $validBarangItems = [];
+            $validRuanganItems = [];
+            
+            foreach ($cart as $key => $item) {
+                if ($item['type'] === 'barang') {
+                    $barang = \App\Models\Barang::find($item['id']);
+                    if ($barang && $barang->stok_tersedia >= $item['qty']) {
+                        $validBarangItems[$key] = $item;
+                    }
+                } elseif ($item['type'] === 'ruangan') {
+                    $ruangan = \App\Models\Ruangan::find($item['id']);
+                    if ($ruangan && $ruangan->bisaDipinjam()) {
+                        $validRuanganItems[$key] = $item;
+                    }
                 }
             }
             
-            // Jika tidak ada barang valid di cart
-            if (empty($validCart)) {
+            // Jika tidak ada item valid di cart
+            if (empty($validBarangItems) && empty($validRuanganItems)) {
                 session()->forget('cart');
-                return redirect()->route('keranjang.index')->with('error', 'Keranjang kosong atau semua barang tidak tersedia.');
+                return redirect()->route('dashboard')->with('error', 'Keranjang kosong atau semua item tidak tersedia.');
             }
             
-            $formData['cart'] = $validCart;
+            $formData['validBarangItems'] = $validBarangItems;
+            $formData['validRuanganItems'] = $validRuanganItems;
             // Generate kode peminjaman otomatis dengan format NAMAAWAL-TANGGALMULAIDIPINJAM-000X
             $namaAwal = strtoupper(substr($formData['nama'], 0, 3)); // Ambil 3 huruf pertama nama
             $tanggalMulai = date('Ymd', strtotime($formData['tanggal_mulai']));
@@ -135,7 +159,7 @@ class PeminjamanController extends Controller
                 'kode_peminjaman' => $kodePeminjaman,
             ]);
                 // Simpan detail barang yang dipinjam
-                foreach ($formData['cart'] as $item) {
+                foreach ($formData['validBarangItems'] as $key => $item) {
                     // Validasi barang masih ada di database
                     $barang = \App\Models\Barang::find($item['id']);
                     if (!$barang) {
@@ -158,10 +182,39 @@ class PeminjamanController extends Controller
                         
                         // JANGAN kurangi stok barang saat submit request
                         // Stock hanya dikurangi saat admin approve
-                                } catch (\Exception $e) {
+                    } catch (\Exception $e) {
                         // Jika terjadi error, rollback dan kembalikan error
                         DB::rollback();
                         return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan detail peminjaman: ' . $e->getMessage()]);
+                    }
+                }
+                
+                // Simpan detail ruangan yang dipinjam
+                foreach ($formData['validRuanganItems'] as $key => $item) {
+                    // Validasi ruangan masih ada di database
+                    $ruangan = \App\Models\Ruangan::find($item['id']);
+                    if (!$ruangan) {
+                        // Jika ruangan tidak ditemukan, hapus dari cart dan lanjutkan
+                        continue;
+                    }
+                    
+                    // Validasi ruangan masih bisa dipinjam
+                    if (!$ruangan->bisaDipinjam()) {
+                        return redirect()->back()->withErrors(['ruangan' => 'Ruangan "' . $ruangan->nama . '" tidak tersedia untuk dipinjam. Status: ' . ucfirst($ruangan->status)]);
+                    }
+                    
+                    try {
+                        \App\Models\DetailPeminjamanRuangan::create([
+                            'peminjaman_id' => $peminjaman->id,
+                            'ruangan_id' => $item['id'],
+                        ]);
+                        
+                        // JANGAN ubah status ruangan saat submit request
+                        // Status hanya diubah saat admin approve
+                    } catch (\Exception $e) {
+                        // Jika terjadi error, rollback dan kembalikan error
+                        DB::rollback();
+                        return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan detail peminjaman ruangan: ' . $e->getMessage()]);
                     }
                 }
                 
@@ -173,8 +226,8 @@ class PeminjamanController extends Controller
                 
                 // Hapus session cart
                 session()->forget('cart');
-                // Simpan kode peminjaman di session untuk ditampilkan di sidebar
-                session(['kode_peminjaman' => $kodePeminjaman]);
+                // Hapus session kode peminjaman agar tidak ditampilkan lagi
+                session()->forget('kode_peminjaman');
                 return redirect()->route('dashboard')->with('success', 'Peminjaman berhasil diajukan! Kode Peminjaman: ' . $kodePeminjaman);
                 
             } catch (\Exception $e) {

@@ -34,17 +34,130 @@
                 <i class="bi bi-info-circle me-2"></i>
                 <strong>Format Kode:</strong> NAMA-TANGGAL-URUTAN (Contoh: JOH-20241201-0001)
             </div>
-            
-            @if(session('kode_peminjaman'))
-                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-                    <i class="bi bi-receipt me-2"></i>
-                    <strong>Kode Peminjaman Anda:</strong> 
-                    <span class="badge bg-dark ms-2">{{ session('kode_peminjaman') }}</span>
-                    <br><small class="text-muted">Format: NAMA-TANGGAL-URUTAN</small>
-                    <br><small class="text-muted">Contoh: JOH-20241201-0001, SAR-20241201-0002, MIK-20241201-0003, ANA-20241201-0004, DAV-20241201-0005, EMM-20241201-0006, JAM-20241201-0007</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+            <!-- Barang yang Dipilih -->
+            @if(!empty($barangItems))
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="bi bi-box-seam me-2"></i>Barang yang Dipilih</h6>
                 </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Nama Barang</th>
+                                    <th>Jumlah</th>
+                                    <th>Stok Tersedia</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($barangItems as $key => $item)
+                                <tr>
+                                    <td>
+                                        @if(isset($item['foto']))
+                                            <img src="{{ Storage::url($item['foto']) }}" alt="{{ $item['nama'] }}" 
+                                                 class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                        @else
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                 style="width: 50px; height: 50px;">
+                                                <i class="bi bi-box-seam text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <strong>{{ $item['nama'] }}</strong>
+                                        @if(isset($item['kode']))
+                                            <br><small class="text-muted">{{ $item['kode'] }}</small>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ $item['qty'] }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-success">{{ $item['stok_tersedia'] }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">Tersedia</span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
             @endif
+
+            <!-- Ruangan yang Dipilih -->
+            @if(!empty($ruanganItems))
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="bi bi-building me-2"></i>Ruangan yang Dipilih</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Nama Ruangan</th>
+                                    <th>Lokasi</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($ruanganItems as $key => $item)
+                                <tr>
+                                    <td>
+                                        @if(isset($item['foto']))
+                                            <img src="{{ Storage::url($item['foto']) }}" alt="{{ $item['nama'] }}" 
+                                                 class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                        @else
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                 style="width: 50px; height: 50px;">
+                                                <i class="bi bi-building text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <strong>{{ $item['nama'] }}</strong>
+                                        @if(isset($item['kode']))
+                                            <br><small class="text-muted">{{ $item['kode'] }}</small>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <small>{{ $item['lokasi'] ?? '-' }}</small>
+                                        @if(isset($item['lantai']))
+                                            <br><small class="text-muted">Lantai {{ $item['lantai'] }}</small>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            @if($item['status'] == 'tersedia') bg-success
+                                            @elseif($item['status'] == 'maintenance') bg-warning
+                                            @elseif($item['status'] == 'dipinjam') bg-danger
+                                            @else bg-secondary
+                                            @endif">
+                                            @if($item['status'] == 'tersedia') Tersedia
+                                            @elseif($item['status'] == 'maintenance') Maintenance
+                                            @elseif($item['status'] == 'dipinjam') Dipinjam
+                                            @else {{ ucfirst($item['status']) }}
+                                            @endif
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @endif
+            
+
             
             @if($errors->any())
                 <div class="alert alert-danger">
