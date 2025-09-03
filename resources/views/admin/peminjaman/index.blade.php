@@ -63,132 +63,146 @@
         </div>
     </div>
 
-    <!-- Table Section -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-white border-0">
-            <h6 class="mb-0 text-primary fw-semibold">
-                <i class="bi bi-table me-2"></i>Daftar Peminjaman
-            </h6>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kode Unik</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Nama & Unit</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kegiatan</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Periode</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Tanggal Pengajuan</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">Status</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">No. HP</th>
-                            <th class="border-0 px-3 py-3 text-muted small fw-semibold text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        @forelse($peminjamans as $p)
-                        <tr class="border-bottom">
-                            <td class="px-3 py-3">
-                                <span class="badge bg-dark">{{ $p->kode_peminjaman }}</span>
-                            </td>
-                            <td class="px-3 py-3">
-                                <div class="fw-semibold text-dark">{{ $p->nama }}</div>
-                                <small class="text-muted">{{ $p->unit }}</small>
-                            </td>
-                            <td class="px-3 py-3">
-                                <div class="fw-medium" title="{{ $p->nama_kegiatan }}">
-                                    {{ Str::limit($p->nama_kegiatan, 50) }}
-                                </div>
-                            </td>
-                            <td class="px-3 py-3">
-                                <div class="mb-2">
-                                    <small class="text-muted">Tanggal Mulai</small>
-                                    <div>{{ format_tanggal($p->tanggal_mulai) }}</div>
-                                </div>
-                                <div class="mb-2">
-                                    <small class="text-muted">Tanggal Selesai</small>
-                                    <div>{{ format_tanggal($p->tanggal_selesai) }}</div>
-                                </div>
-                            </td>
-                            <td class="px-3 py-3">
-                                <div class="mb-2">
-                                    <small class="text-muted">Tanggal Pengajuan</small>
-                                    <div>{{ format_tanggal($p->created_at) }}</div>
-                                    <div class="text-muted">{{ \Carbon\Carbon::parse($p->created_at)->format('H:i') }}</div>
-                                </div>
-                            </td>
-                            <td class="px-3 py-3">
-                                @if($p->status == 'menunggu')
-                                    <span class="badge bg-warning text-dark rounded-pill">
-                                        <i class="bi bi-clock me-1"></i>Menunggu
-                                    </span>
-                                @elseif($p->status == 'disetujui')
-                                    <span class="badge bg-success rounded-pill">
-                                        <i class="bi bi-check-circle me-1"></i>Disetujui
-                                    </span>
-                                @elseif($p->status == 'ditolak')
-                                    <span class="badge bg-danger rounded-pill">
-                                        <i class="bi bi-x-circle me-1"></i>Ditolak
-                                    </span>
-                                @elseif($p->status == 'pengembalian_diajukan')
-                                    <span class="badge bg-info rounded-pill">
-                                        <i class="bi bi-arrow-clockwise me-1"></i>Pengembalian Diajukan
-                                    </span>
-                                @elseif($p->status == 'dikembalikan')
-                                    <span class="badge bg-secondary rounded-pill">
-                                        <i class="bi bi-check2-all me-1"></i>Dikembalikan
-                                    </span>
-                                @elseif($p->status == 'pengembalian ditolak')
-                                    <span class="badge bg-warning text-dark rounded-pill">
-                                        <i class="bi bi-exclamation-triangle me-1"></i>Pengembalian Ditolak
-                                    </span>
-                                @else
-                                    <span class="badge bg-secondary rounded-pill">{{ ucfirst($p->status) }}</span>
-                                @endif
-                            </td>
-                            <td class="px-3 py-3">
-                                <span class="text-muted">{{ $p->no_telp }}</span>
-                            </td>
-                            <td class="px-3 py-3 text-center">
-                                <div class="d-flex gap-1 justify-content-center">
-                                    <a href="{{ route('admin.peminjaman.show', $p->id) }}" 
-                                       class="btn btn-sm btn-outline-info shadow-sm">
-                                        <i class="bi bi-eye me-1"></i>Detail
-                                    </a>
-                                    @if($p->status == 'menunggu')
-                                        <form action="{{ route('admin.peminjaman.approve', $p->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button class="btn btn-sm btn-success shadow-sm" 
-                                                    onclick="return confirm('Approve peminjaman ini?')">
-                                                <i class="bi bi-check-lg me-1"></i>Approve
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('admin.peminjaman.reject', $p->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button class="btn btn-sm btn-danger shadow-sm" 
-                                                    onclick="return confirm('Tolak peminjaman ini?')">
-                                                <i class="bi bi-x-lg me-1"></i>Reject
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="8" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="bi bi-inbox fs-1"></i>
-                                    <p class="mb-0 mt-2">Tidak ada data peminjaman</p>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+    <!-- Peminjaman Cards Section -->
+    <div class="row" id="peminjamanCards">
+        @forelse($peminjamans as $p)
+        <div class="col-lg-6 col-xl-4 mb-4">
+            <div class="card shadow-sm border-0 h-100 peminjaman-card">
+                <div class="card-header bg-white border-bottom-0 pb-0">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <span class="badge bg-dark mb-2">{{ $p->kode_peminjaman }}</span>
+                            <h6 class="mb-1 fw-semibold text-dark">{{ $p->nama }}</h6>
+                            <small class="text-muted">{{ $p->unit }}</small>
+                        </div>
+                        <div class="text-end">
+                            @if($p->status == 'menunggu')
+                                <span class="badge bg-warning text-dark rounded-pill">
+                                    <i class="bi bi-clock me-1"></i>Menunggu
+                                </span>
+                            @elseif($p->status == 'disetujui')
+                                <span class="badge bg-success rounded-pill">
+                                    <i class="bi bi-check-circle me-1"></i>Disetujui
+                                </span>
+                            @elseif($p->status == 'ditolak')
+                                <span class="badge bg-danger rounded-pill">
+                                    <i class="bi bi-x-circle me-1"></i>Ditolak
+                                </span>
+                            @elseif($p->status == 'pengembalian_diajukan')
+                                <span class="badge bg-info rounded-pill">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Pengembalian Diajukan
+                                </span>
+                            @elseif($p->status == 'dikembalikan')
+                                <span class="badge bg-secondary rounded-pill">
+                                    <i class="bi bi-check2-all me-1"></i>Dikembalikan
+                                </span>
+                            @elseif($p->status == 'pengembalian ditolak')
+                                <span class="badge bg-warning text-dark rounded-pill">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>Pengembalian Ditolak
+                                </span>
+                            @else
+                                <span class="badge bg-secondary rounded-pill">{{ ucfirst($p->status) }}</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body pt-2">
+                    <!-- Kegiatan -->
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">
+                            <i class="bi bi-calendar-event me-1"></i>Kegiatan
+                        </small>
+                        <div class="fw-medium text-dark" title="{{ $p->nama_kegiatan }}">
+                            {{ Str::limit($p->nama_kegiatan, 60) }}
+                        </div>
+                    </div>
+
+                    <!-- Periode -->
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">
+                            <i class="bi bi-calendar-range me-1"></i>Periode
+                        </small>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <small class="text-muted">Mulai</small>
+                                <div class="fw-medium">{{ format_tanggal($p->tanggal_mulai) }}</div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Selesai</small>
+                                <div class="fw-medium">{{ format_tanggal($p->tanggal_selesai) }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Tambahan -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <small class="text-muted d-block">
+                                <i class="bi bi-telephone me-1"></i>No. HP
+                            </small>
+                            <div class="fw-medium">{{ $p->no_telp }}</div>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">
+                                <i class="bi bi-clock me-1"></i>Pengajuan
+                            </small>
+                            <div class="fw-medium">{{ format_tanggal($p->created_at) }}</div>
+                            <small class="text-muted">{{ \Carbon\Carbon::parse($p->created_at)->format('H:i') }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Footer - Actions -->
+                <div class="card-footer bg-white border-top-0 pt-0">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{{ route('admin.peminjaman.show', $p->id) }}" 
+                           class="btn btn-sm btn-outline-primary flex-fill">
+                            <i class="bi bi-eye me-1"></i>Detail
+                        </a>
+                        
+                        @if($p->status == 'menunggu')
+                            <form action="{{ route('admin.peminjaman.approve', $p->id) }}" method="POST" class="flex-fill">
+                                @csrf
+                                <button class="btn btn-sm btn-success w-100" 
+                                        onclick="return confirm('Approve peminjaman ini?')">
+                                    <i class="bi bi-check-lg me-1"></i>Approve
+                                </button>
+                            </form>
+                            <form action="{{ route('admin.peminjaman.reject', $p->id) }}" method="POST" class="flex-fill">
+                                @csrf
+                                <button class="btn btn-sm btn-danger w-100" 
+                                        onclick="return confirm('Tolak peminjaman ini?')">
+                                    <i class="bi bi-x-lg me-1"></i>Reject
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
+        @empty
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    <div class="text-muted">
+                        <i class="bi bi-inbox fs-1"></i>
+                        <p class="mb-0 mt-2">Tidak ada data peminjaman</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endforelse
     </div>
+
+    <!-- Pagination -->
+    @if($peminjamans->hasPages())
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Pagination">
+            {{ $peminjamans->links() }}
+        </nav>
+    </div>
+    @endif
 </div>
 
 <script>
@@ -222,30 +236,17 @@ document.addEventListener('DOMContentLoaded', function() {
 <style>
 .card {
     border-radius: 0.75rem;
+    transition: all 0.3s ease;
 }
 
-.table-responsive { overflow-x: auto; }
-.table { min-width: 1100px; }
-
-.table th {
-    font-size: 0.875rem;
-    font-weight: 600;
-    white-space: nowrap;
+.peminjaman-card {
+    border: 1px solid #e9ecef;
 }
 
-.table td {
-    vertical-align: middle;
-    white-space: nowrap;
+.peminjaman-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
-
-.table th:nth-child(1), .table td:nth-child(1) { min-width: 150px; }
-.table th:nth-child(2), .table td:nth-child(2) { min-width: 200px; }
-.table th:nth-child(3), .table td:nth-child(3) { min-width: 220px; }
-.table th:nth-child(4), .table td:nth-child(4) { min-width: 220px; }
-.table th:nth-child(5), .table td:nth-child(5) { min-width: 200px; }
-.table th:nth-child(6), .table td:nth-child(6) { min-width: 140px; }
-.table th:nth-child(7), .table td:nth-child(7) { min-width: 160px; }
-.table th:nth-child(8), .table td:nth-child(8) { min-width: 140px; text-align:center; }
 
 .badge {
     font-size: 0.75rem;
@@ -253,10 +254,71 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .btn-sm {
     font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
 }
 
-.table-hover tbody tr:hover {
-    background-color: rgba(13, 110, 253, 0.05);
+.card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.card-footer {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .col-lg-6 {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-sm {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Animation for cards */
+.peminjaman-card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Status badge colors */
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.badge.bg-info {
+    background-color: #0dcaf0 !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
 }
 </style>
 @endsection 

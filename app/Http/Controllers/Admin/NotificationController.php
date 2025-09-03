@@ -92,11 +92,14 @@ class NotificationController extends Controller
      */
     public function getPeminjamanNotifications(): JsonResponse
     {
-        $peminjamanCount = NotificationService::getUnreadCountByType('peminjaman_baru');
+        // Count peminjaman yang menunggu persetujuan (status = 'menunggu')
+        $peminjamanMenungguCount = \App\Models\Peminjaman::where('status', 'menunggu')->count();
+        
+        // Get recent notifications for peminjaman
         $recentPeminjaman = NotificationService::getRecentNotifications(5);
         
         return response()->json([
-            'peminjaman_unread_count' => $peminjamanCount,
+            'peminjaman_unread_count' => $peminjamanMenungguCount,
             'recent_peminjaman' => $recentPeminjaman
         ]);
     }

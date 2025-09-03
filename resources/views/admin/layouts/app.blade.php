@@ -170,7 +170,8 @@
                         this.badge.style.display = 'flex';
                         
                         // Add sound notification for new notifications
-                        if (data.peminjaman_unread_count > parseInt(this.badge.textContent || 0)) {
+                        const currentCount = parseInt(this.badge.textContent || 0);
+                        if (data.peminjaman_unread_count > currentCount) {
                             this.playNotificationSound();
                         }
                     } else {

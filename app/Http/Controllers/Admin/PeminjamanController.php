@@ -35,8 +35,8 @@ class PeminjamanController extends Controller
             $query->orderBy('created_at', 'desc');
         }
         
-        // Tanpa pagination - tampilkan semua data
-        $peminjamans = $query->get();
+        // Dengan pagination - tampilkan 12 data per halaman
+        $peminjamans = $query->paginate(12);
         
         // Data untuk tabel terpisah (tanpa pagination)
         $menunggu = Peminjaman::where('status', 'menunggu')->orderBy('created_at', 'desc')->get();
