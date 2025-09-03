@@ -125,6 +125,15 @@
     
     <!-- Notification System Script -->
     <script>
+        // Reset badge immediately when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const badge = document.getElementById('peminjamanNotificationBadge');
+            if (badge) {
+                badge.textContent = '0';
+                badge.style.display = 'none';
+            }
+        });
+        
         class NotificationSystem {
             constructor() {
                 this.badge = document.getElementById('peminjamanNotificationBadge');
@@ -135,6 +144,13 @@
             init() {
                 console.log('NotificationSystem initialized');
                 console.log('Badge element:', this.badge);
+                
+                // Reset badge to ensure it's hidden initially
+                if (this.badge) {
+                    this.badge.textContent = '0';
+                    this.badge.style.display = 'none';
+                }
+                
                 this.updateNotificationCount();
                 this.startAutoUpdate();
                 this.setupEventListeners();
@@ -159,6 +175,7 @@
                         }
                     } else {
                         console.log('Hiding badge - no unread notifications');
+                        this.badge.textContent = '0';
                         this.badge.style.display = 'none';
                     }
                 } catch (error) {
