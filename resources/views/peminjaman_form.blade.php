@@ -247,6 +247,7 @@
                             </div>
                         </div>
                         
+                        @if(!empty($barangItems))
                         <h5 class="mb-3"><i class="bi bi-box-seam me-2"></i>Barang yang Dipinjam:</h5>
                         <div class="table-responsive mb-3">
                             <table class="table align-middle table-bordered">
@@ -257,7 +258,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($cart as $item)
+                                    @foreach($barangItems as $item)
                                     <tr>
                                         <td>{{ $item['nama'] }}</td>
                                         <td><span class="badge bg-primary">{{ $item['qty'] }}</span></td>
@@ -266,6 +267,29 @@
                                 </tbody>
                             </table>
                         </div>
+                        @endif
+                        
+                        @if(!empty($ruanganItems))
+                        <h5 class="mb-3"><i class="bi bi-building me-2"></i>Ruangan yang Dipinjam:</h5>
+                        <div class="table-responsive mb-3">
+                            <table class="table align-middle table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nama Ruangan</th>
+                                        <th>Lokasi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($ruanganItems as $item)
+                                    <tr>
+                                        <td>{{ $item['nama'] }}</td>
+                                        <td>{{ $item['lokasi'] ?? '-' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        @endif
                         
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-info" onclick="testForm()">

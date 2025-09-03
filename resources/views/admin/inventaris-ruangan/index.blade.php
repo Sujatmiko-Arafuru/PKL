@@ -115,43 +115,59 @@
         </div>
         <div class="card-body p-0">
             @if($ruangans->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
+                <div class="table-responsive" style="overflow-x: auto;">
+                    <table class="table table-hover mb-0" style="min-width: 800px;">
                         <thead class="table-light">
                             <tr>
-                                <th class="border-0">Foto</th>
-                                <th class="border-0">Nama Ruangan</th>
-                                <th class="border-0">Status</th>
-                                <th class="border-0">Deskripsi</th>
-                                
+                                <th class="border-0 px-3 py-3 text-muted small fw-semibold">Foto</th>
+                                <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kode Ruangan</th>
+                                <th class="border-0 px-3 py-3 text-muted small fw-semibold">Nama Ruangan</th>
+                                <th class="border-0 px-3 py-3 text-muted small fw-semibold">Lokasi</th>
+                                <th class="border-0 px-3 py-3 text-muted small fw-semibold">Status</th>
+                                <th class="border-0 px-3 py-3 text-muted small fw-semibold">Deskripsi</th>
+                                <th class="border-0 px-3 py-3 text-muted small fw-semibold">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($ruangans as $ruangan)
-                            <tr>
-                                <td class="align-middle">
+                            <tr class="border-bottom">
+                                <td class="px-3 py-3">
                                     @if($ruangan->hasPhotos())
-                                        <img src="{{ Storage::url($ruangan->main_photo) }}" 
-                                             alt="{{ $ruangan->nama }}" 
-                                             class="rounded" 
-                                             style="width: 50px; height: 50px; object-fit: cover;">
+                                        <div class="position-relative">
+                                            <img src="{{ Storage::url($ruangan->main_photo) }}" 
+                                                 alt="{{ $ruangan->nama }}" 
+                                                 class="rounded" 
+                                                 style="width: 60px; height: 60px; object-fit: cover;">
+                                            @if($ruangan->photo_count > 1)
+                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" 
+                                                      style="font-size: 0.6rem; transform: translate(-50%, -50%);">
+                                                    +{{ $ruangan->photo_count - 1 }}
+                                                </span>
+                                            @endif
+                                        </div>
                                     @else
                                         <div class="bg-light rounded d-flex align-items-center justify-content-center" 
-                                             style="width: 50px; height: 50px;">
+                                             style="width: 60px; height: 60px;">
                                             <i class="bi bi-building text-muted"></i>
                                         </div>
                                     @endif
                                 </td>
-                                <td class="align-middle">
+                                <td class="px-3 py-3">
+                                    <div class="fw-semibold text-dark">{{ $ruangan->kode ?? '-' }}</div>
+                                </td>
+                                <td class="px-3 py-3">
                                     <div class="fw-semibold text-dark">{{ $ruangan->nama }}</div>
                                 </td>
-                                <td class="align-middle">
+                                <td class="px-3 py-3">
+                                    <div class="text-muted">{{ $ruangan->lokasi ?? '-' }}</div>
+                                </td>
+                                <td class="px-3 py-3">
                                     <span class="badge 
                                         @if($ruangan->status == 'tersedia') bg-success
                                         @elseif($ruangan->status == 'maintenance') bg-warning
                                         @elseif($ruangan->status == 'dipinjam') bg-danger
                                         @else bg-secondary
-                                        @endif">
+                                        @endif rounded-pill fs-6">
                                         @if($ruangan->status == 'tersedia') Tersedia
                                         @elseif($ruangan->status == 'maintenance') Maintenance
                                         @elseif($ruangan->status == 'dipinjam') Dipinjam
@@ -159,12 +175,37 @@
                                         @endif
                                     </span>
                                 </td>
-                                <td class="align-middle">
+                                <td class="px-3 py-3">
                                     <div class="text-muted" title="{{ $ruangan->deskripsi }}">
                                         {{ Str::limit($ruangan->deskripsi, 40) }}
                                     </div>
                                 </td>
-                                
+                                <td class="px-3 py-3">
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('admin.inventaris-ruangan.show', $ruangan->id) }}" 
+                                           class="btn btn-sm btn-outline-primary" 
+                                           title="Detail">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.inventaris-ruangan.edit', $ruangan->id) }}" 
+                                           class="btn btn-sm btn-outline-warning" 
+                                           title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form action="{{ route('admin.inventaris-ruangan.destroy', $ruangan->id) }}" 
+                                              method="POST" 
+                                              class="d-inline" 
+                                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus ruangan ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-outline-danger" 
+                                                    title="Hapus">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

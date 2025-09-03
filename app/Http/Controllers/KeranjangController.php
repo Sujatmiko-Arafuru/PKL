@@ -286,10 +286,8 @@ class KeranjangController extends Controller
                 }
             } elseif ($item['type'] === 'ruangan') {
                 $ruangan = Ruangan::find($item['id']);
-                if ($ruangan && $ruangan->bisaDipinjam($item['qty'])) {
+                if ($ruangan && $ruangan->bisaDipinjam()) {
                     $ruanganItems[$key] = array_merge($item, [
-                        'kapasitas_tersedia' => $ruangan->kapasitas_tersedia,
-                        'kapasitas_dipinjam' => $ruangan->kapasitas_dipinjam,
                         'status' => $ruangan->status,
                         'kode' => $ruangan->kode,
                         'kategori' => $ruangan->kategori,

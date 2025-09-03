@@ -52,7 +52,9 @@ Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->nam
     // CRUD Inventaris Barang
     Route::resource('inventaris', InventarisController::class);
     // CRUD Inventaris Ruangan
-    Route::resource('inventaris-ruangan', InventarisRuanganController::class);
+    Route::resource('inventaris-ruangan', InventarisRuanganController::class)->parameters([
+        'inventaris-ruangan' => 'ruangan'
+    ]);
     // Kelola Peminjaman
     Route::get('peminjaman', [AdminPeminjamanController::class, 'index'])->name('peminjaman.index');
     Route::get('peminjaman/{id}', [AdminPeminjamanController::class, 'show'])->name('peminjaman.show');

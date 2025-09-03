@@ -64,6 +64,7 @@ class InventarisRuanganController extends Controller
             'lantai' => 'nullable|string|max:50',
             'lokasi' => 'nullable|string|max:255',
             'fasilitas' => 'nullable|string',
+            'status' => 'required|in:tersedia,maintenance,dipinjam,tidak tersedia',
             'foto1' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'foto2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'foto3' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -71,7 +72,7 @@ class InventarisRuanganController extends Controller
 
         $data = $request->only([
             'nama', 'deskripsi', 'kode', 'kategori', 
-            'lantai', 'lokasi', 'fasilitas'
+            'lantai', 'lokasi', 'fasilitas', 'status'
         ]);
 
         // Handle photo uploads
@@ -90,18 +91,22 @@ class InventarisRuanganController extends Controller
             ->with('success', 'Ruangan berhasil ditambahkan!');
     }
 
-    public function show(Ruangan $ruangan)
+    public function show($id)
     {
+        $ruangan = Ruangan::findOrFail($id);
         return view('admin.inventaris-ruangan.show', compact('ruangan'));
     }
 
-    public function edit(Ruangan $ruangan)
+    public function edit($id)
     {
+        $ruangan = Ruangan::findOrFail($id);
         return view('admin.inventaris-ruangan.edit', compact('ruangan'));
     }
 
-    public function update(Request $request, Ruangan $ruangan)
+    public function update(Request $request, $id)
     {
+        $ruangan = Ruangan::findOrFail($id);
+        
         $request->validate([
             'nama' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
@@ -110,6 +115,7 @@ class InventarisRuanganController extends Controller
             'lantai' => 'nullable|string|max:50',
             'lokasi' => 'nullable|string|max:255',
             'fasilitas' => 'nullable|string',
+            'status' => 'required|in:tersedia,maintenance,dipinjam,tidak tersedia',
             'foto1' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'foto2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'foto3' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -117,7 +123,7 @@ class InventarisRuanganController extends Controller
 
         $data = $request->only([
             'nama', 'deskripsi', 'kode', 'kategori', 
-            'lantai', 'lokasi', 'fasilitas'
+            'lantai', 'lokasi', 'fasilitas', 'status'
         ]);
 
         // Handle photo uploads
@@ -141,8 +147,10 @@ class InventarisRuanganController extends Controller
             ->with('success', 'Ruangan berhasil diperbarui!');
     }
 
-    public function destroy(Ruangan $ruangan)
+    public function destroy($id)
     {
+        $ruangan = Ruangan::findOrFail($id);
+        
         // Delete photos from storage
         for ($i = 1; $i <= 3; $i++) {
             if ($ruangan->{"foto{$i}"}) {
