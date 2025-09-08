@@ -152,24 +152,12 @@
                             </div>
                             @endif
 
-                            @if($ruangan->fasilitas)
-                            <div class="mb-4">
-                                <h6 class="text-muted small mb-2">Fasilitas</h6>
-                                <div class="bg-light rounded p-3">
-                                    <p class="mb-0">{{ $ruangan->fasilitas }}</p>
-                                </div>
-                            </div>
-                            @endif
-
                             @if($ruangan->lokasi)
                             <div class="mb-4">
                                 <h6 class="text-muted small mb-2">Lokasi</h6>
                                 <div class="bg-light rounded p-3">
                                     <p class="mb-0">
                                         <i class="bi bi-geo-alt me-2"></i>{{ $ruangan->lokasi }}
-                                        @if($ruangan->lantai)
-                                            <br><i class="bi bi-layers me-2"></i>Lantai {{ $ruangan->lantai }}
-                                        @endif
                                     </p>
                                 </div>
                             </div>

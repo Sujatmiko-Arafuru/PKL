@@ -20,7 +20,7 @@ class InventarisRuanganController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
                   ->orWhere('kode', 'like', "%{$search}%")
-                  ->orWhere('kategori', 'like', "%{$search}%")
+                  ->orWhere('lokasi', 'like', "%{$search}%")
                   ->orWhere('deskripsi', 'like', "%{$search}%");
             });
         }
@@ -30,22 +30,14 @@ class InventarisRuanganController extends Controller
             $query->where('status', $request->status);
         }
         
-        // Filter by kategori
-        if ($request->filled('kategori')) {
-            $query->where('kategori', $request->kategori);
-        }
-        
         $ruangans = $query->orderBy('created_at', 'desc')->paginate(10);
         
         // Get statistics
         $totalRuangan = Ruangan::count();
         $ruanganTersedia = Ruangan::where('status', 'tersedia')->count();
         
-        // Get unique categories for filter
-        $kategoris = Ruangan::whereNotNull('kategori')->distinct()->pluck('kategori');
-        
         return view('admin.inventaris-ruangan.index', compact(
-            'ruangans', 'totalRuangan', 'ruanganTersedia', 'kategoris'
+            'ruangans', 'totalRuangan', 'ruanganTersedia'
         ));
     }
 
@@ -60,10 +52,7 @@ class InventarisRuanganController extends Controller
             'nama' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
             'kode' => 'nullable|string|max:50',
-            'kategori' => 'nullable|string|max:100',
-            'lantai' => 'nullable|string|max:50',
             'lokasi' => 'nullable|string|max:255',
-            'fasilitas' => 'nullable|string',
             'status' => 'required|in:tersedia,maintenance,dipinjam,tidak tersedia',
             'foto1' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'foto2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -71,8 +60,7 @@ class InventarisRuanganController extends Controller
         ]);
 
         $data = $request->only([
-            'nama', 'deskripsi', 'kode', 'kategori', 
-            'lantai', 'lokasi', 'fasilitas', 'status'
+            'nama', 'deskripsi', 'kode', 'lokasi', 'status'
         ]);
 
         // Handle photo uploads
@@ -111,10 +99,7 @@ class InventarisRuanganController extends Controller
             'nama' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
             'kode' => 'nullable|string|max:50',
-            'kategori' => 'nullable|string|max:100',
-            'lantai' => 'nullable|string|max:50',
             'lokasi' => 'nullable|string|max:255',
-            'fasilitas' => 'nullable|string',
             'status' => 'required|in:tersedia,maintenance,dipinjam,tidak tersedia',
             'foto1' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'foto2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -122,8 +107,7 @@ class InventarisRuanganController extends Controller
         ]);
 
         $data = $request->only([
-            'nama', 'deskripsi', 'kode', 'kategori', 
-            'lantai', 'lokasi', 'fasilitas', 'status'
+            'nama', 'deskripsi', 'kode', 'lokasi', 'status'
         ]);
 
         // Handle photo uploads

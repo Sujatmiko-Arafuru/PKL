@@ -49,14 +49,6 @@
                             <div class="text-dark">{{ $ruangan->lokasi ?? 'Tidak ada lokasi' }}</div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold text-muted">Lantai</label>
-                            <div class="text-dark">{{ $ruangan->lantai ?? 'Tidak ada lantai' }}</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold text-muted">Kategori</label>
-                            <div class="text-dark">{{ $ruangan->kategori ?? 'Tidak ada kategori' }}</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold text-muted">Status</label>
                             <div>
                                 <span class="badge 
@@ -77,12 +69,6 @@
                             <label class="form-label fw-bold text-muted">Deskripsi</label>
                             <div class="text-dark">{{ $ruangan->deskripsi ?? 'Tidak ada deskripsi' }}</div>
                         </div>
-                        @if($ruangan->fasilitas)
-                        <div class="col-12 mb-3">
-                            <label class="form-label fw-bold text-muted">Fasilitas</label>
-                            <div class="text-dark">{{ $ruangan->fasilitas }}</div>
-                        </div>
-                        @endif
                     </div>
                 </div>
             </div>

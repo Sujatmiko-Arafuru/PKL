@@ -330,43 +330,42 @@
                         <tr>
                             <td>
                                 <strong>{{ $detail->ruangan->nama }}</strong>
-                                @if($detail->ruangan->kategori)
-                                    <br><span class="badge bg-info">{{ $detail->ruangan->kategori }}</span>
-                                @endif
                             </td>
                             <td>
                                 @if($detail->ruangan->lokasi)
                                     <small>{{ $detail->ruangan->lokasi }}</small>
-                                    @if($detail->ruangan->lantai)
-                                        <br><small class="text-muted">Lantai {{ $detail->ruangan->lantai }}</small>
-                                    @endif
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
                             </td>
                             <td>
                                 <span class="badge 
-                                    @if($detail->ruangan->status == 'tersedia') bg-success
-                                    @elseif($detail->ruangan->status == 'maintenance') bg-warning
-                                    @elseif($detail->ruangan->status == 'dipinjam') bg-danger
-                                    @else bg-secondary
+                                    @if($detail->sudah_dikembalikan) bg-success
+                                    @else bg-warning text-dark
                                     @endif">
-                                    @if($detail->ruangan->status == 'tersedia') Tersedia
-                                    @elseif($detail->ruangan->status == 'maintenance') Maintenance
-                                    @elseif($detail->ruangan->status == 'dipinjam') Dipinjam
-                                    @else {{ ucfirst($detail->ruangan->status) }}
+                                    @if($detail->sudah_dikembalikan) Sudah Dikembalikan
+                                    @else Belum Dikembalikan
                                     @endif
                                 </span>
                             </td>
                             <td class="text-center">
-                               <form action="{{ route('admin.pengembalian.return-room', $peminjaman->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <input type="hidden" name="ruangan_id" value="{{ $detail->ruangan->id }}">
-                                    <button type="submit" class="btn btn-success btn-sm" 
-                                            onclick="return confirm('Yakin ingin mengembalikan ruangan {{ $detail->ruangan->nama }}?')">
-                                        <i class="bi bi-check-circle me-1"></i>Kembalikan
-                                    </button>
-                                </form>
+                                @if(!$detail->sudah_dikembalikan)
+                                    <form action="{{ route('admin.pengembalian.return-room', $peminjaman->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <input type="hidden" name="ruangan_id" value="{{ $detail->ruangan->id }}">
+                                        <button type="submit" class="btn btn-success btn-sm" 
+                                                onclick="return confirm('Yakin ingin mengembalikan ruangan {{ $detail->ruangan->nama }}?')">
+                                            <i class="bi bi-check-circle me-1"></i>Kembalikan
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="text-muted small">
+                                        <i class="bi bi-check-circle me-1"></i>Sudah dikembalikan
+                                        @if($detail->tanggal_dikembalikan)
+                                            <br><small>{{ \Carbon\Carbon::parse($detail->tanggal_dikembalikan)->format('d/m/Y H:i') }}</small>
+                                        @endif
+                                    </span>
+                                @endif
                             </td>
                         </tr>
                         @endforeach

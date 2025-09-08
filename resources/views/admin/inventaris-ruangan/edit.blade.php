@@ -56,19 +56,11 @@
                                 <label class="form-label fw-bold">Nama Ruangan</label>
                                 <input type="text" name="nama" class="form-control" required value="{{ old('nama', $ruangan->nama) }}">
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-12 mb-3">
                                 <label class="form-label fw-bold">Lokasi</label>
                                 <input type="text" name="lokasi" class="form-control" value="{{ old('lokasi', $ruangan->lokasi) }}">
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Lantai</label>
-                                <input type="text" name="lantai" class="form-control" value="{{ old('lantai', $ruangan->lantai) }}">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Kategori</label>
-                                <input type="text" name="kategori" class="form-control" value="{{ old('kategori', $ruangan->kategori) }}">
-                            </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-12 mb-3">
                                 <label class="form-label fw-bold">Status</label>
                                 <select name="status" class="form-select" required>
                                     <option value="tersedia" {{ old('status', $ruangan->status)=='tersedia'?'selected':'' }}>Tersedia</option>
@@ -80,10 +72,6 @@
                             <div class="col-md-12 mb-3">
                                 <label class="form-label fw-bold">Deskripsi</label>
                                 <textarea name="deskripsi" class="form-control" rows="3" placeholder="Deskripsi ruangan...">{{ old('deskripsi', $ruangan->deskripsi) }}</textarea>
-                            </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label fw-bold">Fasilitas</label>
-                                <textarea name="fasilitas" class="form-control" rows="3" placeholder="Fasilitas ruangan...">{{ old('fasilitas', $ruangan->fasilitas) }}</textarea>
                             </div>
                         </div>
 

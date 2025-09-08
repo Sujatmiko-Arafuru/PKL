@@ -110,10 +110,7 @@ class KeranjangController extends Controller
                 'nama' => $ruangan->nama,
                 'deskripsi' => $ruangan->deskripsi,
                 'kode' => $ruangan->kode,
-                'kategori' => $ruangan->kategori,
                 'lokasi' => $ruangan->lokasi,
-                'lantai' => $ruangan->lantai,
-                'fasilitas' => $ruangan->fasilitas,
                 'status' => $ruangan->status,
                 'foto' => $ruangan->foto1,
                 'type' => 'ruangan'
@@ -290,9 +287,7 @@ class KeranjangController extends Controller
                     $ruanganItems[$key] = array_merge($item, [
                         'status' => $ruangan->status,
                         'kode' => $ruangan->kode,
-                        'kategori' => $ruangan->kategori,
-                        'lokasi' => $ruangan->lokasi,
-                        'lantai' => $ruangan->lantai
+                        'lokasi' => $ruangan->lokasi
                     ]);
                 }
             }

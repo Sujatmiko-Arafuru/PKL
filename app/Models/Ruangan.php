@@ -20,10 +20,7 @@ class Ruangan extends Model
         'foto3',
         'status',
         'kode',
-        'kategori',
-        'lantai',
-        'lokasi',
-        'fasilitas'
+        'lokasi'
     ];
 
     protected static function boot()

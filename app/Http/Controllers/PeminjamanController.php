@@ -411,13 +411,13 @@ class PeminjamanController extends Controller
                     return [
                         'id' => $detail->id,
                         'ruangan_id' => $detail->ruangan_id,
+                        'sudah_dikembalikan' => $detail->sudah_dikembalikan,
+                        'tanggal_dikembalikan' => $detail->tanggal_dikembalikan,
                         'ruangan' => [
                             'id' => $detail->ruangan->id,
                             'nama' => $detail->ruangan->nama,
                             'kode' => $detail->ruangan->kode,
                             'lokasi' => $detail->ruangan->lokasi,
-                            'lantai' => $detail->ruangan->lantai,
-                            'kategori' => $detail->ruangan->kategori,
                             'status' => $detail->ruangan->status,
                         ]
                     ];

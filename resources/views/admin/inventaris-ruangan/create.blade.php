@@ -18,22 +18,9 @@
                         <input type="text" name="nama" class="form-control" value="{{ old('nama') }}" required>
                     </div>
 
-                    <div class="col-md-6">
-                        <label class="form-label">Kategori</label>
-                        <input type="text" name="kategori" class="form-control" value="{{ old('kategori') }}">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Lantai</label>
-                        <input type="text" name="lantai" class="form-control" value="{{ old('lantai') }}">
-                    </div>
-                    <div class="col-md-3">
+                    <div class="col-md-12">
                         <label class="form-label">Lokasi</label>
                         <input type="text" name="lokasi" class="form-control" value="{{ old('lokasi') }}">
-                    </div>
-
-                    <div class="col-12">
-                        <label class="form-label">Fasilitas</label>
-                        <input type="text" name="fasilitas" class="form-control" value="{{ old('fasilitas') }}">
                     </div>
 
                     <div class="col-12">

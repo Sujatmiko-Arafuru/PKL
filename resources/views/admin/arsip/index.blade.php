@@ -37,24 +37,25 @@
                     <input type="text" name="nama" class="form-control form-control-sm" 
                            placeholder="Cari nama peminjam..." value="{{ request('nama') }}">
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label text-muted small">Tanggal Mulai</label>
-                    <input type="date" name="tanggal_mulai" class="form-control form-control-sm" 
-                           value="{{ request('tanggal_mulai') }}">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label text-muted small">Tanggal Selesai</label>
-                    <input type="date" name="tanggal_selesai" class="form-control form-control-sm" 
-                           value="{{ request('tanggal_selesai') }}">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label text-muted small">Urutan</label>
-                    <select name="urut" class="form-select form-select-sm">
-                        <option value="terbaru" {{ request('urut')=='terbaru'?'selected':'' }}>Terbaru</option>
-                        <option value="terlama" {{ request('urut')=='terlama'?'selected':'' }}>Terlama</option>
+                <div class="col-md-3">
+                    <label class="form-label text-muted small">Bulan Kegiatan</label>
+                    <select name="bulan" class="form-select form-select-sm">
+                        <option value="">Pilih Bulan</option>
+                        <option value="1" {{ request('bulan')=='1'?'selected':'' }}>Januari</option>
+                        <option value="2" {{ request('bulan')=='2'?'selected':'' }}>Februari</option>
+                        <option value="3" {{ request('bulan')=='3'?'selected':'' }}>Maret</option>
+                        <option value="4" {{ request('bulan')=='4'?'selected':'' }}>April</option>
+                        <option value="5" {{ request('bulan')=='5'?'selected':'' }}>Mei</option>
+                        <option value="6" {{ request('bulan')=='6'?'selected':'' }}>Juni</option>
+                        <option value="7" {{ request('bulan')=='7'?'selected':'' }}>Juli</option>
+                        <option value="8" {{ request('bulan')=='8'?'selected':'' }}>Agustus</option>
+                        <option value="9" {{ request('bulan')=='9'?'selected':'' }}>September</option>
+                        <option value="10" {{ request('bulan')=='10'?'selected':'' }}>Oktober</option>
+                        <option value="11" {{ request('bulan')=='11'?'selected':'' }}>November</option>
+                        <option value="12" {{ request('bulan')=='12'?'selected':'' }}>Desember</option>
                     </select>
                 </div>
-                <div class="col-md-1">
+                <div class="col-md-2">
                     <label class="form-label text-muted small">&nbsp;</label>
                     <button class="btn btn-primary btn-sm w-100 shadow-sm">
                         <i class="bi bi-search me-1"></i>Filter
@@ -116,7 +117,7 @@
                         <span class="badge bg-primary ms-2">{{ $peminjamans->count() }} data</span>
                     @endif
                 </h6>
-                @if(request('kode_peminjaman') || request('nama') || request('tanggal_mulai') || request('tanggal_selesai'))
+                @if(request('kode_peminjaman') || request('nama') || request('bulan'))
                 <div class="text-muted small">
                     <i class="bi bi-funnel me-1"></i>Filter Aktif:
                     @if(request('kode_peminjaman'))
@@ -125,11 +126,15 @@
                     @if(request('nama'))
                         <span class="badge bg-primary me-1">Nama: {{ request('nama') }}</span>
                     @endif
-                    @if(request('tanggal_mulai'))
-                        <span class="badge bg-info me-1">Mulai: {{ request('tanggal_mulai') }}</span>
-                    @endif
-                    @if(request('tanggal_selesai'))
-                        <span class="badge bg-info me-1">Selesai: {{ request('tanggal_selesai') }}</span>
+                    @if(request('bulan'))
+                        @php
+                            $bulanNames = [
+                                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                                5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                                9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                            ];
+                        @endphp
+                        <span class="badge bg-info me-1">Bulan: {{ $bulanNames[request('bulan')] }}</span>
                     @endif
                     <a href="{{ route('admin.arsip.index') }}" class="btn btn-sm btn-outline-secondary ms-2">
                         <i class="bi bi-x-circle me-1"></i>Reset Filter
@@ -230,13 +235,13 @@
                                 <div class="text-muted">
                                     <i class="bi bi-inbox fs-1"></i>
                                     <p class="mb-0 mt-2">
-                                        @if(request('kode_peminjaman') || request('nama') || request('tanggal_mulai') || request('tanggal_selesai'))
+                                        @if(request('kode_peminjaman') || request('nama') || request('bulan'))
                                             Tidak ada data yang sesuai dengan filter yang dipilih
                                         @else
                                             Tidak ada data arsip
                                         @endif
                                     </p>
-                                    @if(request('kode_peminjaman') || request('nama') || request('tanggal_mulai') || request('tanggal_selesai'))
+                                    @if(request('kode_peminjaman') || request('nama') || request('bulan'))
                                         <a href="{{ route('admin.arsip.index') }}" class="btn btn-sm btn-outline-primary mt-2">
                                             <i class="bi bi-arrow-clockwise me-1"></i>Reset Filter
                                         </a>
@@ -799,21 +804,25 @@ document.addEventListener('DOMContentLoaded', function() {
                                                     <table class="table table-sm table-borderless mb-0">
                                                         <thead class="table-light">
                                                             <tr>
-                                                                <th class="text-muted small fw-semibold px-3 py-2" style="width: 70%">Nama Ruangan</th>
+                                                                <th class="text-muted small fw-semibold px-3 py-2" style="width: 50%">Nama Ruangan</th>
                                                                 <th class="text-muted small fw-semibold px-2 py-2" style="width: 30%">Lokasi</th>
+                                                                <th class="text-muted small fw-semibold px-2 py-2" style="width: 20%">Status</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             ${peminjaman.detailsRuangan.map(detail => {
+                                                                const statusText = detail.sudah_dikembalikan ? 'Sudah Dikembalikan' : 'Belum Dikembalikan';
+                                                                const statusClass = detail.sudah_dikembalikan ? 'bg-success' : 'bg-warning text-dark';
                                                                 return `
                                                                 <tr class="border-bottom">
                                                                     <td class="px-3 py-2">
                                                                         <div class="fw-semibold text-dark">${detail.ruangan.nama}</div>
-                                                                        ${detail.ruangan.kategori ? `<small class=\"text-muted\">${detail.ruangan.kategori}</small>` : ''}
                                                                     </td>
                                                                     <td class="px-2 py-2">
                                                                         <small class="text-muted">${detail.ruangan.lokasi || '-'}</small>
-                                                                        ${detail.ruangan.lantai ? `<br><small class=\"text-muted\">Lantai ${detail.ruangan.lantai}</small>` : ''}
+                                                                    </td>
+                                                                    <td class="px-2 py-2">
+                                                                        <span class="badge ${statusClass}">${statusText}</span>
                                                                     </td>
                                                                 </tr>
                                                             `}).join('')}

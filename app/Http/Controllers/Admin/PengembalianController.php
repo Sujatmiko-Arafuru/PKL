@@ -190,8 +190,11 @@ class PengembalianController extends Controller
             // Update room status to available
             $roomDetail->ruangan->setAvailable();
             
-            // Delete the room detail (since rooms are returned as whole units)
-            $roomDetail->delete();
+            // Mark room as returned instead of deleting the record
+            $roomDetail->update([
+                'sudah_dikembalikan' => true,
+                'tanggal_dikembalikan' => now()
+            ]);
             
             // Update loan status
             $this->updatePeminjamanStatus($peminjaman);
@@ -217,8 +220,10 @@ class PengembalianController extends Controller
         $totalDikembalikan = \App\Models\DetailPeminjaman::where('peminjaman_id', $peminjaman->id)
             ->sum('jumlah_dikembalikan');
         
-        // Check if there are any rooms still borrowed
-        $hasRooms = \App\Models\DetailPeminjamanRuangan::where('peminjaman_id', $peminjaman->id)->exists();
+        // Check if there are any rooms still borrowed (not returned)
+        $hasRooms = \App\Models\DetailPeminjamanRuangan::where('peminjaman_id', $peminjaman->id)
+            ->where('sudah_dikembalikan', false)
+            ->exists();
 
         if ($totalDikembalikan == 0 && !$hasRooms) {
             // Jika belum ada yang dikembalikan dan tidak ada ruangan, status tetap seperti semula
@@ -235,8 +240,12 @@ class PengembalianController extends Controller
             // Jika status menjadi dikembalikan, pastikan semua ruangan yang terkait juga dikembalikan
             $peminjaman->load('detailsRuangan.ruangan');
             foreach ($peminjaman->detailsRuangan as $detail) {
-                if ($detail->ruangan && $detail->ruangan->status === 'dipinjam') {
+                if ($detail->ruangan && $detail->ruangan->status === 'dipinjam' && !$detail->sudah_dikembalikan) {
                     $detail->ruangan->setAvailable();
+                    $detail->update([
+                        'sudah_dikembalikan' => true,
+                        'tanggal_dikembalikan' => now()
+                    ]);
                 }
             }
         }

@@ -14,7 +14,9 @@ class DetailPeminjamanRuangan extends Model
 
     protected $fillable = [
         'peminjaman_id',
-        'ruangan_id'
+        'ruangan_id',
+        'sudah_dikembalikan',
+        'tanggal_dikembalikan'
     ];
 
     public function peminjaman(): BelongsTo

@@ -21,28 +21,19 @@
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
             <form method="GET" action="{{ route('admin.inventaris-ruangan.index') }}" class="row g-3">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="search" class="form-label">Cari Ruangan</label>
                     <input type="text" class="form-control" id="search" name="search" 
-                           placeholder="Nama, kode, atau kategori..." value="{{ request('search') }}">
+                           placeholder="Nama, kode, lokasi, atau deskripsi..." value="{{ request('search') }}">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <label for="status" class="form-label">Status</label>
                     <select class="form-select" id="status" name="status">
                         <option value="">Semua Status</option>
                         <option value="tersedia" {{ request('status') == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
+                        <option value="maintenance" {{ request('status') == 'maintenance' ? 'selected' : '' }}>Maintenance</option>
+                        <option value="dipinjam" {{ request('status') == 'dipinjam' ? 'selected' : '' }}>Dipinjam</option>
                         <option value="tidak tersedia" {{ request('status') == 'tidak tersedia' ? 'selected' : '' }}>Tidak Tersedia</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label for="kategori" class="form-label">Kategori</label>
-                    <select class="form-select" id="kategori" name="kategori">
-                        <option value="">Semua Kategori</option>
-                        @foreach($kategoris as $kategori)
-                            <option value="{{ $kategori }}" {{ request('kategori') == $kategori ? 'selected' : '' }}>
-                                {{ $kategori }}
-                            </option>
-                        @endforeach
                     </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">

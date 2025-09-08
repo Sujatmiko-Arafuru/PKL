@@ -405,14 +405,18 @@ function generateDetailContent(peminjaman) {
                         <tr>
                             <th>Nama Ruangan</th>
                             <th>Lokasi</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${peminjaman.detailsRuangan.map((detail) => {
+                            const statusText = detail.sudah_dikembalikan ? 'Sudah Dikembalikan' : 'Belum Dikembalikan';
+                            const statusClass = detail.sudah_dikembalikan ? 'bg-success' : 'bg-warning text-dark';
                             return `
                             <tr>
-                                <td><strong>${detail.ruangan.nama}</strong><br>${detail.ruangan.kategori ? `<small class="text-muted">${detail.ruangan.kategori}</small>` : ''}</td>
-                                <td><small class="text-muted">${detail.ruangan.lokasi || '-'}</small> ${detail.ruangan.lantai ? `<br><small class="text-muted">Lantai ${detail.ruangan.lantai}</small>` : ''}</td>
+                                <td><strong>${detail.ruangan.nama}</strong></td>
+                                <td><small class="text-muted">${detail.ruangan.lokasi || '-'}</small></td>
+                                <td><span class="badge ${statusClass}">${statusText}</span></td>
                             </tr>
                         `}).join('')}
                     </tbody>

@@ -23,25 +23,14 @@ class ArsipController extends Controller
             $query->where('nama', 'like', '%' . $request->nama . '%');
         }
 
-        // Filter berdasarkan tanggal
-        if ($request->filled('tanggal_mulai')) {
-            $query->where('tanggal_mulai', '>=', $request->tanggal_mulai);
+        // Filter berdasarkan bulan kegiatan (tanggal_mulai)
+        if ($request->filled('bulan')) {
+            $bulan = $request->bulan;
+            $query->whereMonth('tanggal_mulai', $bulan);
         }
 
-        if ($request->filled('tanggal_selesai')) {
-            $query->where('tanggal_selesai', '<=', $request->tanggal_selesai);
-        }
-
-        // Urutan
-        if ($request->filled('urut')) {
-            if ($request->urut == 'terlama') {
-                $query->orderBy('created_at', 'asc');
-            } else {
-                $query->orderBy('created_at', 'desc');
-            }
-        } else {
-            $query->orderBy('created_at', 'desc');
-        }
+        // Urutan berdasarkan tanggal pengajuan (terbaru)
+        $query->orderBy('created_at', 'desc');
 
         $peminjamans = $query->with(['details.barang', 'detailsRuangan.ruangan'])->paginate(10);
 
@@ -79,25 +68,14 @@ class ArsipController extends Controller
             $query->where('nama', 'like', '%' . $request->nama . '%');
         }
 
-        // Filter berdasarkan tanggal
-        if ($request->filled('tanggal_mulai')) {
-            $query->where('tanggal_mulai', '>=', $request->tanggal_mulai);
+        // Filter berdasarkan bulan kegiatan (tanggal_mulai)
+        if ($request->filled('bulan')) {
+            $bulan = $request->bulan;
+            $query->whereMonth('tanggal_mulai', $bulan);
         }
 
-        if ($request->filled('tanggal_selesai')) {
-            $query->where('tanggal_selesai', '<=', $request->tanggal_selesai);
-        }
-
-        // Urutan
-        if ($request->filled('urut')) {
-            if ($request->urut == 'terlama') {
-                $query->orderBy('created_at', 'asc');
-            } else {
-                $query->orderBy('created_at', 'desc');
-            }
-        } else {
-            $query->orderBy('created_at', 'desc');
-        }
+        // Urutan berdasarkan tanggal pengajuan (terbaru)
+        $query->orderBy('created_at', 'desc');
 
         $peminjamans = $query->get();
 
@@ -105,8 +83,14 @@ class ArsipController extends Controller
         $filterInfo = [];
         if ($request->filled('kode_peminjaman')) $filterInfo['kode_peminjaman'] = $request->kode_peminjaman;
         if ($request->filled('nama')) $filterInfo['nama'] = $request->nama;
-        if ($request->filled('tanggal_mulai')) $filterInfo['tanggal_mulai'] = $request->tanggal_mulai;
-        if ($request->filled('tanggal_selesai')) $filterInfo['tanggal_selesai'] = $request->tanggal_selesai;
+        if ($request->filled('bulan')) {
+            $bulanNames = [
+                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+            ];
+            $filterInfo['bulan'] = $bulanNames[$request->bulan];
+        }
 
         $pdf = app('dompdf.wrapper');
         $pdf->loadView('admin.arsip.pdf', compact('peminjamans', 'filterInfo'));
