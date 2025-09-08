@@ -185,25 +185,78 @@
     </div>
 </div>
 
-<!-- Action Buttons -->
+<!-- Admin Notes and Quantity Adjustment -->
 @if($peminjaman->status == 'menunggu')
-<div class="card shadow-sm">
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Penyesuaian Admin</h5>
+    </div>
     <div class="card-body">
-        <h6 class="card-title text-primary mb-3"><i class="bi bi-gear me-2"></i>Aksi Peminjaman</h6>
-        <div class="d-flex gap-2">
-            <form action="{{ route('admin.peminjaman.approve', $peminjaman->id) }}" method="POST" class="d-inline">
-                @csrf
-                <button class="btn btn-success" onclick="return confirm('Approve peminjaman ini?')">
-                    <i class="bi bi-check-circle me-2"></i>Approve Peminjaman
+        <form action="{{ route('admin.peminjaman.adjust', $peminjaman->id) }}" method="POST" id="adjustForm">
+            @csrf
+            
+            <!-- Admin Notes -->
+            <div class="mb-4">
+                <label class="form-label fw-bold">Catatan Admin</label>
+                <textarea name="admin_notes" class="form-control" rows="3" placeholder="Berikan catatan untuk penyesuaian jumlah barang (opsional)">{{ old('admin_notes', $peminjaman->admin_notes) }}</textarea>
+                <div class="form-text">Catatan ini akan ditampilkan kepada peminjam untuk menjelaskan penyesuaian yang dilakukan</div>
+            </div>
+            
+            <!-- Quantity Adjustments -->
+            @if($peminjaman->details->count() > 0)
+            <div class="mb-4">
+                <h6 class="fw-bold mb-3">Penyesuaian Jumlah Barang</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nama Barang</th>
+                                <th class="text-center">Jumlah Diajukan</th>
+                                <th class="text-center">Stok Tersedia</th>
+                                <th class="text-center">Jumlah Disetujui</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($peminjaman->details as $detail)
+                            <tr>
+                                <td>{{ $detail->barang->nama ?? '-' }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary">{{ $detail->jumlah }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-info">{{ $detail->barang->stok_tersedia ?? 0 }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <input type="number" 
+                                           name="quantities[{{ $detail->id }}]" 
+                                           value="{{ old('quantities.' . $detail->id, $detail->jumlah) }}"
+                                           min="0" 
+                                           max="{{ $detail->barang->stok_tersedia ?? 0 }}"
+                                           class="form-control form-control-sm text-center" 
+                                           style="width: 80px; display: inline-block;">
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Catatan:</strong> Anda dapat mengurangi atau menambah jumlah barang yang akan disetujui. Tidak dapat menambah barang baru atau ruangan baru.
+                </div>
+            </div>
+            @endif
+            
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2">
+                <button type="submit" name="action" value="approve" class="btn btn-success" onclick="return confirm('Approve peminjaman dengan penyesuaian ini?')">
+                    <i class="bi bi-check-circle me-2"></i>Approve dengan Penyesuaian
                 </button>
-            </form>
-            <form action="{{ route('admin.peminjaman.reject', $peminjaman->id) }}" method="POST" class="d-inline">
-                @csrf
-                <button class="btn btn-danger" onclick="return confirm('Tolak peminjaman ini?')">
+                <button type="submit" name="action" value="reject" class="btn btn-danger" onclick="return confirm('Reject peminjaman ini?')">
                     <i class="bi bi-x-circle me-2"></i>Reject Peminjaman
                 </button>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 @endif

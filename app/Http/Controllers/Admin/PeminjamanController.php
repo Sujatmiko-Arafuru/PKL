@@ -177,4 +177,106 @@ class PeminjamanController extends Controller
             return redirect()->route('admin.peminjaman.index')->with('error', 'Terjadi kesalahan saat menolak peminjaman. Silakan coba lagi.');
         }
     }
+
+    public function adjust(Request $request, $id): \Illuminate\Http\RedirectResponse
+    {
+        $request->validate([
+            'action' => 'required|in:approve,reject',
+            'admin_notes' => 'nullable|string|max:1000',
+            'quantities' => 'nullable|array',
+            'quantities.*' => 'nullable|integer|min:0'
+        ]);
+
+        try {
+            $peminjaman = Peminjaman::with(['details.barang', 'detailsRuangan.ruangan'])->findOrFail($id);
+            $action = $request->input('action');
+            $adminNotes = $request->input('admin_notes');
+            $quantities = $request->input('quantities', []);
+
+            DB::beginTransaction();
+
+            // Update admin notes
+            $peminjaman->admin_notes = $adminNotes;
+
+            if ($action === 'approve') {
+                // Update quantities if provided
+                if (!empty($quantities)) {
+                    foreach ($quantities as $detailId => $newQuantity) {
+                        $detail = $peminjaman->details->find($detailId);
+                        if ($detail && $newQuantity >= 0) {
+                            $detail->jumlah = $newQuantity;
+                            $detail->save();
+                        }
+                    }
+                }
+
+                // Validate stock after quantity adjustments
+                foreach ($peminjaman->details as $detail) {
+                    $barang = $detail->barang;
+                    if (!$barang) {
+                        throw new \Exception('Data barang tidak ditemukan.');
+                    }
+                    
+                    $availableStock = $barang->stok_tersedia;
+                    
+                    if ($availableStock < $detail->jumlah) {
+                        throw new \Exception('Stok barang "' . $barang->nama . '" tidak mencukupi. Stok tersedia: ' . $availableStock . ', diminta: ' . $detail->jumlah);
+                    }
+                }
+
+                // Validate rooms
+                foreach ($peminjaman->detailsRuangan as $detail) {
+                    $ruangan = $detail->ruangan;
+                    if (!$ruangan) {
+                        throw new \Exception('Data ruangan tidak ditemukan.');
+                    }
+                    
+                    if (!$ruangan->bisaDipinjam()) {
+                        throw new \Exception('Ruangan "' . $ruangan->nama . '" tidak tersedia untuk dipinjam.');
+                    }
+                }
+
+                // Update status to approved
+                $peminjaman->status = 'disetujui';
+                $peminjaman->save();
+
+                // Update stock
+                foreach ($peminjaman->details as $detail) {
+                    $barang = $detail->barang;
+                    $newStok = max(0, $barang->stok - $detail->jumlah);
+                    $barang->stok = $newStok;
+                    $barang->save();
+                }
+
+                // Update room status
+                foreach ($peminjaman->detailsRuangan as $detail) {
+                    $detail->ruangan->setBorrowed();
+                }
+
+                $message = 'Peminjaman berhasil disetujui dengan penyesuaian.';
+                if ($adminNotes) {
+                    $message .= ' Catatan admin telah disimpan.';
+                }
+            } else {
+                // Reject
+                $peminjaman->status = 'ditolak';
+                $peminjaman->save();
+                $message = 'Peminjaman berhasil ditolak.';
+                if ($adminNotes) {
+                    $message .= ' Catatan admin telah disimpan.';
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('admin.peminjaman.index')->with('success', $message);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Error saat adjust peminjaman: ' . $e->getMessage(), [
+                'peminjaman_id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+        }
+    }
 } 

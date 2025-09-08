@@ -240,6 +240,15 @@ function generateDetailContent(peminjaman) {
                             (peminjaman.status == 'ditolak' ? 'bg-danger' : 'bg-warning text-dark'))));
     
     return `
+        ${peminjaman.admin_notes ? `
+        <div class="alert alert-info mb-4">
+            <h6 class="fw-bold mb-2">
+                <i class="bi bi-sticky me-2"></i>Catatan Admin
+            </h6>
+            <p class="mb-0">${peminjaman.admin_notes}</p>
+        </div>
+        ` : ''}
+        
         <div class="row">
             <div class="col-md-6">
                 <h6 class="fw-bold text-primary mb-3">

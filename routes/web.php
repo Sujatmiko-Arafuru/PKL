@@ -66,6 +66,7 @@ Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->nam
     Route::get('peminjaman/{id}', [AdminPeminjamanController::class, 'show'])->name('peminjaman.show');
     Route::post('peminjaman/{id}/approve', [AdminPeminjamanController::class, 'approve'])->name('peminjaman.approve');
     Route::post('peminjaman/{id}/reject', [AdminPeminjamanController::class, 'reject'])->name('peminjaman.reject');
+    Route::post('peminjaman/{id}/adjust', [AdminPeminjamanController::class, 'adjust'])->name('peminjaman.adjust');
     // Kelola Pengembalian
     Route::get('pengembalian', [PengembalianController::class, 'index'])->name('pengembalian.index');
     Route::get('pengembalian/{id}', [PengembalianController::class, 'show'])->name('pengembalian.show');

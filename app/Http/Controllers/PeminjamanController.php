@@ -386,6 +386,7 @@ class PeminjamanController extends Controller
                 'tanggal_mulai' => $peminjaman->tanggal_mulai,
                 'tanggal_selesai' => $peminjaman->tanggal_selesai,
                 'status' => $peminjaman->status,
+                'admin_notes' => $peminjaman->admin_notes,
                 'foto_peminjam' => $peminjaman->foto_peminjam ? asset('storage/' . $peminjaman->foto_peminjam) : null,
                 'bukti' => $peminjaman->bukti ? asset('storage/' . $peminjaman->bukti) : null,
                 'created_at' => $peminjaman->created_at->toISOString(),
