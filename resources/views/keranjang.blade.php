@@ -10,10 +10,6 @@
         <div class="col-md-9 col-lg-10">
             <h1 class="dashboard-title mb-3"><i class="bi bi-cart3 me-2"></i>Keranjang Peminjaman</h1>
             
-            <div class="alert alert-info mb-3">
-                <i class="bi bi-info-circle me-2"></i>
-                <strong>Format Kode:</strong> NAMA-TANGGAL-URUTAN (Contoh: JOH-20241201-0001)
-            </div>
             
             @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">

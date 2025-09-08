@@ -41,117 +41,76 @@
                 <a href="{{ route('ruangan.index') }}" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Kembali ke List Ruangan</a>
             </div>
             
-            <div class="alert alert-info mb-3">
-                <i class="bi bi-info-circle me-2"></i>
-                <strong>Format Kode:</strong> NAMA-TANGGAL-URUTAN (Contoh: JOH-20241201-0001)
-            </div>
             
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
                     <div class="row">
-                        <!-- Photo Section - Shopee Style -->
-                        @if($ruangan->hasPhotos())
+                        <!-- Photo Section - Always show, with placeholder if no photos -->
                         <div class="col-lg-8 mb-4">
                             <div class="card border-0 shadow-sm">
                                 <div class="card-header bg-white border-0">
                                     <h6 class="mb-0 text-primary fw-semibold">
-                                        <i class="bi bi-camera me-2"></i>Foto Ruangan ({{ $ruangan->photo_count }} foto)
+                                        <i class="bi bi-camera me-2"></i>Foto Ruangan 
+                                        @if($ruangan->hasPhotos())
+                                            ({{ $ruangan->photo_count }} foto)
+                                        @else
+                                            (Belum ada foto)
+                                        @endif
                                     </h6>
                                 </div>
                                 <div class="card-body p-0">
-                                    <!-- Main Photo Display -->
-                                    <div class="main-photo-container">
-                                        <div id="mainPhotoDisplay" class="main-photo">
-                                            <img src="{{ Storage::url($ruangan->photos[0]) }}" alt="Foto Utama" id="mainPhotoImage">
+                                    @if($ruangan->hasPhotos())
+                                        <!-- Main Photo Display -->
+                                        <div class="main-photo-container">
+                                            <div id="mainPhotoDisplay" class="main-photo">
+                                                <img src="{{ Storage::url($ruangan->photos[0]) }}" alt="Foto Utama" id="mainPhotoImage">
+                                            </div>
+                                            
+                                            <!-- Navigation Arrows -->
+                                            @if($ruangan->photo_count > 1)
+                                            <button class="photo-nav-btn photo-nav-prev" onclick="changeMainPhoto('prev')">
+                                                <i class="bi bi-chevron-left"></i>
+                                            </button>
+                                            <button class="photo-nav-btn photo-nav-next" onclick="changeMainPhoto('next')">
+                                                <i class="bi bi-chevron-right"></i>
+                                            </button>
+                                            @endif
                                         </div>
                                         
-                                        <!-- Navigation Arrows -->
+                                        <!-- Thumbnail Navigation -->
                                         @if($ruangan->photo_count > 1)
-                                        <button class="photo-nav-btn photo-nav-prev" onclick="changeMainPhoto('prev')">
-                                            <i class="bi bi-chevron-left"></i>
-                                        </button>
-                                        <button class="photo-nav-btn photo-nav-next" onclick="changeMainPhoto('next')">
-                                            <i class="bi bi-chevron-right"></i>
-                                        </button>
-                                        @endif
-                                    </div>
-                                    
-                                    <!-- Thumbnail Navigation -->
-                                    @if($ruangan->photo_count > 1)
-                                    <div class="thumbnail-navigation">
-                                        @foreach($ruangan->photos as $index => $photo)
-                                        <div class="thumbnail-item {{ $index === 0 ? 'active' : '' }}" 
-                                             onclick="changeMainPhoto({{ $index }})" 
-                                             data-index="{{ $index }}">
-                                            <img src="{{ Storage::url($photo) }}" alt="Thumbnail {{ $index + 1 }}">
+                                        <div class="thumbnail-navigation">
+                                            @foreach($ruangan->photos as $index => $photo)
+                                            <div class="thumbnail-item {{ $index === 0 ? 'active' : '' }}" 
+                                                 onclick="changeMainPhoto({{ $index }})" 
+                                                 data-index="{{ $index }}">
+                                                <img src="{{ Storage::url($photo) }}" alt="Thumbnail {{ $index + 1 }}">
+                                            </div>
+                                            @endforeach
                                         </div>
-                                        @endforeach
-                                    </div>
+                                        @endif
+                                    @else
+                                        <!-- Placeholder when no photos -->
+                                        <div class="main-photo-container">
+                                            <div class="main-photo d-flex align-items-center justify-content-center bg-light" style="height: 400px;">
+                                                <div class="text-center text-muted">
+                                                    <i class="bi bi-camera fs-1 mb-3"></i>
+                                                    <h5>Belum ada foto ruangan</h5>
+                                                    <p class="mb-0">Foto ruangan akan ditampilkan di sini</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
                         </div>
-                        @endif
 
                         <!-- Information Section -->
-                        <div class="col-lg-{{ $ruangan->hasPhotos() ? '4' : '12' }}">
+                        <div class="col-lg-4">
                             <div class="text-center mb-4">
                                 <h2 class="text-primary mb-3">{{ $ruangan->nama }}</h2>
                             </div>
                             
-                            <div class="row mb-4">
-                                <div class="col-md-12 mb-3">
-                                    <div class="card border-0 
-                                        @if($ruangan->status == 'tersedia') bg-success bg-opacity-10
-                                        @elseif($ruangan->status == 'maintenance') bg-warning bg-opacity-10
-                                        @elseif($ruangan->status == 'dipinjam') bg-danger bg-opacity-10
-                                        @else bg-secondary bg-opacity-10
-                                        @endif">
-                                        <div class="card-body text-center py-3">
-                                            <div class="
-                                                @if($ruangan->status == 'tersedia') bg-success bg-opacity-10
-                                                @elseif($ruangan->status == 'maintenance') bg-warning bg-opacity-10
-                                                @elseif($ruangan->status == 'dipinjam') bg-danger bg-opacity-10
-                                                @else bg-secondary bg-opacity-10
-                                                @endif rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                                                 style="width: 40px; height: 40px;">
-                                                @if($ruangan->status == 'tersedia')
-                                                    <i class="bi bi-check-circle text-success"></i>
-                                                @elseif($ruangan->status == 'maintenance')
-                                                    <i class="bi bi-tools text-warning"></i>
-                                                @elseif($ruangan->status == 'dipinjam')
-                                                    <i class="bi bi-x-circle text-danger"></i>
-                                                @else
-                                                    <i class="bi bi-question-circle text-secondary"></i>
-                                                @endif
-                                            </div>
-                                            <h6 class="mb-0 
-                                                @if($ruangan->status == 'tersedia') text-success
-                                                @elseif($ruangan->status == 'maintenance') text-warning
-                                                @elseif($ruangan->status == 'dipinjam') text-danger
-                                                @else text-secondary
-                                                @endif fw-semibold">Status Ruangan</h6>
-                                            <p class="mb-0 text-muted small">
-                                                @if($ruangan->status == 'tersedia') Tersedia untuk dipinjam
-                                                @elseif($ruangan->status == 'maintenance') Sedang dalam perawatan
-                                                @elseif($ruangan->status == 'dipinjam') Sedang dipinjam
-                                                @else {{ ucfirst($ruangan->status) }}
-                                                @endif
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            @if($ruangan->deskripsi)
-                            <div class="mb-4">
-                                <h6 class="text-muted small mb-2">Deskripsi</h6>
-                                <div class="bg-light rounded p-3">
-                                    <p class="mb-0">{{ $ruangan->deskripsi }}</p>
-                                </div>
-                            </div>
-                            @endif
-
                             @if($ruangan->lokasi)
                             <div class="mb-4">
                                 <h6 class="text-muted small mb-2">Lokasi</h6>
@@ -163,45 +122,32 @@
                             </div>
                             @endif
                             
+                            @if($ruangan->deskripsi)
+                            <div class="mb-4">
+                                <h6 class="text-muted small mb-2">Deskripsi</h6>
+                                <div class="bg-light rounded p-3">
+                                    <p class="mb-0">{{ $ruangan->deskripsi }}</p>
+                                </div>
+                            </div>
+                            @endif
+                            
                             <div class="mt-4">
                                 <form action="{{ route('keranjang.tambah-ruangan') }}" method="POST" class="d-flex flex-column align-items-start gap-2">
                                     @csrf
                                     <input type="hidden" name="ruangan_id" value="{{ $ruangan->id }}">
-                                    <button type="submit" class="btn btn-lg {{ $ruangan->status === 'tersedia' ? 'btn-primary' : 'btn-secondary' }}" {{ $ruangan->status !== 'tersedia' ? 'disabled' : '' }} style="{{ $ruangan->status !== 'tersedia' ? 'opacity: 0.6; cursor: not-allowed;' : '' }}" title="{{ $ruangan->status !== 'tersedia' ? 'Ruangan tidak tersedia untuk dipinjam. Status: ' . ucfirst($ruangan->status) : 'Klik untuk menambah ke keranjang' }}">
-                                        <i class="bi bi-cart-plus me-2"></i>
-                                        @if($ruangan->status === 'tersedia')
-                                            Tambah ke Keranjang
-                                        @else
-                                            Tidak Tersedia
-                                        @endif
-                                    </button>
+                                    @if($ruangan->bisaDipinjam())
+                                        <button type="submit" class="btn btn-success btn-lg">
+                                            <i class="bi bi-cart-plus me-2"></i>Tambah ke Keranjang
+                                        </button>
+                                    @else
+                                        <button type="button" class="btn btn-secondary btn-lg" disabled>
+                                            <i class="bi bi-cart-plus me-2"></i>Tidak Tersedia
+                                        </button>
+                                    @endif
                                 </form>
-                                @if($ruangan->status !== 'tersedia')
-                                    <small class="text-muted mt-1">
-                                        <i class="bi bi-exclamation-triangle me-1"></i>
-                                        @if($ruangan->status == 'maintenance')
-                                            Ruangan sedang dalam perawatan
-                                        @elseif($ruangan->status == 'dipinjam')
-                                            Ruangan sedang dipinjam
-                                        @else
-                                            Ruangan tidak tersedia untuk dipinjam
-                                        @endif
-                                    </small>
-                                    <div class="alert alert-warning mt-2" role="alert">
-                                        <i class="bi bi-info-circle me-2"></i>
-                                        <strong>Informasi:</strong> 
-                                        @if($ruangan->status == 'maintenance')
-                                            Ruangan ini sedang dalam perawatan dan tidak dapat dipinjam.
-                                        @elseif($ruangan->status == 'dipinjam')
-                                            Ruangan ini sedang dipinjam oleh pengguna lain.
-                                        @else
-                                            Ruangan ini tidak tersedia untuk dipinjam.
-                                        @endif
-                                    </div>
-                                @else
-                                    <div class="alert alert-info mt-2" role="alert">
-                                        <i class="bi bi-info-circle me-2"></i>
-                                        <strong>Info:</strong> Ruangan dipinjam sebagai satu kesatuan (seluruh ruangan).
+                                @if(!$ruangan->bisaDipinjam())
+                                    <div class="text-warning mt-2">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>Ruangan tidak tersedia untuk dipinjam
                                     </div>
                                 @endif
                             </div>

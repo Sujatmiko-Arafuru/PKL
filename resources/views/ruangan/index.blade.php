@@ -121,10 +121,6 @@
                 <h1 class="dashboard-title mb-0">Daftar Ruangan Tersedia</h1>
             </div>
             
-            <div class="alert alert-info mb-3">
-                <i class="bi bi-info-circle me-2"></i>
-                <strong>Format Kode:</strong> NAMA-TANGGAL-URUTAN (Contoh: JOH-20241201-0001)
-            </div>
             
             <!-- Search Form -->
             <form method="GET" action="{{ route('ruangan.search') }}" class="mb-4">
@@ -192,42 +188,31 @@
                             <p class="card-text mb-1">{{ Str::limit($ruangan->deskripsi, 60) }}</p>
                             <p>Status: 
                                 <span class="badge 
-                                    @if($ruangan->effective_status == 'tersedia') bg-success
-                                    @elseif($ruangan->effective_status == 'maintenance') bg-warning
-                                    @elseif($ruangan->effective_status == 'dipinjam') bg-danger
-                                    @else bg-secondary
+                                    @if($ruangan->bisaDipinjam()) bg-success
+                                    @else bg-warning text-dark
                                     @endif">
-                                    @if($ruangan->effective_status == 'tersedia') Tersedia
-                                    @elseif($ruangan->effective_status == 'maintenance') Maintenance
-                                    @elseif($ruangan->effective_status == 'dipinjam') Dipinjam
-                                    @else {{ ucfirst($ruangan->effective_status) }}
+                                    @if($ruangan->bisaDipinjam()) Tersedia
+                                    @else Tidak Tersedia
                                     @endif
                                 </span>
                             </p>
-                            @if($ruangan->effective_status !== 'tersedia')
+                            @if(!$ruangan->bisaDipinjam())
                                 <small class="text-muted">
-                                    <i class="bi bi-exclamation-triangle me-1"></i>
-                                    @if($ruangan->effective_status == 'maintenance')
-                                        Sedang dalam perawatan
-                                    @elseif($ruangan->effective_status == 'dipinjam')
-                                        Sedang dipinjam
-                                    @else
-                                        Tidak tersedia untuk dipinjam
-                                    @endif
+                                    <i class="bi bi-exclamation-triangle me-1"></i>Tidak tersedia untuk dipinjam
                                 </small>
                             @endif
                             <div class="mt-auto d-flex gap-2">
                                 <a href="{{ route('ruangan.detail', $ruangan->id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-info-circle"></i> Detail</a>
-                                <button class="btn btn-sm {{ $ruangan->effective_status === 'tersedia' ? 'btn-success' : 'btn-secondary' }}" 
-                                        {{ $ruangan->effective_status !== 'tersedia' ? 'disabled' : '' }}
-                                        style="{{ $ruangan->effective_status !== 'tersedia' ? 'opacity: 0.6; cursor: not-allowed;' : '' }}"
+                                <button class="btn btn-sm {{ $ruangan->bisaDipinjam() ? 'btn-success' : 'btn-secondary' }}" 
+                                        {{ !$ruangan->bisaDipinjam() ? 'disabled' : '' }}
+                                        style="{{ !$ruangan->bisaDipinjam() ? 'opacity: 0.6; cursor: not-allowed;' : '' }}"
                                         data-id="{{ $ruangan->id }}"
                                         data-nama="{{ $ruangan->nama }}"
                                         data-deskripsi="{{ $ruangan->deskripsi }}"
                                         data-status="{{ $ruangan->effective_status }}"
-                                        title="{{ $ruangan->effective_status !== 'tersedia' ? 'Ruangan tidak tersedia untuk dipinjam. Status: ' . ucfirst($ruangan->effective_status) : 'Klik untuk menambah ke keranjang' }}">
+                                        title="{{ !$ruangan->bisaDipinjam() ? 'Ruangan tidak tersedia untuk dipinjam' : 'Klik untuk menambah ke keranjang' }}">
                                     <i class="bi bi-cart-plus"></i> 
-                                    {{ $ruangan->effective_status === 'tersedia' ? 'Tambah' : 'Tidak Tersedia' }}
+                                    {{ $ruangan->bisaDipinjam() ? 'Tambah' : 'Tidak Tersedia' }}
                                 </button>
                             </div>
                         </div>

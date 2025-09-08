@@ -28,7 +28,7 @@ Route::post('/keranjang/kosongkan-ruangan', [KeranjangController::class, 'kosong
 
 // Routes untuk Ruangan
 Route::get('/list-ruangan', [RuanganController::class, 'index'])->name('ruangan.index');
-Route::get('/ruangan/{id}', [RuanganController::class, 'show'])->name('ruangan.detail');
+Route::get('/ruangan/{ruangan}', [RuanganController::class, 'show'])->name('ruangan.detail');
 Route::get('/ruangan/search', [RuanganController::class, 'search'])->name('ruangan.search');
 
 // Foto Upload Routes (untuk modal di form peminjaman)

@@ -218,10 +218,6 @@
                 <h1 class="dashboard-title mb-0">Daftar Barang Tersedia</h1>
             </div>
             
-            <div class="alert alert-info mb-3">
-                <i class="bi bi-info-circle me-2"></i>
-                <strong>Format Kode:</strong> NAMA-TANGGAL-URUTAN (Contoh: JOH-20241201-0001)
-            </div>
             
             <!-- Search Form -->
             <form method="GET" action="{{ route('dashboard') }}" class="mb-4">

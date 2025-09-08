@@ -10,20 +10,12 @@
         <div class="col-md-9 col-lg-10">
             <h1 class="dashboard-title mb-3"><i class="bi bi-people me-2"></i>List Peminjam</h1>
             
-            <div class="alert alert-info mb-3">
-                <i class="bi bi-info-circle me-2"></i>
-                <strong>Format Kode:</strong> NAMA-TANGGAL-URUTAN (Contoh: JOH-20241201-0001)
-            </div>
             
 
             
             <!-- Filter Form -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
-                    <div class="alert alert-info mb-3">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <strong>Format Kode:</strong> NAMA-TANGGAL-URUTAN (Contoh: JOH-20241201-0001)
-                    </div>
                     <form method="GET" class="row g-3">
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Kode Peminjaman</label>

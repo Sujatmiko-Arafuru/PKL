@@ -42,7 +42,7 @@ class Ruangan extends Model
             ->whereDoesntHave('peminjamanDetails', function ($q) {
                 $q->whereHas('peminjaman', function ($sub) {
                     $sub->whereIn('status', ['disetujui', 'dipinjam']);
-                });
+                })->where('sudah_dikembalikan', false);
             });
     }
 
@@ -55,6 +55,7 @@ class Ruangan extends Model
             ->whereHas('peminjaman', function ($query) {
                 $query->whereIn('status', ['disetujui', 'dipinjam']);
             })
+            ->where('sudah_dikembalikan', false)
             ->exists();
     }
 
@@ -67,6 +68,7 @@ class Ruangan extends Model
             ->whereHas('peminjaman', function ($query) {
                 $query->whereIn('status', ['disetujui', 'dipinjam']);
             })
+            ->where('sudah_dikembalikan', false)
             ->with('peminjaman')
             ->first();
     }
