@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\PeminjamanController as AdminPeminjamanController
 use App\Http\Controllers\Admin\PengembalianController;
 use App\Http\Controllers\Admin\ArsipController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\FotoUploadController;
 
 Route::get('/', [BarangController::class, 'beranda'])->name('beranda');
 Route::get('/list-barang', [BarangController::class, 'index'])->name('dashboard');
@@ -29,6 +30,11 @@ Route::post('/keranjang/kosongkan-ruangan', [KeranjangController::class, 'kosong
 Route::get('/list-ruangan', [RuanganController::class, 'index'])->name('ruangan.index');
 Route::get('/ruangan/{id}', [RuanganController::class, 'show'])->name('ruangan.detail');
 Route::get('/ruangan/search', [RuanganController::class, 'search'])->name('ruangan.search');
+
+// Foto Upload Routes (untuk modal di form peminjaman)
+Route::post('/foto/upload', [FotoUploadController::class, 'upload'])->name('foto.upload');
+Route::get('/foto/get', [FotoUploadController::class, 'getFoto'])->name('foto.get');
+Route::delete('/foto/delete', [FotoUploadController::class, 'deleteFoto'])->name('foto.delete');
 
 Route::get('/peminjaman/form', [PeminjamanController::class, 'form'])->name('peminjaman.form');
 Route::post('/peminjaman/ajukan', [PeminjamanController::class, 'ajukan'])->name('peminjaman.ajukan');
@@ -71,6 +77,7 @@ Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->nam
     Route::get('arsip', [ArsipController::class, 'index'])->name('arsip.index');
     Route::get('arsip/{id}', [ArsipController::class, 'show'])->name('arsip.show');
     Route::get('arsip/export/pdf', [ArsipController::class, 'exportPdf'])->name('arsip.export.pdf');
+    Route::get('arsip/{id}/export/pdf', [ArsipController::class, 'exportPeminjamanPdf'])->name('arsip.peminjaman.export.pdf');
     
     // Notifikasi API
     Route::prefix('notifications')->name('notifications.')->group(function () {

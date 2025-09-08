@@ -5,85 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arsip Peminjaman SarPras</title>
     <style>
-        /* Import PDF optimization CSS */
-        @import url('{{ asset('assets/css/pdf-optimization-v3.css') }}');
-        
         body {
             font-family: 'Arial', sans-serif;
-            font-size: 12px;
-            line-height: 1.4;
+            font-size: 9px;
+            line-height: 1.2;
             color: #333;
             margin: 0;
-            padding: 20px;
+            padding: 8px;
         }
         
         .header {
             text-align: center;
-            border-bottom: 3px solid #20B2AA;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+            border-bottom: 2px solid #20B2AA;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
         }
         
         .header h1 {
             color: #20B2AA;
-            font-size: 24px;
+            font-size: 16px;
             font-weight: bold;
-            margin: 0 0 5px 0;
+            margin: 0 0 3px 0;
         }
         
         .header h2 {
             color: #666;
-            font-size: 16px;
+            font-size: 11px;
             font-weight: normal;
-            margin: 0 0 10px 0;
+            margin: 0 0 5px 0;
         }
         
         .header .info {
-            font-size: 11px;
+            font-size: 8px;
             color: #888;
         }
         
         .filter-info {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 6px;
+            margin-bottom: 8px;
+            font-size: 8px;
         }
         
         .filter-info h3 {
             color: #20B2AA;
-            font-size: 14px;
-            margin: 0 0 10px 0;
+            font-size: 9px;
+            margin: 0 0 4px 0;
             border-bottom: 1px solid #dee2e6;
-            padding-bottom: 5px;
+            padding-bottom: 2px;
         }
         
         .filter-info p {
-            margin: 5px 0;
-            font-size: 11px;
+            margin: 2px 0;
+            font-size: 8px;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 10px;
+            margin-bottom: 8px;
+            font-size: 8px;
         }
         
         th {
             background: #20B2AA;
             color: white;
-            padding: 8px;
+            padding: 4px 3px;
             text-align: left;
             font-weight: bold;
             border: 1px solid #20B2AA;
+            font-size: 8px;
         }
         
         td {
-            padding: 6px 8px;
+            padding: 3px;
             border: 1px solid #dee2e6;
             vertical-align: top;
+            font-size: 8px;
         }
         
         tr:nth-child(even) {
@@ -91,9 +90,9 @@
         }
         
         .status-badge {
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 9px;
+            padding: 1px 4px;
+            border-radius: 2px;
+            font-size: 7px;
             font-weight: bold;
             color: white;
         }
@@ -105,145 +104,151 @@
         .status-pengembalian-ditolak { background: #dc3545; }
         .status-menunggu { background: #6c757d; }
         
-        .barang-list {
-            margin: 0;
-            padding: 0;
-            list-style: none;
+        .barang-text {
+            font-size: 7px;
+            line-height: 1.1;
         }
         
-        .barang-list li {
-            margin: 2px 0;
-            padding: 2px 0;
+        .barang-item {
+            margin: 1px 0;
         }
         
-        /* Styling untuk kolom barang yang dipinjam */
-        td:last-child {
-            word-wrap: break-word;
-            max-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: normal;
-            line-height: 1.2;
-            font-size: 9px;
+        /* Compact layout */
+        .nama-peminjam {
+            font-weight: bold;
+            font-size: 8px;
+        }
+        
+        .jurusan-info {
+            font-size: 7px;
+            color: #666;
+        }
+        
+        .kode-peminjaman {
+            font-size: 7px;
+            color: #888;
+        }
+        
+        .tanggal-info {
+            font-size: 7px;
+            line-height: 1.1;
+        }
+        
+        .tanggal-label {
+            font-weight: bold;
         }
         
         /* Responsive table untuk PDF */
         @media print {
+            body {
+                padding: 5px;
+            }
+            
             table {
                 page-break-inside: auto;
             }
             
             tr {
                 page-break-inside: avoid;
-                page-break-after: auto;
             }
             
             thead {
                 display: table-header-group;
             }
-            
-            tfoot {
-                display: table-footer-group;
-            }
         }
         
         .footer {
-            margin-top: 30px;
+            margin-top: 10px;
             text-align: center;
-            font-size: 10px;
+            font-size: 7px;
             color: #666;
             border-top: 1px solid #dee2e6;
-            padding-top: 15px;
-        }
-        
-        .page-break {
-            page-break-before: always;
+            padding-top: 5px;
         }
         
         .no-data {
             text-align: center;
-            padding: 40px;
+            padding: 20px;
             color: #666;
             font-style: italic;
+            font-size: 8px;
         }
     </style>
 </head>
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>ARSIP PEMINJAMAN SARANA DAN PRASARANA</h1>
-        <h2>Sistem Peminjaman Sarana dan Prasarana (SarPras)</h2>
+        <h1>ARSIP PEMINJAMAN SARPRA</h1>
         <div class="info">
-            <p>Dicetak pada: {{ format_tanggal(now(), true) }}</p>
-            <p>Total Data: {{ $peminjamans->count() }} peminjaman</p>
+            Dicetak: {{ format_tanggal(now(), true) }} | Total: {{ $peminjamans->count() }} data
         </div>
     </div>
 
     <!-- Filter Information -->
     @if(!empty($filterInfo))
     <div class="filter-info">
-        <h3>📋 Filter yang Diterapkan</h3>
+        <strong>Filter:</strong>
         @if(isset($filterInfo['kode_peminjaman']))
-            <p><strong>Kode Peminjaman:</strong> {{ $filterInfo['kode_peminjaman'] }}</p>
+            Kode: {{ $filterInfo['kode_peminjaman'] }} |
         @endif
         @if(isset($filterInfo['nama']))
-            <p><strong>Nama Peminjam:</strong> {{ $filterInfo['nama'] }}</p>
+            Nama: {{ $filterInfo['nama'] }} |
         @endif
         @if(isset($filterInfo['tanggal_mulai']))
-            <p><strong>Tanggal Mulai:</strong> {{ format_tanggal($filterInfo['tanggal_mulai']) }}</p>
+            Mulai: {{ format_tanggal($filterInfo['tanggal_mulai']) }} |
         @endif
         @if(isset($filterInfo['tanggal_selesai']))
-            <p><strong>Tanggal Selesai:</strong> {{ format_tanggal($filterInfo['tanggal_selesai']) }}</p>
+            Selesai: {{ format_tanggal($filterInfo['tanggal_selesai']) }}
         @endif
     </div>
     @endif
 
     <!-- Data Table -->
     @if($peminjamans->count() > 0)
-    <table class="pdf-table">
+    <table>
         <thead>
             <tr>
-                <th class="col-no">No</th>
-                <th class="col-nama">Nama & Jurusan/Ormawa</th>
-                <th class="col-hp">No HP</th>
-                <th class="col-kegiatan">Nama Kegiatan</th>
-                <th class="col-tanggal">Tanggal Pinjam</th>
-                <th class="col-status">Status</th>
-                <th class="col-barang">Barang Dipinjam</th>
+                <th style="width: 3%">No</th>
+                <th style="width: 20%">Nama & Unit</th>
+                <th style="width: 12%">HP</th>
+                <th style="width: 20%">Kegiatan</th>
+                <th style="width: 15%">Periode</th>
+                <th style="width: 8%">Status</th>
+                <th style="width: 22%">Barang</th>
             </tr>
         </thead>
         <tbody>
             @foreach($peminjamans as $index => $p)
             <tr>
-                <td class="col-no">{{ $index + 1 }}</td>
-                <td class="col-nama">
+                <td>{{ $index + 1 }}</td>
+                <td>
                     <div class="nama-peminjam">{{ $p->nama }}</div>
                     <div class="jurusan-info">{{ $p->unit }}</div>
-                    <div class="kode-peminjaman">Kode: {{ $p->kode_peminjaman }}</div>
+                    <div class="kode-peminjaman">{{ $p->kode_peminjaman }}</div>
                 </td>
-                <td class="col-hp">{{ $p->no_telp }}</td>
-                <td class="col-kegiatan">{{ Str::limit($p->nama_kegiatan, 25) }}</td>
-                <td class="col-tanggal">
+                <td>{{ $p->no_telp }}</td>
+                <td>{{ Str::limit($p->nama_kegiatan, 20) }}</td>
+                <td>
                     <div class="tanggal-info">
-                        <span class="tanggal-label">Mulai:</span> {{ format_tanggal($p->tanggal_mulai) }}<br>
-                        <span class="tanggal-label">Selesai:</span> {{ format_tanggal($p->tanggal_selesai) }}
+                        {{ format_tanggal($p->tanggal_mulai) }}<br>
+                        {{ format_tanggal($p->tanggal_selesai) }}
                     </div>
                 </td>
-                <td class="col-status">
+                <td>
                     <span class="status-badge status-{{ str_replace(' ', '-', $p->status) }}">
                         @if($p->status == 'pengembalian_diajukan')
-                            Pengembalian Diajukan
+                            Pengembalian
                         @elseif($p->status == 'pengembalian ditolak')
-                            Pengembalian Ditolak
+                            Ditolak
                         @else
                             {{ ucfirst($p->status) }}
                         @endif
                     </span>
                 </td>
-                <td class="col-barang">
+                <td>
                     <div class="barang-text">
                         @foreach($p->details as $detail)
-                        <div class="barang-item">• {{ $detail->barang->nama ?? '-' }} ({{ $detail->jumlah }})</div>
+                        <div class="barang-item">• {{ Str::limit($detail->barang->nama ?? '-', 15) }} ({{ $detail->jumlah }})</div>
                         @endforeach
                     </div>
                 </td>
@@ -253,16 +258,13 @@
     </table>
     @else
     <div class="no-data">
-        <h3>📭 Tidak Ada Data</h3>
-        <p>Tidak ada data peminjaman yang sesuai dengan filter yang dipilih.</p>
+        Tidak ada data peminjaman yang sesuai dengan filter yang dipilih.
     </div>
     @endif
 
     <!-- Footer -->
     <div class="footer">
-        <p><strong>Dokumen ini dibuat secara otomatis oleh sistem SarPras</strong></p>
-        <p>© {{ date('Y') }} Sistem Peminjaman Sarana dan Prasarana. All rights reserved.</p>
-        <p>Halaman 1 dari 1</p>
+        Dokumen otomatis SarPras © {{ date('Y') }}
     </div>
 </body>
 </html> 

@@ -37,6 +37,19 @@ class Ruangan extends Model
     }
 
     /**
+     * Scope: hanya ruangan yang benar-benar tersedia (status tersedia dan tidak sedang dipinjam)
+     */
+    public function scopeAvailable($query)
+    {
+        return $query->where('status', 'tersedia')
+            ->whereDoesntHave('peminjamanDetails', function ($q) {
+                $q->whereHas('peminjaman', function ($sub) {
+                    $sub->whereIn('status', ['disetujui', 'dipinjam']);
+                });
+            });
+    }
+
+    /**
      * Check if room is currently being borrowed
      */
     public function isCurrentlyBorrowed()
@@ -67,6 +80,15 @@ class Ruangan extends Model
     public function bisaDipinjam()
     {
         return $this->status === 'tersedia' && !$this->isCurrentlyBorrowed();
+    }
+
+    /**
+     * Effective status considering active borrowings
+     * - If there is an active borrowing, treat as 'dipinjam' regardless of saved status
+     */
+    public function getEffectiveStatusAttribute()
+    {
+        return $this->isCurrentlyBorrowed() ? 'dipinjam' : $this->status;
     }
 
     /**

@@ -2,6 +2,12 @@
 
 @section('content')
 <style>
+#preview-image {
+    border: 3px solid #20B2AA;
+    border-radius: 8px;
+}
+</style>
+<style>
 .is-invalid {
     border-color: #dc3545 !important;
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
@@ -69,9 +75,6 @@
                                     </td>
                                     <td>
                                         <strong>{{ $item['nama'] }}</strong>
-                                        @if(isset($item['kode']))
-                                            <br><small class="text-muted">{{ $item['kode'] }}</small>
-                                        @endif
                                     </td>
                                     <td>
                                         <span class="badge bg-primary">{{ $item['qty'] }}</span>
@@ -124,9 +127,6 @@
                                     </td>
                                     <td>
                                         <strong>{{ $item['nama'] }}</strong>
-                                        @if(isset($item['kode']))
-                                            <br><small class="text-muted">{{ $item['kode'] }}</small>
-                                        @endif
                                     </td>
                                     <td>
                                         <small>{{ $item['lokasi'] ?? '-' }}</small>
@@ -182,16 +182,27 @@
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-body">
                                         <h6 class="card-title text-primary mb-3"><i class="bi bi-camera me-2"></i>Foto Peminjam</h6>
-                                        <div class="row align-items-center">
+                                        
+                                        <div class="row">
                                             <div class="col-md-4">
                                                 <div class="text-center">
                                                     <div class="mb-3">
-                                                        <img id="preview-foto" src="{{ asset('storage/dummy.jpg') }}" alt="Preview Foto" class="img-fluid rounded" style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                                        @if(session('foto_peminjam_path'))
+                                                            <img id="preview-foto" src="{{ Storage::url(session('foto_peminjam_path')) }}" alt="Preview Foto" class="img-fluid rounded" style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                                        @else
+                                                            <img id="preview-foto" src="{{ asset('storage/dummy.jpg') }}" alt="Preview Foto" class="img-fluid rounded" style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                                        @endif
                                                     </div>
                                                     <div class="mb-3">
-                                                        <input type="file" id="foto_peminjam" name="foto_peminjam" class="form-control" accept="image/jpg,image/jpeg,image/png" required onchange="previewFoto(this)">
-                                                        <div class="form-text">Format: JPG, JPEG, PNG (Max: 2MB)</div>
+                                                        <input type="file" id="foto-input-direct" accept="image/jpg,image/jpeg,image/png" class="form-control d-none" onchange="handleFileSelectDirect(event)">
+                                                        <button type="button" class="btn btn-primary" onclick="document.getElementById('foto-input-direct').click()">
+                                                            <i class="bi bi-camera me-1"></i>Upload Foto
+                                                        </button>
+                                                        @if(session('foto_peminjam_path'))
+                                                            <input type="hidden" name="foto_peminjam_path" value="{{ session('foto_peminjam_path') }}">
+                                                        @endif
                                                     </div>
+                                                    <div class="form-text">Klik tombol di atas untuk upload foto</div>
                                                 </div>
                                             </div>
                                             <div class="col-md-8">
@@ -227,6 +238,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -247,54 +259,8 @@
                             </div>
                         </div>
                         
-                        @if(!empty($barangItems))
-                        <h5 class="mb-3"><i class="bi bi-box-seam me-2"></i>Barang yang Dipinjam:</h5>
-                        <div class="table-responsive mb-3">
-                            <table class="table align-middle table-bordered">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Nama Barang</th>
-                                        <th>Jumlah</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($barangItems as $item)
-                                    <tr>
-                                        <td>{{ $item['nama'] }}</td>
-                                        <td><span class="badge bg-primary">{{ $item['qty'] }}</span></td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        @endif
-                        
-                        @if(!empty($ruanganItems))
-                        <h5 class="mb-3"><i class="bi bi-building me-2"></i>Ruangan yang Dipinjam:</h5>
-                        <div class="table-responsive mb-3">
-                            <table class="table align-middle table-bordered">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Nama Ruangan</th>
-                                        <th>Lokasi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($ruanganItems as $item)
-                                    <tr>
-                                        <td>{{ $item['nama'] }}</td>
-                                        <td>{{ $item['lokasi'] ?? '-' }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        @endif
-                        
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="button" class="btn btn-info" onclick="testForm()">
-                                <i class="bi bi-bug"></i> Test Form
-                            </button>
+
+                        <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-success" id="submitBtn">
                                 <i class="bi bi-send-check"></i> Ajukan Peminjaman
                             </button>
@@ -321,35 +287,9 @@ function previewFoto(input) {
     }
 }
 
-function testForm() {
-    console.log('=== FORM TEST START ===');
-    const form = document.querySelector('form[action*="peminjaman/ajukan"]');
-    console.log('Form found:', !!form);
-    console.log('Form action:', form ? form.action : 'N/A');
-    console.log('Form method:', form ? form.method : 'N/A');
-    console.log('Form enctype:', form ? form.enctype : 'N/A');
-    
-    // Check all form fields
-    const fields = form ? form.querySelectorAll('input, select, textarea') : [];
-    console.log('Total form fields:', fields.length);
-    
-    fields.forEach((field, index) => {
-        console.log(`Field ${index + 1}:`, {
-            name: field.name,
-            type: field.type,
-            value: field.value,
-            required: field.required,
-            disabled: field.disabled
-        });
-    });
-    
-    // Check cart
-    const cartTable = document.querySelector('table tbody');
-    console.log('Cart table found:', !!cartTable);
-    console.log('Cart items:', cartTable ? cartTable.children.length : 0);
-    
-    console.log('=== FORM TEST END ===');
-}
+
+
+
 
 // Set default date values
 document.addEventListener('DOMContentLoaded', function() {
@@ -432,5 +372,149 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Form not found!');
     }
 });
+
+// Foto upload functionality
+let capturedImageData = null;
+
+// Handle file selection (for modal)
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) {
+        if (!file.type.match('image.*')) {
+            alert('File yang dipilih bukan gambar!');
+            return;
+        }
+        
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Ukuran file terlalu besar! Maksimal 2MB.');
+            return;
+        }
+        
+        capturedImageData = file;
+        showPreview(URL.createObjectURL(file));
+    }
+}
+
+// Handle file selection directly (for main form)
+function handleFileSelectDirect(event) {
+    const file = event.target.files[0];
+    if (file) {
+        if (!file.type.match('image.*')) {
+            alert('File yang dipilih bukan gambar!');
+            return;
+        }
+        
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Ukuran file terlalu besar! Maksimal 2MB.');
+            return;
+        }
+        
+        // Show preview immediately
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview-foto').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+        
+        // Upload file via AJAX
+        uploadFileDirect(file);
+    }
+}
+
+// Upload file directly without modal
+function uploadFileDirect(file) {
+    const formData = new FormData();
+    formData.append('foto_peminjam', file);
+    formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+    
+    // Show loading indicator
+    const uploadBtn = document.querySelector('button[onclick*="foto-input-direct"]');
+    const originalText = uploadBtn.innerHTML;
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Uploading...';
+    
+    fetch('{{ route("foto.upload") }}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Update hidden input
+            let hiddenInput = document.querySelector('input[name="foto_peminjam_path"]');
+            if (!hiddenInput) {
+                hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'foto_peminjam_path';
+                document.querySelector('form').appendChild(hiddenInput);
+            }
+            hiddenInput.value = data.foto_path;
+            
+            // Show success message
+            showAlert('Foto berhasil diupload!', 'success');
+            
+            // Update preview image without reload
+            document.getElementById('preview-foto').src = data.foto_url;
+        } else {
+            throw new Error(data.message || 'Gagal upload foto');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        
+        // Reset button
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = originalText;
+        
+        // Show specific error message
+        if (error.message.includes('HTTP 419')) {
+            alert('Session telah berakhir. Silakan refresh halaman dan coba lagi.');
+        } else if (error.message.includes('HTTP 422')) {
+            alert('File tidak valid. Pastikan file adalah gambar (JPG, JPEG, PNG) dan ukuran maksimal 2MB.');
+        } else if (error.message.includes('HTTP 500')) {
+            alert('Terjadi kesalahan server. Silakan coba lagi nanti.');
+        } else {
+            alert('Terjadi kesalahan saat upload foto: ' + error.message);
+        }
+    });
+}
+
+
+
+
+
+// Show alert
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+
 </script>
+
+
+
+
+
 @endpush 

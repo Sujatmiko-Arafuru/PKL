@@ -48,25 +48,13 @@
                 @if($peminjaman->detailsRuangan->count() > 0)
                     <ul class="list-group">
                         @foreach($peminjaman->detailsRuangan as $detail)
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <li class="list-group-item">
                             <div>
                                 <strong>{{ $detail->ruangan->nama ?? '-' }}</strong>
-                                @if($detail->ruangan->kode)
-                                    <br><small class="text-muted">{{ $detail->ruangan->kode }}</small>
+                                @if($detail->ruangan->lokasi)
+                                    <br><small class="text-muted">{{ $detail->ruangan->lokasi }}</small>
                                 @endif
                             </div>
-                            <span class="badge 
-                                @if($detail->ruangan->status == 'tersedia') bg-success
-                                @elseif($detail->ruangan->status == 'maintenance') bg-warning
-                                @elseif($detail->ruangan->status == 'dipinjam') bg-danger
-                                @else bg-secondary
-                                @endif">
-                                @if($detail->ruangan->status == 'tersedia') Tersedia
-                                @elseif($detail->ruangan->status == 'maintenance') Maintenance
-                                @elseif($detail->ruangan->status == 'dipinjam') Dipinjam
-                                @else {{ ucfirst($detail->ruangan->status) }}
-                                @endif
-                            </span>
                         </li>
                         @endforeach
                     </ul>
@@ -79,5 +67,14 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Download PDF Button -->
+<div class="text-center mt-4">
+    <a href="{{ route('admin.arsip.peminjaman.export.pdf', $peminjaman->id) }}" 
+       class="btn btn-danger" 
+       title="Download PDF Detail Peminjaman">
+        <i class="bi bi-file-earmark-pdf me-2"></i>Download PDF
+    </a>
 </div>
 @endsection 

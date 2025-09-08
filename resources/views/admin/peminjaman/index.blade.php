@@ -151,6 +151,30 @@
                             <small class="text-muted">{{ \Carbon\Carbon::parse($p->created_at)->format('H:i') }}</small>
                         </div>
                     </div>
+
+                    <!-- Item yang Dipinjam -->
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">
+                            <i class="bi bi-box-seam me-1"></i>Barang & Ruangan
+                        </small>
+                        <div class="row g-1">
+                            @if($p->details->count() > 0)
+                                <div class="col-12">
+                                    <small class="badge bg-primary">{{ $p->details->count() }} Barang</small>
+                                </div>
+                            @endif
+                            @if($p->detailsRuangan->count() > 0)
+                                <div class="col-12">
+                                    <small class="badge bg-info">{{ $p->detailsRuangan->count() }} Ruangan</small>
+                                </div>
+                            @endif
+                            @if($p->details->count() == 0 && $p->detailsRuangan->count() == 0)
+                                <div class="col-12">
+                                    <small class="text-muted">Tidak ada item</small>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Card Footer - Actions -->

@@ -123,11 +123,11 @@
                                 </div>
                             </div>
 
-    <!-- Progress Bar Pengembalian -->
+    <!-- Progress Bar Pengembalian Barang -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-white border-0">
             <h6 class="mb-0 text-primary fw-semibold">
-                <i class="bi bi-graph-up me-2"></i>Progress Pengembalian
+                <i class="bi bi-graph-up me-2"></i>Progress Pengembalian Barang
             </h6>
         </div>
         <div class="card-body">
@@ -153,11 +153,56 @@
                         <span class="badge bg-warning text-dark fs-6">
                             {{ $peminjaman->total_belum_dikembalikan }} Belum Dikembalikan
                         </span>
-                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Progress Bar Pengembalian Ruangan -->
+    @if($peminjaman->detailsRuangan->count() > 0)
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0">
+            <h6 class="mb-0 text-primary fw-semibold">
+                <i class="bi bi-graph-up me-2"></i>Progress Pengembalian Ruangan
+            </h6>
+        </div>
+        <div class="card-body">
+            @php
+                $total_ruangan = $peminjaman->detailsRuangan->count();
+                $ruangan_dikembalikan = $peminjaman->detailsRuangan->filter(function($detail) {
+                    return $detail->ruangan && $detail->ruangan->status == 'tersedia';
+                })->count();
+                $percentage_ruangan = $total_ruangan > 0 ? round(($ruangan_dikembalikan / $total_ruangan) * 100) : 0;
+            @endphp
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="progress mb-2" style="height: 25px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ $percentage_ruangan }}%"
+                             aria-valuenow="{{ $percentage_ruangan }}" 
+                             aria-valuemin="0" aria-valuemax="100">
+                            {{ $percentage_ruangan }}%
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        {{ $ruangan_dikembalikan }} dari {{ $total_ruangan }} ruangan sudah dikembalikan
+                    </small>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="d-flex flex-column">
+                        <span class="badge bg-success fs-6 mb-1">
+                            {{ $ruangan_dikembalikan }} Dikembalikan
+                        </span>
+                        <span class="badge bg-warning text-dark fs-6">
+                            {{ $total_ruangan - $ruangan_dikembalikan }} Belum Dikembalikan
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Form Pengembalian Barang -->
     <div class="card border-0 shadow-sm">
@@ -275,7 +320,6 @@
                     <thead class="table-light">
                         <tr>
                             <th>Nama Ruangan</th>
-                            <th>Kode</th>
                             <th>Lokasi</th>
                             <th>Status</th>
                             <th class="text-center">Aksi</th>
@@ -288,13 +332,6 @@
                                 <strong>{{ $detail->ruangan->nama }}</strong>
                                 @if($detail->ruangan->kategori)
                                     <br><span class="badge bg-info">{{ $detail->ruangan->kategori }}</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($detail->ruangan->kode)
-                                    <span class="badge bg-dark">{{ $detail->ruangan->kode }}</span>
-                                @else
-                                    <span class="text-muted">-</span>
                                 @endif
                             </td>
                             <td>
@@ -322,7 +359,7 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                <form action="{{ route('pengembalian.return-room', $peminjaman->id) }}" method="POST" class="d-inline">
+                               <form action="{{ route('admin.pengembalian.return-room', $peminjaman->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     <input type="hidden" name="ruangan_id" value="{{ $detail->ruangan->id }}">
                                     <button type="submit" class="btn btn-success btn-sm" 
@@ -344,6 +381,8 @@
         </div>
     </div>
     @endif
+
+
 
     <!-- Informasi Status Pengembalian -->
     <div class="card border-0 shadow-sm mt-4">

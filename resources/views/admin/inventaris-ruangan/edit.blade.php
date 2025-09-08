@@ -52,13 +52,9 @@
                         @method('PUT')
                         
                         <div class="row mb-3">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-12 mb-3">
                                 <label class="form-label fw-bold">Nama Ruangan</label>
                                 <input type="text" name="nama" class="form-control" required value="{{ old('nama', $ruangan->nama) }}">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Kode Ruangan</label>
-                                <input type="text" name="kode" class="form-control" value="{{ old('kode', $ruangan->kode) }}">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Lokasi</label>

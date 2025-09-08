@@ -362,7 +362,6 @@ function generateDetailContent(peminjaman) {
                 <thead class="table-light">
                     <tr>
                         <th>No</th>
-                        <th>Kode Barang</th>
                         <th>Nama Barang</th>
                         <th>Kategori</th>
                         <th>Qty Dipinjam</th>
@@ -382,7 +381,6 @@ function generateDetailContent(peminjaman) {
                         return `
                             <tr>
                                 <td>${index + 1}</td>
-                                <td><span class="badge bg-secondary">${detail.barang.kode}</span></td>
                                 <td><strong>${detail.barang.nama}</strong></td>
                                 <td>${detail.barang.kategori}</td>
                                 <td><span class="badge bg-info">${detail.jumlah}</span></td>
@@ -395,6 +393,36 @@ function generateDetailContent(peminjaman) {
                 </tbody>
             </table>
         </div>
+        
+        <hr class="my-4">
+        <h6 class="fw-bold text-primary mb-3">
+            <i class="bi bi-building me-2"></i>Ruangan yang Dipinjam (${peminjaman.detailsRuangan ? peminjaman.detailsRuangan.length : 0} ruangan)
+        </h6>
+        ${peminjaman.detailsRuangan && peminjaman.detailsRuangan.length > 0 ? `
+            <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nama Ruangan</th>
+                            <th>Lokasi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${peminjaman.detailsRuangan.map((detail) => {
+                            return `
+                            <tr>
+                                <td><strong>${detail.ruangan.nama}</strong><br>${detail.ruangan.kategori ? `<small class="text-muted">${detail.ruangan.kategori}</small>` : ''}</td>
+                                <td><small class="text-muted">${detail.ruangan.lokasi || '-'}</small> ${detail.ruangan.lantai ? `<br><small class="text-muted">Lantai ${detail.ruangan.lantai}</small>` : ''}</td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            </div>
+        ` : `
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>Tidak ada ruangan yang dipinjam
+            </div>
+        `}
         
         ${peminjaman.status === 'proses_pengembalian' ? `
             <div class="alert alert-warning mt-3">

@@ -53,10 +53,16 @@ class PeminjamanController extends Controller
         ]);
         
         try {
+            // Check if foto is uploaded via session
+            $fotoPath = session('foto_peminjam_path');
+            if (!$fotoPath) {
+                return redirect()->route('peminjaman.form')
+                    ->with('error', 'Foto peminjam wajib diupload terlebih dahulu. Silakan upload foto menggunakan tombol "Upload Foto" di form.');
+            }
+
             $request->validate([
                 'nama' => 'required|string|max:100|min:3',
                 'nim_nip' => 'required|string|max:50',
-                'foto_peminjam' => 'required|image|mimes:jpg,jpeg,png|max:2048',
                 'unit' => 'required|string|max:100',
                 'no_telp' => 'required|string|max:20',
                 'nama_kegiatan' => 'required|string|max:255',
@@ -69,21 +75,15 @@ class PeminjamanController extends Controller
                 'nama.max' => 'Nama maksimal 100 karakter.',
                 'nim_nip.required' => 'NIM/NIP wajib diisi.',
                 'nim_nip.max' => 'NIM/NIP maksimal 50 karakter.',
-                'foto_peminjam.required' => 'Foto peminjam wajib diupload.',
-                'foto_peminjam.image' => 'File foto harus berupa gambar.',
-                'foto_peminjam.mimes' => 'Format foto harus JPG, JPEG, atau PNG.',
-                'foto_peminjam.max' => 'Ukuran foto maksimal 2MB.',
                 'bukti.required' => 'Bukti kegiatan wajib diupload.',
                 'bukti.mimes' => 'Format bukti harus PDF, JPG, JPEG, atau PNG.',
                 'bukti.max' => 'Ukuran bukti maksimal 2MB.',
             ]);
             // Simpan data form
-            $formData = $request->except(['bukti', 'foto_peminjam']);
+            $formData = $request->except(['bukti']);
             
-            // Handle foto peminjam upload
-            if ($request->hasFile('foto_peminjam')) {
-                $formData['foto_peminjam'] = $request->file('foto_peminjam')->store('foto_peminjam', 'public');
-            }
+            // Use foto from session
+            $formData['foto_peminjam'] = $fotoPath;
             
             // Handle bukti upload
             if ($request->hasFile('bukti')) {
@@ -371,7 +371,7 @@ class PeminjamanController extends Controller
 
     public function getDetailPeminjamApi($id): \Illuminate\Http\JsonResponse
     {
-        $peminjaman = \App\Models\Peminjaman::with('details.barang')->findOrFail($id);
+        $peminjaman = \App\Models\Peminjaman::with(['details.barang', 'detailsRuangan.ruangan'])->findOrFail($id);
         
         return response()->json([
             'success' => true,
@@ -404,6 +404,21 @@ class PeminjamanController extends Controller
                             'kategori' => 'Barang',
                             'stok' => $detail->barang->stok,
                             'satuan' => 'Unit',
+                        ]
+                    ];
+                }),
+                'detailsRuangan' => $peminjaman->detailsRuangan->map(function($detail) {
+                    return [
+                        'id' => $detail->id,
+                        'ruangan_id' => $detail->ruangan_id,
+                        'ruangan' => [
+                            'id' => $detail->ruangan->id,
+                            'nama' => $detail->ruangan->nama,
+                            'kode' => $detail->ruangan->kode,
+                            'lokasi' => $detail->ruangan->lokasi,
+                            'lantai' => $detail->ruangan->lantai,
+                            'kategori' => $detail->ruangan->kategori,
+                            'status' => $detail->ruangan->status,
                         ]
                     ];
                 })

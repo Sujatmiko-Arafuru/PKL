@@ -36,7 +36,7 @@ class PeminjamanController extends Controller
         }
         
         // Dengan pagination - tampilkan 12 data per halaman
-        $peminjamans = $query->paginate(12);
+        $peminjamans = $query->with(['details.barang', 'detailsRuangan.ruangan'])->paginate(12);
         
         // Data untuk tabel terpisah (tanpa pagination)
         $menunggu = Peminjaman::where('status', 'menunggu')->orderBy('created_at', 'desc')->get();
@@ -145,17 +145,31 @@ class PeminjamanController extends Controller
     public function reject($id): \Illuminate\Http\RedirectResponse
     {
         try {
-            $peminjaman = Peminjaman::findOrFail($id);
+            $peminjaman = Peminjaman::with(['detailsRuangan.ruangan'])->findOrFail($id);
             $oldStatus = $peminjaman->status;
+            
+            DB::beginTransaction();
             
             $peminjaman->status = 'ditolak';
             $peminjaman->saveQuietly();
+            
+            // Jika ada ruangan yang sudah diubah statusnya menjadi dipinjam saat approve sebelumnya,
+            // kembalikan statusnya menjadi tersedia saat reject
+            foreach ($peminjaman->detailsRuangan as $detail) {
+                $ruangan = $detail->ruangan;
+                if ($ruangan && $ruangan->status === 'dipinjam') {
+                    $ruangan->setAvailable();
+                }
+            }
+            
+            DB::commit();
             
             // Create notification for status change
             NotificationService::notifyPeminjamanStatusChange($peminjaman, $oldStatus, 'ditolak');
             
             return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman berhasil ditolak.');
         } catch (\Exception $e) {
+            DB::rollback();
             Log::error('Error saat reject peminjaman: ' . $e->getMessage(), [
                 'peminjaman_id' => $id,
                 'trace' => $e->getTraceAsString()

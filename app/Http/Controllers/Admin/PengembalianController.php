@@ -231,6 +231,14 @@ class PengembalianController extends Controller
         } else {
             // Jika semua dikembalikan dan tidak ada ruangan, status menjadi dikembalikan
             $peminjaman->status = 'dikembalikan';
+            
+            // Jika status menjadi dikembalikan, pastikan semua ruangan yang terkait juga dikembalikan
+            $peminjaman->load('detailsRuangan.ruangan');
+            foreach ($peminjaman->detailsRuangan as $detail) {
+                if ($detail->ruangan && $detail->ruangan->status === 'dipinjam') {
+                    $detail->ruangan->setAvailable();
+                }
+            }
         }
 
         $peminjaman->save();

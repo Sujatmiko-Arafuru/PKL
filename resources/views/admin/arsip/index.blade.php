@@ -147,6 +147,7 @@
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">NAMA & UNIT</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">KEGIATAN</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">PERIODE</th>
+                            <th class="border-0 px-3 py-3 text-muted small fw-semibold">ITEM</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">TANGGAL PENGAJUAN</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">STATUS</th>
                             <th class="border-0 px-3 py-3 text-muted small fw-semibold">NO. HP</th>
@@ -172,6 +173,19 @@
                                 <div class="small text-muted">
                                     <div>Tanggal Mulai {{ format_tanggal($p->tanggal_mulai) }}</div>
                                     <div>Tanggal Selesai {{ format_tanggal($p->tanggal_selesai) }}</div>
+                                </div>
+                            </td>
+                            <td class="px-3 py-3">
+                                <div class="d-flex flex-column gap-1">
+                                    @if($p->details->count() > 0)
+                                        <span class="badge bg-primary">{{ $p->details->count() }} Barang</span>
+                                    @endif
+                                    @if($p->detailsRuangan->count() > 0)
+                                        <span class="badge bg-info">{{ $p->detailsRuangan->count() }} Ruangan</span>
+                                    @endif
+                                    @if($p->details->count() == 0 && $p->detailsRuangan->count() == 0)
+                                        <span class="text-muted small">Tidak ada item</span>
+                                    @endif
                                 </div>
                             </td>
                             <td class="px-3 py-3">
@@ -212,7 +226,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center py-5">
+                            <td colspan="9" class="text-center py-5">
                                 <div class="text-muted">
                                     <i class="bi bi-inbox fs-1"></i>
                                     <p class="mb-0 mt-2">
@@ -257,6 +271,14 @@
             </div>
             <div class="modal-body p-0" id="modalBody">
                 <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer bg-light border-top" id="modalFooter" style="display: none;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Tutup
+                </button>
+                <a href="#" class="btn btn-danger" id="downloadPdfBtn">
+                    <i class="bi bi-file-earmark-pdf me-2"></i>Download PDF
+                </a>
             </div>
         </div>
     </div>
@@ -412,6 +434,16 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.125);
+    padding: 1rem 1.5rem;
+}
+
+.modal-footer .btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
+
 /* Responsive modal improvements */
 .modal-responsive {
     max-width: 90vw !important;
@@ -558,7 +590,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     function showDetailModal(peminjamanId) {
-        // Show loading state
+        // Show loading state and hide footer
         document.getElementById('modalBody').innerHTML = `
             <div class="text-center py-4">
                 <div class="spinner-border text-primary" role="status">
@@ -567,6 +599,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p class="mt-2 text-muted">Memuat data...</p>
             </div>
         `;
+        document.getElementById('modalFooter').style.display = 'none';
         
         // Show modal first
         const modal = new bootstrap.Modal(document.getElementById('detailModal'));
@@ -578,6 +611,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     const peminjaman = data.data;
+                    
+                    // Show modal footer and set download PDF link
+                    document.getElementById('modalFooter').style.display = 'block';
+                    document.getElementById('downloadPdfBtn').href = `/admin/arsip/${peminjaman.id}/export/pdf`;
+                    
                     const modalContent = `
                         <div class="p-3">
                             <div class="row">
@@ -678,7 +716,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                                                     }
                                                                 </td>
                                                                 <td class="text-center px-2 py-2">
-                                                                    <small class="text-muted font-monospace">${detail.barang.kode}</small>
                                                                 </td>
                                                             </tr>
                                                         `).join('')}
@@ -748,6 +785,50 @@ document.addEventListener('DOMContentLoaded', function() {
                                         `}
                                     </div>
                                 </div>
+                                <!-- Ruangan -->
+                                <div class="col-12 mt-3">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-header bg-light">
+                                            <h6 class="mb-0 text-primary">
+                                                <i class="bi bi-building me-2"></i>Ruangan yang Dipinjam
+                                            </h6>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            ${peminjaman.detailsRuangan && peminjaman.detailsRuangan.length > 0 ? `
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm table-borderless mb-0">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th class="text-muted small fw-semibold px-3 py-2" style="width: 70%">Nama Ruangan</th>
+                                                                <th class="text-muted small fw-semibold px-2 py-2" style="width: 30%">Lokasi</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            ${peminjaman.detailsRuangan.map(detail => {
+                                                                return `
+                                                                <tr class="border-bottom">
+                                                                    <td class="px-3 py-2">
+                                                                        <div class="fw-semibold text-dark">${detail.ruangan.nama}</div>
+                                                                        ${detail.ruangan.kategori ? `<small class=\"text-muted\">${detail.ruangan.kategori}</small>` : ''}
+                                                                    </td>
+                                                                    <td class="px-2 py-2">
+                                                                        <small class="text-muted">${detail.ruangan.lokasi || '-'}</small>
+                                                                        ${detail.ruangan.lantai ? `<br><small class=\"text-muted\">Lantai ${detail.ruangan.lantai}</small>` : ''}
+                                                                    </td>
+                                                                </tr>
+                                                            `}).join('')}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            ` : `
+                                                <div class="text-center text-muted py-3">
+                                                    <i class="bi bi-building fs-1"></i>
+                                                    <p class="mb-0 mt-2">Tidak ada ruangan yang dipinjam</p>
+                                                </div>
+                                            `}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -760,6 +841,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             Gagal memuat data peminjaman.
                         </div>
                     `;
+                    document.getElementById('modalFooter').style.display = 'none';
                 }
             })
             .catch(error => {
@@ -770,6 +852,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         Terjadi kesalahan saat memuat data.
                     </div>
                 `;
+                document.getElementById('modalFooter').style.display = 'none';
             });
     }
     

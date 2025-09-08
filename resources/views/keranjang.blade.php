@@ -129,9 +129,6 @@
                                     <td>
                                         <div>
                                             <strong>{{ $item['nama'] }}</strong>
-                                            @if($item['kode'])
-                                                <br><small class="text-muted">{{ $item['kode'] }}</small>
-                                            @endif
                                             @if($item['kategori'])
                                                 <br><span class="badge bg-info">{{ $item['kategori'] }}</span>
                                             @endif
@@ -194,7 +191,9 @@
             </div>
             @else
             <div class="d-flex justify-content-end mt-3">
-                <a href="{{ route('peminjaman.form') }}" class="btn btn-success"><i class="bi bi-arrow-right-circle"></i> Lanjutkan Peminjaman</a>
+                <a href="{{ route('peminjaman.form') }}" class="btn btn-success">
+                    <i class="bi bi-arrow-right-circle me-1"></i>Lanjutkan Peminjaman
+                </a>
             </div>
             @endif
         </div>

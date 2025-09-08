@@ -9,7 +9,8 @@ class RuanganController extends Controller
 {
     public function index()
     {
-        $ruangans = Ruangan::where('status', 'tersedia')
+        // Hanya tampilkan ruangan yang benar-benar tersedia (tidak sedang dipinjam di peminjaman aktif)
+        $ruangans = Ruangan::available()
             ->orderBy('nama', 'asc')
             ->paginate(12);
         
@@ -25,7 +26,7 @@ class RuanganController extends Controller
     {
         $query = $request->get('q');
         
-        $ruangans = Ruangan::where('status', 'tersedia')
+        $ruangans = Ruangan::available()
             ->where(function($q) use ($query) {
                 $q->where('nama', 'like', "%{$query}%")
                   ->orWhere('deskripsi', 'like', "%{$query}%")

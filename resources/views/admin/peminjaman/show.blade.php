@@ -144,12 +144,15 @@
             </div>
         </div>
     </div>
-    
-    <!-- Ruangan yang Dipinjam -->
-    <div class="col-lg-4 mb-4">
+</div>
+
+<!-- Ruangan yang Dipinjam -->
+<div class="row mt-4">
+    <div class="col-12">
+        <!-- DEBUG: Total ruangan = {{ $peminjaman->detailsRuangan->count() }} -->
         <div class="card shadow-sm">
             <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="bi bi-building me-2"></i>Ruangan yang Dipinjam</h5>
+                <h5 class="mb-0"><i class="bi bi-building me-2"></i>Ruangan yang Dipinjam ({{ $peminjaman->detailsRuangan->count() }} ruangan)</h5>
             </div>
             <div class="card-body">
                 @if($peminjaman->detailsRuangan->count() > 0)
@@ -158,27 +161,14 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Nama Ruangan</th>
-                                    <th class="text-center">Status</th>
+                                    <th>Lokasi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($peminjaman->detailsRuangan as $detail)
                                     <tr>
                                         <td>{{ $detail->ruangan->nama ?? '-' }}</td>
-                                        <td class="text-center">
-                                            <span class="badge 
-                                                @if($detail->ruangan->status == 'tersedia') bg-success
-                                                @elseif($detail->ruangan->status == 'maintenance') bg-warning
-                                                @elseif($detail->ruangan->status == 'dipinjam') bg-danger
-                                                @else bg-secondary
-                                                @endif">
-                                                @if($detail->ruangan->status == 'tersedia') Tersedia
-                                                @elseif($detail->ruangan->status == 'maintenance') Maintenance
-                                                @elseif($detail->ruangan->status == 'dipinjam') Dipinjam
-                                                @else {{ ucfirst($detail->ruangan->status) }}
-                                                @endif
-                                            </span>
-                                        </td>
+                                        <td>{{ $detail->ruangan->lokasi ?? '-' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -217,6 +207,15 @@
     </div>
 </div>
 @endif
+
+<!-- Download PDF Button -->
+<div class="text-center mt-4">
+    <a href="{{ route('admin.arsip.peminjaman.export.pdf', $peminjaman->id) }}" 
+       class="btn btn-danger" 
+       title="Download PDF Detail Peminjaman">
+        <i class="bi bi-file-earmark-pdf me-2"></i>Download PDF
+    </a>
+</div>
 
 <style>
 .card {
@@ -257,5 +256,6 @@
         margin-bottom: 0.5rem;
     }
 }
+
 </style>
 @endsection 

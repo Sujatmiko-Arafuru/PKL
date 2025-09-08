@@ -192,24 +192,24 @@
                             <p class="card-text mb-1">{{ Str::limit($ruangan->deskripsi, 60) }}</p>
                             <p>Status: 
                                 <span class="badge 
-                                    @if($ruangan->status == 'tersedia') bg-success
-                                    @elseif($ruangan->status == 'maintenance') bg-warning
-                                    @elseif($ruangan->status == 'dipinjam') bg-danger
+                                    @if($ruangan->effective_status == 'tersedia') bg-success
+                                    @elseif($ruangan->effective_status == 'maintenance') bg-warning
+                                    @elseif($ruangan->effective_status == 'dipinjam') bg-danger
                                     @else bg-secondary
                                     @endif">
-                                    @if($ruangan->status == 'tersedia') Tersedia
-                                    @elseif($ruangan->status == 'maintenance') Maintenance
-                                    @elseif($ruangan->status == 'dipinjam') Dipinjam
-                                    @else {{ ucfirst($ruangan->status) }}
+                                    @if($ruangan->effective_status == 'tersedia') Tersedia
+                                    @elseif($ruangan->effective_status == 'maintenance') Maintenance
+                                    @elseif($ruangan->effective_status == 'dipinjam') Dipinjam
+                                    @else {{ ucfirst($ruangan->effective_status) }}
                                     @endif
                                 </span>
                             </p>
-                            @if($ruangan->status !== 'tersedia')
+                            @if($ruangan->effective_status !== 'tersedia')
                                 <small class="text-muted">
                                     <i class="bi bi-exclamation-triangle me-1"></i>
-                                    @if($ruangan->status == 'maintenance')
+                                    @if($ruangan->effective_status == 'maintenance')
                                         Sedang dalam perawatan
-                                    @elseif($ruangan->status == 'dipinjam')
+                                    @elseif($ruangan->effective_status == 'dipinjam')
                                         Sedang dipinjam
                                     @else
                                         Tidak tersedia untuk dipinjam
@@ -218,16 +218,16 @@
                             @endif
                             <div class="mt-auto d-flex gap-2">
                                 <a href="{{ route('ruangan.detail', $ruangan->id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-info-circle"></i> Detail</a>
-                                <button class="btn btn-sm {{ $ruangan->status === 'tersedia' ? 'btn-success' : 'btn-secondary' }}" 
-                                        {{ $ruangan->status !== 'tersedia' ? 'disabled' : '' }}
-                                        style="{{ $ruangan->status !== 'tersedia' ? 'opacity: 0.6; cursor: not-allowed;' : '' }}"
+                                <button class="btn btn-sm {{ $ruangan->effective_status === 'tersedia' ? 'btn-success' : 'btn-secondary' }}" 
+                                        {{ $ruangan->effective_status !== 'tersedia' ? 'disabled' : '' }}
+                                        style="{{ $ruangan->effective_status !== 'tersedia' ? 'opacity: 0.6; cursor: not-allowed;' : '' }}"
                                         data-id="{{ $ruangan->id }}"
                                         data-nama="{{ $ruangan->nama }}"
                                         data-deskripsi="{{ $ruangan->deskripsi }}"
-                                        data-status="{{ $ruangan->status }}"
-                                        title="{{ $ruangan->status !== 'tersedia' ? 'Ruangan tidak tersedia untuk dipinjam. Status: ' . ucfirst($ruangan->status) : 'Klik untuk menambah ke keranjang' }}">
+                                        data-status="{{ $ruangan->effective_status }}"
+                                        title="{{ $ruangan->effective_status !== 'tersedia' ? 'Ruangan tidak tersedia untuk dipinjam. Status: ' . ucfirst($ruangan->effective_status) : 'Klik untuk menambah ke keranjang' }}">
                                     <i class="bi bi-cart-plus"></i> 
-                                    {{ $ruangan->status === 'tersedia' ? 'Tambah' : 'Tidak Tersedia' }}
+                                    {{ $ruangan->effective_status === 'tersedia' ? 'Tambah' : 'Tidak Tersedia' }}
                                 </button>
                             </div>
                         </div>

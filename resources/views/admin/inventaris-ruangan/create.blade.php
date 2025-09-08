@@ -13,13 +13,9 @@
                 @csrf
 
                 <div class="row g-3">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label class="form-label">Nama</label>
                         <input type="text" name="nama" class="form-control" value="{{ old('nama') }}" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Kode</label>
-                        <input type="text" name="kode" class="form-control" value="{{ old('kode') }}">
                     </div>
 
                     <div class="col-md-6">

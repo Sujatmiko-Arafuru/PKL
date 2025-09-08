@@ -78,8 +78,6 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold text-muted">Kode Barang</label>
-                            <p class="mb-0 fs-5">{{ $barang->kode ?? 'Tidak ada kode' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold text-muted">Nama Barang</label>

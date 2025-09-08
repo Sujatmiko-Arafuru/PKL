@@ -43,7 +43,7 @@ class ArsipController extends Controller
             $query->orderBy('created_at', 'desc');
         }
 
-        $peminjamans = $query->paginate(10);
+        $peminjamans = $query->with(['details.barang', 'detailsRuangan.ruangan'])->paginate(10);
 
         // Data untuk summary - perbaiki relationship yang salah
         $terlaris = Barang::withCount(['peminjamanDetails' => function($query) {
@@ -112,6 +112,18 @@ class ArsipController extends Controller
         $pdf->loadView('admin.arsip.pdf', compact('peminjamans', 'filterInfo'));
         
         $filename = 'arsip_peminjaman_' . date('Y-m-d_H-i-s') . '.pdf';
+        
+        return $pdf->download($filename);
+    }
+
+    public function exportPeminjamanPdf($id)
+    {
+        $peminjaman = Peminjaman::with(['details.barang', 'detailsRuangan.ruangan'])->findOrFail($id);
+        
+        $pdf = app('dompdf.wrapper');
+        $pdf->loadView('admin.arsip.peminjaman-detail-pdf', compact('peminjaman'));
+        
+        $filename = 'detail_peminjaman_' . $peminjaman->kode_peminjaman . '_' . date('Y-m-d_H-i-s') . '.pdf';
         
         return $pdf->download($filename);
     }
