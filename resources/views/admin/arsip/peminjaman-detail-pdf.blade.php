@@ -224,7 +224,7 @@
                 </div>
                 @if($peminjaman->bukti)
                 <div class="data-item">
-                    <div class="data-label">Lampiran Bukti</div>
+                    <div class="data-label">File Bukti Kegiatan</div>
                     <div class="data-value">
                         <span class="badge badge-primary">📎 File terlampir</span>
                     </div>

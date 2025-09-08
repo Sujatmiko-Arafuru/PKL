@@ -249,7 +249,7 @@
                                 <input type="date" name="tanggal_selesai" class="form-control" required value="{{ old('tanggal_selesai') }}">
                             </div>
                             <div class="col-12 mb-3">
-                                <label class="form-label fw-bold">Lampiran Bukti (PDF/JPG/PNG)</label>
+                                <label class="form-label fw-bold">File Bukti Kegiatan (PDF/JPG/PNG)</label>
                                 <input type="file" name="bukti" class="form-control" accept="application/pdf,image/jpeg,image/png" required>
                                 <div class="form-text">Upload bukti kegiatan atau surat pengantar</div>
                             </div>

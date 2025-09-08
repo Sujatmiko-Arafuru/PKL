@@ -89,7 +89,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold text-muted">Lampiran Bukti</label>
+                                <label class="form-label fw-bold text-muted">File Bukti Kegiatan</label>
                                 <div>
                                     @if($peminjaman->bukti)
                                         <a href="{{ asset('storage/' . $peminjaman->bukti) }}" target="_blank" class="btn btn-sm btn-info text-white">
