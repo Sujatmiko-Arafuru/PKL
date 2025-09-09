@@ -6,25 +6,31 @@ use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\KeranjangRuanganController;
-use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\InventarisController;
 use App\Http\Controllers\Admin\InventarisRuanganController;
 use App\Http\Controllers\Admin\PeminjamanController as AdminPeminjamanController;
 use App\Http\Controllers\Admin\PengembalianController;
 use App\Http\Controllers\Admin\ArsipController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AkunController;
 use App\Http\Controllers\FotoUploadController;
 
 Route::get('/', [BarangController::class, 'beranda'])->name('beranda');
 Route::get('/list-barang', [BarangController::class, 'index'])->name('dashboard');
 Route::get('/barang/{id}', [BarangController::class, 'show'])->name('barang.detail');
+// Routes that require user authentication - temporarily without middleware for testing
 Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang.index');
 Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
 Route::post('/keranjang/tambah-ruangan', [KeranjangController::class, 'tambahRuangan'])->name('keranjang.tambah-ruangan');
 Route::post('/keranjang/hapus/{id}', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
 Route::post('/keranjang/update-qty/{id}', [KeranjangController::class, 'updateQty'])->name('keranjang.update-qty');
-
 Route::post('/keranjang/kosongkan-ruangan', [KeranjangController::class, 'kosongkanRuangan'])->name('keranjang.kosongkan-ruangan');
+
+Route::get('/peminjaman/form', [PeminjamanController::class, 'form'])->name('peminjaman.form');
+Route::post('/peminjaman/ajukan', [PeminjamanController::class, 'ajukan'])->name('peminjaman.ajukan');
+Route::post('/pengembalian/ajukan/{id}', [PeminjamanController::class, 'ajukanPengembalian'])->name('pengembalian.ajukan');
 
 // Routes untuk Ruangan
 Route::get('/list-ruangan', [RuanganController::class, 'index'])->name('ruangan.index');
@@ -36,9 +42,6 @@ Route::post('/foto/upload', [FotoUploadController::class, 'upload'])->name('foto
 Route::get('/foto/get', [FotoUploadController::class, 'getFoto'])->name('foto.get');
 Route::delete('/foto/delete', [FotoUploadController::class, 'deleteFoto'])->name('foto.delete');
 
-Route::get('/peminjaman/form', [PeminjamanController::class, 'form'])->name('peminjaman.form');
-Route::post('/peminjaman/ajukan', [PeminjamanController::class, 'ajukan'])->name('peminjaman.ajukan');
-Route::post('/pengembalian/ajukan/{id}', [PeminjamanController::class, 'ajukanPengembalian'])->name('pengembalian.ajukan');
 Route::get('/cek-status', [PeminjamanController::class, 'cekStatusForm'])->name('cekStatus.form');
 Route::post('/cek-status', [PeminjamanController::class, 'cekStatus'])->name('cekStatus.submit');
 Route::get('/cek-status/search', [PeminjamanController::class, 'searchByKegiatan'])->name('cekStatus.search');
@@ -47,10 +50,15 @@ Route::get('/list-peminjam', [PeminjamanController::class, 'listPeminjam'])->nam
 Route::get('/list-peminjam/detail/{id}', [PeminjamanController::class, 'detailPeminjamPublic'])->name('list.peminjam.detail');
 Route::get('/api/list-peminjam/detail/{id}', [PeminjamanController::class, 'getDetailPeminjamApi'])->name('api.list.peminjam.detail');
 
+// Route login user
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('auth.login');
+Route::post('/login', [AuthController::class, 'login'])->name('auth.login.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+
 // Route login admin
-Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
-Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
-Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.logout');
+Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
 // Route group admin dengan middleware
 Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->name('admin.')->group(function () {
@@ -79,6 +87,11 @@ Route::middleware([\App\Http\Middleware\AdminAuth::class])->prefix('admin')->nam
     Route::get('arsip/{id}', [ArsipController::class, 'show'])->name('arsip.show');
     Route::get('arsip/export/pdf', [ArsipController::class, 'exportPdf'])->name('arsip.export.pdf');
     Route::get('arsip/{id}/export/pdf', [ArsipController::class, 'exportPeminjamanPdf'])->name('arsip.peminjaman.export.pdf');
+    
+    // Kelola Akun
+    Route::resource('akun', AkunController::class);
+    Route::get('akun/{id}/reset-password', [AkunController::class, 'resetPassword'])->name('akun.reset-password');
+    Route::post('akun/{id}/update-password', [AkunController::class, 'updatePassword'])->name('akun.update-password');
     
     // Notifikasi API
     Route::prefix('notifications')->name('notifications.')->group(function () {

@@ -204,11 +204,68 @@
                 </div>
                 
                 <!-- Pagination -->
-                <div class="card-footer bg-white border-0">
-                    <div class="d-flex justify-content-center">
-                        {{ $ruangans->links() }}
-                    </div>
+                @if($ruangans->hasPages())
+                <div class="d-flex justify-content-center mt-4">
+                    <nav aria-label="Navigasi halaman inventaris ruangan">
+                        <ul class="pagination pagination-lg">
+                            {{-- Previous Page Link --}}
+                            @if ($ruangans->onFirstPage())
+                                <li class="page-item disabled">
+                                    <span class="page-link">
+                                        <i class="bi bi-chevron-left"></i>
+                                        <span class="d-none d-sm-inline">Sebelumnya</span>
+                                    </span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $ruangans->previousPageUrl() }}" rel="prev">
+                                        <i class="bi bi-chevron-left"></i>
+                                        <span class="d-none d-sm-inline">Sebelumnya</span>
+                                    </a>
+                                </li>
+                            @endif
+
+                            {{-- Pagination Elements --}}
+                            @foreach ($ruangans->getUrlRange(1, $ruangans->lastPage()) as $page => $url)
+                                @if ($page == $ruangans->currentPage())
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ $page }}</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                    </li>
+                                @endif
+                            @endforeach
+
+                            {{-- Next Page Link --}}
+                            @if ($ruangans->hasMorePages())
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $ruangans->nextPageUrl() }}" rel="next">
+                                        <span class="d-none d-sm-inline">Selanjutnya</span>
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            @else
+                                <li class="page-item disabled">
+                                    <span class="page-link">
+                                        <span class="d-none d-sm-inline">Selanjutnya</span>
+                                        <i class="bi bi-chevron-right"></i>
+                                    </span>
+                                </li>
+                            @endif
+                        </ul>
+                    </nav>
                 </div>
+                
+                <!-- Page Info -->
+                <div class="text-center text-muted mt-3">
+                    <small>
+                        Menampilkan {{ $ruangans->firstItem() }} - {{ $ruangans->lastItem() }} dari {{ $ruangans->total() }} ruangan 
+                        (Halaman {{ $ruangans->currentPage() }} dari {{ $ruangans->lastPage() }})
+                    </small>
+                </div>
+                @endif
             @else
                 <div class="text-center py-5">
                     <i class="bi bi-building text-muted" style="font-size: 4rem;"></i>

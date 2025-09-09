@@ -65,47 +65,6 @@
         </div>
     </div>
 
-    <!-- Statistics Section -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body py-3">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
-                            <i class="bi bi-star-fill text-primary"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-0 text-primary fw-semibold">Barang Terlaris</h6>
-                            <p class="mb-0 text-muted small">
-                                {{ $terlaris ? $terlaris->nama . ' (' . ($terlaris->peminjaman_details_count ?? 0) . 'x)' : 'Belum ada data' }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body py-3">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-secondary bg-opacity-10 rounded-circle p-2 me-3">
-                            <i class="bi bi-box-seam text-secondary"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-0 text-secondary fw-semibold">Barang Tidak Pernah Dipinjam</h6>
-                            <p class="mb-0 text-muted small">
-                                @if($tidakPernah && count($tidakPernah) > 0)
-                                    {{ count($tidakPernah) }} item
-                                @else
-                                    Semua barang sudah dipinjam
-                                @endif
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Table Section -->
     <div class="card shadow-sm border-0">
@@ -259,7 +218,64 @@
     <!-- Pagination -->
     @if($peminjamans->hasPages())
     <div class="d-flex justify-content-center mt-4">
-        {{ $peminjamans->withQueryString()->links() }}
+        <nav aria-label="Navigasi halaman arsip">
+            <ul class="pagination pagination-lg">
+                {{-- Previous Page Link --}}
+                @if ($peminjamans->onFirstPage())
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <i class="bi bi-chevron-left"></i>
+                            <span class="d-none d-sm-inline">Sebelumnya</span>
+                        </span>
+                    </li>
+                @else
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $peminjamans->appends(request()->query())->previousPageUrl() }}" rel="prev">
+                            <i class="bi bi-chevron-left"></i>
+                            <span class="d-none d-sm-inline">Sebelumnya</span>
+                        </a>
+                    </li>
+                @endif
+
+                {{-- Pagination Elements --}}
+                @foreach ($peminjamans->getUrlRange(1, $peminjamans->lastPage()) as $page => $url)
+                    @if ($page == $peminjamans->currentPage())
+                        <li class="page-item active">
+                            <span class="page-link">{{ $page }}</span>
+                        </li>
+                    @else
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $peminjamans->appends(request()->query())->url($page) }}">{{ $page }}</a>
+                        </li>
+                    @endif
+                @endforeach
+
+                {{-- Next Page Link --}}
+                @if ($peminjamans->hasMorePages())
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $peminjamans->appends(request()->query())->nextPageUrl() }}" rel="next">
+                            <span class="d-none d-sm-inline">Selanjutnya</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                @else
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <span class="d-none d-sm-inline">Selanjutnya</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </span>
+                    </li>
+                @endif
+            </ul>
+        </nav>
+    </div>
+    
+    <!-- Page Info -->
+    <div class="text-center text-muted mt-3">
+        <small>
+            Menampilkan {{ $peminjamans->firstItem() }} - {{ $peminjamans->lastItem() }} dari {{ $peminjamans->total() }} arsip 
+            (Halaman {{ $peminjamans->currentPage() }} dari {{ $peminjamans->lastPage() }})
+        </small>
     </div>
     @endif
 </div>

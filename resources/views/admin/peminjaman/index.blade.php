@@ -222,9 +222,64 @@
     <!-- Pagination -->
     @if($peminjamans->hasPages())
     <div class="d-flex justify-content-center mt-4">
-        <nav aria-label="Pagination">
-            {{ $peminjamans->links() }}
+        <nav aria-label="Navigasi halaman peminjaman">
+            <ul class="pagination pagination-lg">
+                {{-- Previous Page Link --}}
+                @if ($peminjamans->onFirstPage())
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <i class="bi bi-chevron-left"></i>
+                            <span class="d-none d-sm-inline">Sebelumnya</span>
+                        </span>
+                    </li>
+                @else
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $peminjamans->previousPageUrl() }}" rel="prev">
+                            <i class="bi bi-chevron-left"></i>
+                            <span class="d-none d-sm-inline">Sebelumnya</span>
+                        </a>
+                    </li>
+                @endif
+
+                {{-- Pagination Elements --}}
+                @foreach ($peminjamans->getUrlRange(1, $peminjamans->lastPage()) as $page => $url)
+                    @if ($page == $peminjamans->currentPage())
+                        <li class="page-item active">
+                            <span class="page-link">{{ $page }}</span>
+                        </li>
+                    @else
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                        </li>
+                    @endif
+                @endforeach
+
+                {{-- Next Page Link --}}
+                @if ($peminjamans->hasMorePages())
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $peminjamans->nextPageUrl() }}" rel="next">
+                            <span class="d-none d-sm-inline">Selanjutnya</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                @else
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <span class="d-none d-sm-inline">Selanjutnya</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </span>
+                    </li>
+                @endif
+            </ul>
         </nav>
+    </div>
+    
+    <!-- Page Info -->
+    <div class="text-center text-muted mt-3">
+        <small>
+            Menampilkan {{ $peminjamans->firstItem() }} - {{ $peminjamans->lastItem() }} dari {{ $peminjamans->total() }} peminjaman 
+            (Halaman {{ $peminjamans->currentPage() }} dari {{ $peminjamans->lastPage() }})
+        </small>
     </div>
     @endif
 </div>

@@ -21,7 +21,7 @@
                     <i class="bi bi-building me-2"></i>List Ruangan
                 </a>
                 <a href="{{ route('keranjang.index') }}" class="btn {{ request()->routeIs('keranjang.index') ? 'btn-primary' : 'btn-outline-primary' }} position-relative">
-                    <i class="bi bi-cart3 me-2"></i>Keranjang
+                    <i class="bi bi-cart3 me-2"></i>Daftar Peminjaman
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         @php
                             $cart = session('cart', []);

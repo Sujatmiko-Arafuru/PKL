@@ -179,8 +179,9 @@
     <!-- Header -->
     <div class="header">
         <h1>ARSIP PEMINJAMAN SARPRA</h1>
+        <h2>Laporan Bulanan Peminjaman Barang & Ruangan</h2>
         <div class="info">
-            Dicetak: {{ format_tanggal(now(), true) }} | Total: {{ $peminjamans->count() }} data
+            Dicetak: {{ format_tanggal(now(), true) }} | Total: {{ $peminjamans->count() }} data peminjaman
         </div>
     </div>
 
@@ -193,6 +194,9 @@
         @endif
         @if(isset($filterInfo['nama']))
             Nama: {{ $filterInfo['nama'] }} |
+        @endif
+        @if(isset($filterInfo['bulan']))
+            Bulan Kegiatan: {{ $filterInfo['bulan'] }} |
         @endif
         @if(isset($filterInfo['tanggal_mulai']))
             Mulai: {{ format_tanggal($filterInfo['tanggal_mulai']) }} |
@@ -209,12 +213,13 @@
         <thead>
             <tr>
                 <th style="width: 3%">No</th>
-                <th style="width: 20%">Nama & Unit</th>
-                <th style="width: 12%">HP</th>
-                <th style="width: 20%">Kegiatan</th>
-                <th style="width: 15%">Periode</th>
-                <th style="width: 8%">Status</th>
-                <th style="width: 22%">Barang</th>
+                <th style="width: 15%">Nama & Unit</th>
+                <th style="width: 10%">HP</th>
+                <th style="width: 15%">Kegiatan</th>
+                <th style="width: 12%">Periode</th>
+                <th style="width: 6%">Status</th>
+                <th style="width: 20%">Barang</th>
+                <th style="width: 19%">Ruangan</th>
             </tr>
         </thead>
         <tbody>
@@ -250,6 +255,19 @@
                         @foreach($p->details as $detail)
                         <div class="barang-item">• {{ Str::limit($detail->barang->nama ?? '-', 15) }} ({{ $detail->jumlah }})</div>
                         @endforeach
+                        @if($p->details->count() == 0)
+                        <div class="barang-item">-</div>
+                        @endif
+                    </div>
+                </td>
+                <td>
+                    <div class="barang-text">
+                        @foreach($p->detailsRuangan as $detail)
+                        <div class="barang-item">• {{ Str::limit($detail->ruangan->nama ?? '-', 15) }}</div>
+                        @endforeach
+                        @if($p->detailsRuangan->count() == 0)
+                        <div class="barang-item">-</div>
+                        @endif
                     </div>
                 </td>
             </tr>
@@ -262,9 +280,25 @@
     </div>
     @endif
 
+    <!-- Summary Statistics -->
+    @if($peminjamans->count() > 0)
+    <div class="filter-info" style="margin-top: 10px;">
+        <h3>Ringkasan Statistik</h3>
+        <p><strong>Total Peminjaman:</strong> {{ $peminjamans->count() }} data</p>
+        <p><strong>Total Barang Dipinjam:</strong> {{ $peminjamans->sum(function($p) { return $p->details->sum('jumlah'); }) }} unit</p>
+        <p><strong>Total Ruangan Dipinjam:</strong> {{ $peminjamans->sum(function($p) { return $p->detailsRuangan->count(); }) }} ruangan</p>
+        <p><strong>Status:</strong> 
+            Menunggu: {{ $peminjamans->where('status', 'menunggu')->count() }} | 
+            Disetujui: {{ $peminjamans->where('status', 'disetujui')->count() }} | 
+            Ditolak: {{ $peminjamans->where('status', 'ditolak')->count() }} | 
+            Dikembalikan: {{ $peminjamans->where('status', 'dikembalikan')->count() }}
+        </p>
+    </div>
+    @endif
+
     <!-- Footer -->
     <div class="footer">
-        Dokumen otomatis SarPras © {{ date('Y') }}
+        Dokumen otomatis SarPras © {{ date('Y') }} - Laporan Arsip Peminjaman Bulanan
     </div>
 </body>
 </html> 

@@ -150,10 +150,10 @@
                                         <input type="number" name="jumlah" class="form-control" min="1" max="{{ $barang->stok_tersedia }}" value="1" required {{ $barang->status !== 'tersedia' ? 'disabled' : '' }}>
                                     </div>
                                     <input type="hidden" name="barang_id" value="{{ $barang->id }}">
-                                    <button type="submit" class="btn btn-lg {{ $barang->status === 'tersedia' ? 'btn-primary' : 'btn-secondary' }}" {{ $barang->status !== 'tersedia' ? 'disabled' : '' }} style="{{ $barang->status !== 'tersedia' ? 'opacity: 0.6; cursor: not-allowed;' : '' }}" title="{{ $barang->status !== 'tersedia' ? 'Barang tidak tersedia untuk dipinjam (Stok: ' . $barang->stok_tersedia . ')' : 'Klik untuk menambah ke keranjang' }}">
+                                    <button type="submit" class="btn btn-lg {{ $barang->status === 'tersedia' ? 'btn-primary' : 'btn-secondary' }}" {{ $barang->status !== 'tersedia' ? 'disabled' : '' }} style="{{ $barang->status !== 'tersedia' ? 'opacity: 0.6; cursor: not-allowed;' : '' }}" title="{{ $barang->status !== 'tersedia' ? 'Barang tidak tersedia untuk dipinjam (Stok: ' . $barang->stok_tersedia . ')' : 'Klik untuk menambah ke daftar peminjaman' }}">
                                         <i class="bi bi-cart-plus me-2"></i>
                                         @if($barang->status === 'tersedia')
-                                            Tambah ke Keranjang
+                                            Tambah ke Daftar Peminjaman
                                         @else
                                             Tidak Tersedia
                                         @endif

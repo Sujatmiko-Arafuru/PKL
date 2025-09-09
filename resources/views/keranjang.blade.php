@@ -8,7 +8,7 @@
         
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10">
-            <h1 class="dashboard-title mb-3"><i class="bi bi-cart3 me-2"></i>Keranjang Peminjaman</h1>
+            <h1 class="dashboard-title mb-3"><i class="bi bi-cart3 me-2"></i>Daftar Peminjaman</h1>
             
             
             @if(session('success'))
@@ -22,7 +22,7 @@
             @if(count($barangItems) > 0)
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i>Daftar Barang di Keranjang</h5>
+                    <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i>Daftar Barang yang Dipilih</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -92,7 +92,7 @@
             @if(count($ruanganItems) > 0)
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="bi bi-building me-2"></i>Daftar Ruangan di Keranjang</h5>
+                    <h5 class="mb-0"><i class="bi bi-building me-2"></i>Daftar Ruangan yang Dipilih</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -125,16 +125,10 @@
                                     <td>
                                         <div>
                                             <strong>{{ $item['nama'] }}</strong>
-                                            @if($item['kategori'])
-                                                <br><span class="badge bg-info">{{ $item['kategori'] }}</span>
-                                            @endif
                                         </div>
                                     </td>
                                     <td>
                                         <small>{{ $item['lokasi'] ?? '-' }}</small>
-                                        @if($item['lantai'])
-                                            <br><small class="text-muted">Lantai {{ $item['lantai'] }}</small>
-                                        @endif
                                     </td>
                                     <td>
                                         <span class="badge 
@@ -172,7 +166,7 @@
                                 @csrf
                                 <button type="submit" class="btn btn-outline-secondary" 
                                         onclick="return confirm('Yakin ingin mengosongkan keranjang ruangan?')">
-                                    <i class="bi bi-trash me-2"></i>Kosongkan Keranjang Ruangan
+                                    <i class="bi bi-trash me-2"></i>Kosongkan Daftar Ruangan
                                 </button>
                             </form>
                         </div>
@@ -183,7 +177,7 @@
 
             @if(count($barangItems) == 0 && count($ruanganItems) == 0)
             <div class="alert alert-info">
-                <i class="bi bi-info-circle me-2"></i> Keranjang masih kosong.
+                <i class="bi bi-info-circle me-2"></i> Daftar peminjaman masih kosong.
             </div>
             @else
             <div class="d-flex justify-content-end mt-3">

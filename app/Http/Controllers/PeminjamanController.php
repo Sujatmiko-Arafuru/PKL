@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\DB;
 
 class PeminjamanController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(\App\Http\Middleware\UserAuth::class);
+    }
+
     public function form(): \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
     {
         $cart = session()->get('cart', []);
@@ -53,12 +58,8 @@ class PeminjamanController extends Controller
         ]);
         
         try {
-            // Check if foto is uploaded via session
-            $fotoPath = session('foto_peminjam_path');
-            if (!$fotoPath) {
-                return redirect()->route('peminjaman.form')
-                    ->with('error', 'Foto peminjam wajib diupload terlebih dahulu. Silakan upload foto menggunakan tombol "Upload Foto" di form.');
-            }
+            // Foto peminjam sekarang opsional
+            // Tidak perlu validasi wajib upload foto
 
             $request->validate([
                 'nama' => 'required|string|max:100|min:3',
@@ -68,6 +69,7 @@ class PeminjamanController extends Controller
                 'nama_kegiatan' => 'required|string|max:255',
                 'tanggal_mulai' => 'required|date',
                 'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+                'foto_peminjam' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
                 'bukti' => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
             ], [
                 'nama.min' => 'Nama harus minimal 3 karakter untuk generate kode unik.',
@@ -75,15 +77,22 @@ class PeminjamanController extends Controller
                 'nama.max' => 'Nama maksimal 100 karakter.',
                 'nim_nip.required' => 'NIM/NIP wajib diisi.',
                 'nim_nip.max' => 'NIM/NIP maksimal 50 karakter.',
+                'foto_peminjam.image' => 'File foto harus berupa gambar.',
+                'foto_peminjam.mimes' => 'Format foto harus JPG, JPEG, atau PNG.',
+                'foto_peminjam.max' => 'Ukuran foto maksimal 2MB.',
                 'bukti.required' => 'Bukti kegiatan wajib diupload.',
                 'bukti.mimes' => 'Format bukti harus PDF, JPG, JPEG, atau PNG.',
                 'bukti.max' => 'Ukuran bukti maksimal 2MB.',
             ]);
             // Simpan data form
-            $formData = $request->except(['bukti']);
+            $formData = $request->except(['bukti', 'foto_peminjam']);
             
-            // Use foto from session
-            $formData['foto_peminjam'] = $fotoPath;
+            // Handle foto upload (opsional)
+            if ($request->hasFile('foto_peminjam')) {
+                $formData['foto_peminjam'] = $request->file('foto_peminjam')->store('foto_peminjam', 'public');
+            } else {
+                $formData['foto_peminjam'] = null; // Foto opsional
+            }
             
             // Handle bukti upload
             if ($request->hasFile('bukti')) {

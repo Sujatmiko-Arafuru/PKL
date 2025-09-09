@@ -89,6 +89,57 @@
             .sidebar, .main-content, .topbar { margin-left: 0 !important; }
             .sidebar { position: static; width: 100%; min-height: auto; }
         }
+        
+        /* Pagination Styling */
+        .pagination {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .pagination .page-link {
+            border: none;
+            color: #0d6efd;
+            padding: 12px 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #e7f1ff;
+            color: #0d6efd;
+            transform: translateY(-2px);
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            background-color: #f8f9fa;
+        }
+
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            border-radius: 0;
+        }
+
+        /* Responsive pagination text */
+        @media (max-width: 576px) {
+            .pagination .page-link {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Page info styling */
+        .text-muted small {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
@@ -107,6 +158,7 @@
             </li>
             <li><a href="{{ route('admin.pengembalian.index') }}" class="nav-link{{ request()->routeIs('admin.pengembalian.*') ? ' active' : '' }}"><i class="bi bi-arrow-repeat"></i> Pengembalian</a></li>
             <li><a href="{{ route('admin.arsip.index') }}" class="nav-link{{ request()->routeIs('admin.arsip.*') ? ' active' : '' }}"><i class="bi bi-archive"></i> Arsip</a></li>
+            <li><a href="{{ route('admin.akun.index') }}" class="nav-link{{ request()->routeIs('admin.akun.*') ? ' active' : '' }}"><i class="bi bi-people"></i> Kelola Akun</a></li>
             <li>
                 <form action="{{ route('admin.logout') }}" method="POST" class="mt-3">
                     @csrf
@@ -160,18 +212,25 @@
                 try {
                     console.log('Updating notification count...');
                     const response = await fetch('/admin/notifications/peminjaman');
-                    const data = await response.json();
                     
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
                     console.log('Notification data:', data);
                     
-                    if (data.peminjaman_unread_count > 0) {
-                        console.log('Setting badge to show with count:', data.peminjaman_unread_count);
-                        this.badge.textContent = data.peminjaman_unread_count;
+                    // Ensure we have a valid count
+                    const count = parseInt(data.peminjaman_unread_count || 0);
+                    
+                    if (count > 0) {
+                        console.log('Setting badge to show with count:', count);
+                        this.badge.textContent = count;
                         this.badge.style.display = 'flex';
                         
                         // Add sound notification for new notifications
                         const currentCount = parseInt(this.badge.textContent || 0);
-                        if (data.peminjaman_unread_count > currentCount) {
+                        if (count > currentCount) {
                             this.playNotificationSound();
                         }
                     } else {
@@ -181,6 +240,9 @@
                     }
                 } catch (error) {
                     console.error('Error updating notification count:', error);
+                    // Hide badge on error to prevent showing stale data
+                    this.badge.textContent = '0';
+                    this.badge.style.display = 'none';
                 }
             }
             
@@ -264,19 +326,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing NotificationSystem...');
             window.notificationSystem = new NotificationSystem();
-            
-            // Test: Force show badge for testing
-            setTimeout(() => {
-                console.log('Testing badge visibility...');
-                const badge = document.getElementById('peminjamanNotificationBadge');
-                if (badge) {
-                    badge.textContent = '1';
-                    badge.style.display = 'flex';
-                    console.log('Badge should now be visible with count 1');
-                } else {
-                    console.error('Badge element not found!');
-                }
-            }, 2000);
         });
         
         // Expose to global scope for external access

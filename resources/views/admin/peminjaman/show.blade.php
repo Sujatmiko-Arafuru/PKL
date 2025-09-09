@@ -261,14 +261,6 @@
 </div>
 @endif
 
-<!-- Download PDF Button -->
-<div class="text-center mt-4">
-    <a href="{{ route('admin.arsip.peminjaman.export.pdf', $peminjaman->id) }}" 
-       class="btn btn-danger" 
-       title="Download PDF Detail Peminjaman">
-        <i class="bi bi-file-earmark-pdf me-2"></i>Download PDF
-    </a>
-</div>
 
 <style>
 .card {

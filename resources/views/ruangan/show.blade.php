@@ -137,7 +137,7 @@
                                     <input type="hidden" name="ruangan_id" value="{{ $ruangan->id }}">
                                     @if($ruangan->bisaDipinjam())
                                         <button type="submit" class="btn btn-success btn-lg">
-                                            <i class="bi bi-cart-plus me-2"></i>Tambah ke Keranjang
+                                            <i class="bi bi-cart-plus me-2"></i>Tambah ke Daftar Peminjaman
                                         </button>
                                     @else
                                         <button type="button" class="btn btn-secondary btn-lg" disabled>

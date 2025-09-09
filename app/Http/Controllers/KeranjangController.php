@@ -8,6 +8,11 @@ use App\Models\Ruangan;
 
 class KeranjangController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(\App\Http\Middleware\UserAuth::class);
+    }
+
     public function tambah(Request $request)
     {
         try {

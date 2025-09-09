@@ -385,12 +385,12 @@
     </div>
 </div>
 
-<!-- Modal Tambah ke Keranjang -->
+<!-- Modal Tambah ke Daftar Peminjaman -->
 <div class="modal fade" id="modalTambahKeranjang" tabindex="-1" aria-labelledby="modalTambahKeranjangLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalTambahKeranjangLabel">Tambah ke Keranjang</h5>
+        <h5 class="modal-title" id="modalTambahKeranjangLabel">Tambah ke Daftar Peminjaman</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -410,7 +410,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <button type="button" class="btn btn-success" id="btnKonfirmasiTambah">Tambah ke Keranjang</button>
+        <button type="button" class="btn btn-success" id="btnKonfirmasiTambah">Tambah ke Daftar Peminjaman</button>
       </div>
     </div>
   </div>
@@ -523,7 +523,7 @@
             .finally(() => {
                 // Re-enable button
                 btn.disabled = false;
-                btn.innerHTML = 'Tambah ke Keranjang';
+                btn.innerHTML = 'Tambah ke Daftar Peminjaman';
             });
         });
         

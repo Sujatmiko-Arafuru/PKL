@@ -126,9 +126,6 @@
                                     </td>
                                     <td>
                                         <small>{{ $item['lokasi'] ?? '-' }}</small>
-                                        @if(isset($item['lantai']))
-                                            <br><small class="text-muted">Lantai {{ $item['lantai'] }}</small>
-                                        @endif
                                     </td>
                                     <td>
                                         <span class="badge 
@@ -177,28 +174,18 @@
                             <div class="col-12 mb-4">
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-body">
-                                        <h6 class="card-title text-primary mb-3"><i class="bi bi-camera me-2"></i>Foto Peminjam</h6>
+                                        <h6 class="card-title text-primary mb-3"><i class="bi bi-camera me-2"></i>Foto Peminjam <small class="text-muted">(Opsional)</small></h6>
                                         
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div class="text-center">
                                                     <div class="mb-3">
-                                                        @if(session('foto_peminjam_path'))
-                                                            <img id="preview-foto" src="{{ Storage::url(session('foto_peminjam_path')) }}" alt="Preview Foto" class="img-fluid rounded" style="max-width: 200px; max-height: 200px; object-fit: cover;">
-                                                        @else
-                                                            <img id="preview-foto" src="{{ asset('storage/dummy.jpg') }}" alt="Preview Foto" class="img-fluid rounded" style="max-width: 200px; max-height: 200px; object-fit: cover;">
-                                                        @endif
+                                                        <img id="preview-foto" src="{{ asset('storage/dummy.jpg') }}" alt="Preview Foto" class="img-fluid rounded border" style="max-width: 200px; max-height: 200px; object-fit: cover; display: block !important;">
                                                     </div>
                                                     <div class="mb-3">
-                                                        <input type="file" id="foto-input-direct" accept="image/jpg,image/jpeg,image/png" class="form-control d-none" onchange="handleFileSelectDirect(event)">
-                                                        <button type="button" class="btn btn-primary" onclick="document.getElementById('foto-input-direct').click()">
-                                                            <i class="bi bi-camera me-1"></i>Upload Foto
-                                                        </button>
-                                                        @if(session('foto_peminjam_path'))
-                                                            <input type="hidden" name="foto_peminjam_path" value="{{ session('foto_peminjam_path') }}">
-                                                        @endif
+                                                        <input type="file" id="foto-peminjam-input" name="foto_peminjam" accept="image/jpg,image/jpeg,image/png" class="form-control" onchange="window.previewFoto(this)">
                                                     </div>
-                                                    <div class="form-text">Klik tombol di atas untuk upload foto</div>
+                                                    <div class="form-text">Upload foto peminjam (opsional)</div>
                                                 </div>
                                             </div>
                                             <div class="col-md-8">
@@ -221,7 +208,11 @@
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label class="form-label fw-bold">Jurusan / Ormawa</label>
-                                                        <input type="text" name="unit" class="form-control" required value="{{ old('unit') }}" placeholder="Contoh: Teknik Informatika">
+                                                        <input type="text" name="unit" class="form-control" required value="{{ old('unit', session('user_nama')) }}" placeholder="Contoh: Teknik Informatika" readonly>
+                                                        <div class="form-text">
+                                                            <i class="bi bi-info-circle me-1"></i>
+                                                            Field ini terisi otomatis berdasarkan akun yang login
+                                                        </div>
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label class="form-label fw-bold">No. Telepon</label>
@@ -271,17 +262,46 @@
 
 @push('scripts')
 <script>
-function previewFoto(input) {
+window.previewFoto = function(input) {
+    console.log('previewFoto called');
     if (input.files && input.files[0]) {
+        const file = input.files[0];
+        console.log('File selected:', file.name, file.type, file.size);
+        
+        // Validasi file
+        if (!file.type.match('image.*')) {
+            alert('File yang dipilih bukan gambar!');
+            return;
+        }
+        
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Ukuran file terlalu besar! Maksimal 2MB.');
+            return;
+        }
+        
         const reader = new FileReader();
-        
         reader.onload = function(e) {
-            document.getElementById('preview-foto').src = e.target.result;
+            console.log('FileReader loaded, setting image src');
+            const previewImg = document.getElementById('preview-foto');
+            if (previewImg) {
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'block';
+                previewImg.style.maxWidth = '200px';
+                previewImg.style.maxHeight = '200px';
+                previewImg.style.objectFit = 'cover';
+                previewImg.style.border = '2px solid #28a745';
+                previewImg.style.borderRadius = '8px';
+                console.log('Preview image updated successfully');
+            } else {
+                console.error('Preview image element not found!');
+            }
         };
-        
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(file);
+    } else {
+        console.log('No file selected');
     }
 }
+
 
 
 
@@ -305,183 +325,32 @@ document.addEventListener('DOMContentLoaded', function() {
         tanggalSelesaiInput.value = tomorrowStr;
     }
     
-    // Form validation and debugging
+    // Setup photo preview event listener
+    const fotoInput = document.getElementById('foto-peminjam-input');
+    if (fotoInput) {
+        fotoInput.addEventListener('change', function(e) {
+            window.previewFoto(e.target);
+        });
+    }
+    
+    // Simple form handling
     const form = document.querySelector('form[action*="peminjaman/ajukan"]');
     const submitBtn = document.getElementById('submitBtn');
     
     if (form) {
-        console.log('Form found:', form);
         
         form.addEventListener('submit', function(e) {
-            console.log('Form submission started...');
-            
             // Disable submit button to prevent double submission
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Mengirim...';
             }
-            
-            // Check if all required fields are filled
-            const requiredFields = form.querySelectorAll('[required]');
-            let isValid = true;
-            let emptyFields = [];
-            
-            requiredFields.forEach(function(field) {
-                console.log('Checking field:', field.name, 'Value:', field.value);
-                if (!field.value.trim()) {
-                    console.error('Required field empty:', field.name);
-                    emptyFields.push(field.name);
-                    isValid = false;
-                    field.classList.add('is-invalid');
-                } else {
-                    field.classList.remove('is-invalid');
-                }
-            });
-            
-            // Check if cart has items
-            const cartTable = document.querySelector('table tbody');
-            if (cartTable && cartTable.children.length === 0) {
-                console.error('Cart is empty');
-                alert('Keranjang kosong! Silakan tambahkan barang terlebih dahulu.');
-                e.preventDefault();
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="bi bi-send-check"></i> Ajukan Peminjaman';
-                }
-                return false;
-            }
-            
-            if (!isValid) {
-                e.preventDefault();
-                alert('Mohon lengkapi semua field yang wajib diisi: ' + emptyFields.join(', '));
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="bi bi-send-check"></i> Ajukan Peminjaman';
-                }
-                return false;
-            }
-            
-            console.log('Form validation passed, submitting...');
-            // Allow form to submit
         });
     } else {
         console.error('Form not found!');
     }
 });
 
-// Foto upload functionality
-let capturedImageData = null;
-
-// Handle file selection (for modal)
-function handleFileSelect(event) {
-    const file = event.target.files[0];
-    if (file) {
-        if (!file.type.match('image.*')) {
-            alert('File yang dipilih bukan gambar!');
-            return;
-        }
-        
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Ukuran file terlalu besar! Maksimal 2MB.');
-            return;
-        }
-        
-        capturedImageData = file;
-        showPreview(URL.createObjectURL(file));
-    }
-}
-
-// Handle file selection directly (for main form)
-function handleFileSelectDirect(event) {
-    const file = event.target.files[0];
-    if (file) {
-        if (!file.type.match('image.*')) {
-            alert('File yang dipilih bukan gambar!');
-            return;
-        }
-        
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Ukuran file terlalu besar! Maksimal 2MB.');
-            return;
-        }
-        
-        // Show preview immediately
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('preview-foto').src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-        
-        // Upload file via AJAX
-        uploadFileDirect(file);
-    }
-}
-
-// Upload file directly without modal
-function uploadFileDirect(file) {
-    const formData = new FormData();
-    formData.append('foto_peminjam', file);
-    formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-    
-    // Show loading indicator
-    const uploadBtn = document.querySelector('button[onclick*="foto-input-direct"]');
-    const originalText = uploadBtn.innerHTML;
-    uploadBtn.disabled = true;
-    uploadBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Uploading...';
-    
-    fetch('{{ route("foto.upload") }}', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            // Update hidden input
-            let hiddenInput = document.querySelector('input[name="foto_peminjam_path"]');
-            if (!hiddenInput) {
-                hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'foto_peminjam_path';
-                document.querySelector('form').appendChild(hiddenInput);
-            }
-            hiddenInput.value = data.foto_path;
-            
-            // Show success message
-            showAlert('Foto berhasil diupload!', 'success');
-            
-            // Update preview image without reload
-            document.getElementById('preview-foto').src = data.foto_url;
-        } else {
-            throw new Error(data.message || 'Gagal upload foto');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        
-        // Reset button
-        uploadBtn.disabled = false;
-        uploadBtn.innerHTML = originalText;
-        
-        // Show specific error message
-        if (error.message.includes('HTTP 419')) {
-            alert('Session telah berakhir. Silakan refresh halaman dan coba lagi.');
-        } else if (error.message.includes('HTTP 422')) {
-            alert('File tidak valid. Pastikan file adalah gambar (JPG, JPEG, PNG) dan ukuran maksimal 2MB.');
-        } else if (error.message.includes('HTTP 500')) {
-            alert('Terjadi kesalahan server. Silakan coba lagi nanti.');
-        } else {
-            alert('Terjadi kesalahan saat upload foto: ' + error.message);
-        }
-    });
-}
 
 
 

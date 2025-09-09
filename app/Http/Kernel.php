@@ -4,6 +4,7 @@ namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use App\Http\Middleware\AdminAuth;
+use App\Http\Middleware\UserAuth;
 
 class Kernel extends HttpKernel
 {
@@ -54,5 +55,6 @@ class Kernel extends HttpKernel
      */
     protected $routeMiddleware = [
         'admin.auth' => \App\Http\Middleware\AdminAuth::class,
+        'user.auth' => \App\Http\Middleware\UserAuth::class,
     ];
 } 
