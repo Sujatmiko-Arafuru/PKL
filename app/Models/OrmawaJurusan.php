@@ -23,18 +23,27 @@ class OrmawaJurusan extends Model
         'password'
     ];
 
+    // Method to get password for admin views
+    public function getPasswordForAdmin()
+    {
+        // For ormawa and jurusan, return plain text password
+        // For other types, return hashed password
+        return $this->attributes['password'];
+    }
+
     protected $casts = [
         'is_active' => 'boolean',
-        'password' => 'hashed'
     ];
 
     public function setPasswordAttribute($value)
     {
-        $this->attributes['password'] = Hash::make($value);
+        // Always store password as plain text - no hashing
+        $this->attributes['password'] = $value;
     }
 
     public function verifyPassword($password)
     {
-        return Hash::check($password, $this->password);
+        // Always compare plain text passwords
+        return $password === $this->password;
     }
 }

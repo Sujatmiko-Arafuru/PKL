@@ -7,7 +7,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">
-                        <i class="bi bi-people me-2"></i>Kelola Akun Ormawa/Jurusan
+                        <i class="bi bi-people me-2"></i>Kelola Jurusan/Ormawa
                     </h3>
                     <a href="{{ route('admin.akun.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle me-1"></i>Tambah Akun
@@ -37,6 +37,7 @@
                                     <th>Tipe</th>
                                     <th>Email</th>
                                     <th>No. Telp</th>
+                                    <th>Password</th>
                                     <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -53,6 +54,25 @@
                                     </td>
                                     <td>{{ $akun->email ?? '-' }}</td>
                                     <td>{{ $akun->no_telp ?? '-' }}</td>
+                                    <td>
+                                        <div class="input-group input-group-sm">
+                                            <input type="password" 
+                                                   class="form-control password-field text-success" 
+                                                   value="{{ $akun->getPasswordForAdmin() }}" 
+                                                   readonly 
+                                                   id="password-{{ $akun->id }}"
+                                                   style="font-family: monospace;">
+                                            <button class="btn btn-outline-secondary" 
+                                                    type="button" 
+                                                    onclick="togglePassword({{ $akun->id }})"
+                                                    title="Tampilkan/Sembunyikan Password">
+                                                <i class="bi bi-eye" id="eye-{{ $akun->id }}"></i>
+                                            </button>
+                                        </div>
+                                        <small class="text-success">
+                                            <i class="bi bi-check-circle"></i> Plain text
+                                        </small>
+                                    </td>
                                     <td>
                                         <span class="badge {{ $akun->is_active ? 'bg-success' : 'bg-danger' }}">
                                             {{ $akun->is_active ? 'Aktif' : 'Tidak Aktif' }}
@@ -81,7 +101,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="text-center">Tidak ada data akun</td>
+                                    <td colspan="8" class="text-center">Tidak ada data akun</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -92,4 +112,19 @@
         </div>
     </div>
 </div>
+
+<script>
+function togglePassword(id) {
+    const passwordField = document.getElementById('password-' + id);
+    const eyeIcon = document.getElementById('eye-' + id);
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        eyeIcon.className = 'bi bi-eye-slash';
+    } else {
+        passwordField.type = 'password';
+        eyeIcon.className = 'bi bi-eye';
+    }
+}
+</script>
 @endsection

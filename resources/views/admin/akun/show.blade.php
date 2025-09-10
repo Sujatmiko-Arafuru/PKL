@@ -42,6 +42,28 @@
                                     <td><strong>No. Telepon:</strong></td>
                                     <td>{{ $akun->no_telp ?? '-' }}</td>
                                 </tr>
+                                <tr>
+                                    <td><strong>Password:</strong></td>
+                                    <td>
+                                        <div class="input-group" style="max-width: 300px;">
+                                            <input type="password" 
+                                                   class="form-control password-field text-success" 
+                                                   value="{{ $akun->getPasswordForAdmin() }}" 
+                                                   readonly 
+                                                   id="password-detail"
+                                                   style="font-family: monospace;">
+                                            <button class="btn btn-outline-secondary" 
+                                                    type="button" 
+                                                    onclick="togglePasswordDetail()"
+                                                    title="Tampilkan/Sembunyikan Password">
+                                                <i class="bi bi-eye" id="eye-detail"></i>
+                                            </button>
+                                        </div>
+                                        <small class="text-success">
+                                            <i class="bi bi-check-circle"></i> Plain text password
+                                        </small>
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                         <div class="col-md-6">
@@ -96,4 +118,19 @@
         </div>
     </div>
 </div>
+
+<script>
+function togglePasswordDetail() {
+    const passwordField = document.getElementById('password-detail');
+    const eyeIcon = document.getElementById('eye-detail');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        eyeIcon.className = 'bi bi-eye-slash';
+    } else {
+        passwordField.type = 'password';
+        eyeIcon.className = 'bi bi-eye';
+    }
+}
+</script>
 @endsection

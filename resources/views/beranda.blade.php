@@ -428,7 +428,7 @@
             <div class="hero-content">
                 <h1 class="hero-title">Selamat Datang di SIMBARA</h1>
                 <p class="hero-subtitle">
-                    Sistem Peminajaman Barang & Ruangan Poltekkes Denpasar - 
+                    Sistem Peminjaman Barang dan Ruangan Poltekkes Denpasar - 
                     Solusi digital untuk mengelola peminjaman peralatan dan inventaris dengan mudah dan efisien.
                 </p>
                 <a href="{{ route('auth.login') }}" class="cta-button">

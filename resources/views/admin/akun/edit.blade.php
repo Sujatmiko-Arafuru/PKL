@@ -17,7 +17,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="nama" class="form-label">Nama Ormawa/Jurusan <span class="text-danger">*</span></label>
+                                    <label for="nama" class="form-label">Nama Jurusan/Ormawa <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('nama') is-invalid @enderror" 
                                            id="nama" name="nama" value="{{ old('nama', $akun->nama) }}" required>
                                     @error('nama')

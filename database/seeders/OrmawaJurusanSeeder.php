@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use App\Models\OrmawaJurusan;
 
 class OrmawaJurusanSeeder extends Seeder
@@ -82,7 +83,18 @@ class OrmawaJurusanSeeder extends Seeder
         ];
 
         foreach ($akuns as $akun) {
-            OrmawaJurusan::create($akun);
+            // Insert all accounts with plain text passwords
+            DB::table('ormawa_jurusan')->insert([
+                'nama' => $akun['nama'],
+                'tipe' => $akun['tipe'],
+                'password' => $akun['password'], // Store as plain text
+                'email' => $akun['email'],
+                'no_telp' => $akun['no_telp'],
+                'alamat' => $akun['alamat'],
+                'is_active' => $akun['is_active'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
     }
 }
