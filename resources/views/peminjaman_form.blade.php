@@ -179,13 +179,88 @@
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div class="text-center">
+                                                    <!-- Preview Container -->
                                                     <div class="mb-3">
-                                                        <img id="preview-foto" src="{{ asset('storage/dummy.jpg') }}" alt="Preview Foto" class="img-fluid rounded border" style="max-width: 200px; max-height: 200px; object-fit: cover; display: block !important;">
+                                                        <div style="width: 200px; height: 200px; margin: 0 auto; border: 2px dashed #ccc; border-radius: 8px; background-color: #f8f9fa; position: relative; overflow: hidden;">
+                                                            <!-- Placeholder (default) -->
+                                                            <div id="placeholder-foto-peminjam" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                                                                <i class="bi bi-camera text-muted" style="font-size: 3rem;"></i>
+                                                                <p class="text-muted mt-2 mb-0 small">Preview Foto</p>
+                                                            </div>
+                                                            <!-- Image preview (hidden by default) -->
+                                                            <img id="preview-foto-peminjam" src="" alt="Preview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: none; z-index: 10;">
+                                                        </div>
                                                     </div>
+                                                    
+                                                    <!-- File Input -->
                                                     <div class="mb-3">
-                                                        <input type="file" id="foto-peminjam-input" name="foto_peminjam" accept="image/jpg,image/jpeg,image/png" class="form-control" onchange="window.previewFoto(this)">
+                                                        <input type="file" 
+                                                               id="foto-peminjam-input" 
+                                                               name="foto_peminjam" 
+                                                               accept="image/*" 
+                                                               class="form-control"
+                                                               onchange="handleFotoChange(this)">
                                                     </div>
-                                                    <div class="form-text">Upload foto peminjam (opsional)</div>
+                                                    
+                                                    <script>
+                                                    function handleFotoChange(input) {
+                                                        console.log('🔥 FOTO CHANGED!', input.files);
+                                                        
+                                                        if (!input.files || !input.files[0]) {
+                                                            console.log('No file');
+                                                            return;
+                                                        }
+                                                        
+                                                        const file = input.files[0];
+                                                        console.log('📄 File:', file.name, file.type, file.size);
+                                                        
+                                                        // Validate
+                                                        if (!file.type.startsWith('image/')) {
+                                                            alert('File bukan gambar!');
+                                                            input.value = '';
+                                                            return;
+                                                        }
+                                                        
+                                                        if (file.size > 10 * 1024 * 1024) {
+                                                            alert('File terlalu besar! Maksimal 10MB');
+                                                            input.value = '';
+                                                            return;
+                                                        }
+                                                        
+                                                        // Read file
+                                                        const reader = new FileReader();
+                                                        
+                                                        reader.onload = function(e) {
+                                                            console.log('✅ File loaded!');
+                                                            
+                                                            const img = document.getElementById('preview-foto-peminjam');
+                                                            const placeholder = document.getElementById('placeholder-foto-peminjam');
+                                                            
+                                                            if (img && placeholder) {
+                                                                placeholder.style.display = 'none';
+                                                                img.src = e.target.result;
+                                                                img.style.display = 'block';
+                                                                img.parentElement.style.border = '2px solid #28a745';
+                                                                console.log('✅ PREVIEW SHOWN!');
+                                                            } else {
+                                                                console.error('Elements not found!', {img: !!img, placeholder: !!placeholder});
+                                                            }
+                                                        };
+                                                        
+                                                        reader.onerror = function(err) {
+                                                            console.error('Error:', err);
+                                                            alert('Gagal membaca file!');
+                                                        };
+                                                        
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                    </script>
+                                                    
+                                                    <!-- Info Text -->
+                                                    <div class="form-text">
+                                                        <i class="bi bi-info-circle me-1"></i>
+                                                        Format: JPG, JPEG, PNG. Maksimal 10MB
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-8">
@@ -262,45 +337,84 @@
 
 @push('scripts')
 <script>
-window.previewFoto = function(input) {
-    console.log('previewFoto called');
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        console.log('File selected:', file.name, file.type, file.size);
-        
-        // Validasi file
-        if (!file.type.match('image.*')) {
-            alert('File yang dipilih bukan gambar!');
-            return;
-        }
-        
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Ukuran file terlalu besar! Maksimal 2MB.');
-            return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            console.log('FileReader loaded, setting image src');
-            const previewImg = document.getElementById('preview-foto');
-            if (previewImg) {
-                previewImg.src = e.target.result;
-                previewImg.style.display = 'block';
-                previewImg.style.maxWidth = '200px';
-                previewImg.style.maxHeight = '200px';
-                previewImg.style.objectFit = 'cover';
-                previewImg.style.border = '2px solid #28a745';
-                previewImg.style.borderRadius = '8px';
-                console.log('Preview image updated successfully');
-            } else {
-                console.error('Preview image element not found!');
-            }
-        };
-        reader.readAsDataURL(file);
-    } else {
-        console.log('No file selected');
+// Simple and guaranteed to work preview function
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Initializing foto peminjam preview...');
+    
+    const fotoInput = document.getElementById('foto-peminjam-input');
+    const previewImg = document.getElementById('preview-foto-peminjam');
+    const placeholder = document.getElementById('placeholder-foto-peminjam');
+    
+    console.log('Elements check:', {
+        input: !!fotoInput,
+        preview: !!previewImg,
+        placeholder: !!placeholder
+    });
+    
+    if (!fotoInput || !previewImg || !placeholder) {
+        console.error('❌ Required elements not found!');
+        return;
     }
-}
+    
+    fotoInput.addEventListener('change', function(e) {
+        console.log('📸 File input changed!');
+        
+        const file = e.target.files[0];
+        
+        if (!file) {
+            console.log('No file selected');
+            return;
+        }
+        
+        console.log('📄 File:', file.name, file.type, file.size + ' bytes');
+        
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('❌ File yang dipilih bukan gambar!');
+            fotoInput.value = '';
+            return;
+        }
+        
+        // Validate file size (10MB max)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('❌ Ukuran file terlalu besar! Maksimal 10MB.');
+            fotoInput.value = '';
+            return;
+        }
+        
+        // Read and display image
+        const reader = new FileReader();
+        
+        reader.onload = function(event) {
+            console.log('✅ File read successfully!');
+            console.log('Data URL length:', event.target.result.length);
+            
+            // Hide placeholder
+            placeholder.style.display = 'none';
+            
+            // Show and set image
+            previewImg.src = event.target.result;
+            previewImg.style.display = 'block';
+            
+            // Update container border to green
+            const container = previewImg.parentElement;
+            if (container) {
+                container.style.border = '2px solid #28a745';
+            }
+            
+            console.log('✅ Preview image displayed!');
+        };
+        
+        reader.onerror = function(error) {
+            console.error('❌ Error reading file:', error);
+            alert('❌ Gagal membaca file. Silakan coba lagi.');
+        };
+        
+        reader.readAsDataURL(file);
+    });
+    
+    console.log('✅ Preview initialized successfully!');
+});
 
 
 
@@ -325,13 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
         tanggalSelesaiInput.value = tomorrowStr;
     }
     
-    // Setup photo preview event listener
-    const fotoInput = document.getElementById('foto-peminjam-input');
-    if (fotoInput) {
-        fotoInput.addEventListener('change', function(e) {
-            window.previewFoto(e.target);
-        });
-    }
+    // Photo preview is handled by separate DOMContentLoaded above
     
     // Simple form handling
     const form = document.querySelector('form[action*="peminjaman/ajukan"]');

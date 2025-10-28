@@ -111,7 +111,6 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="border-0 px-3 py-3 text-muted small fw-semibold">Foto</th>
-                                <th class="border-0 px-3 py-3 text-muted small fw-semibold">Kode Ruangan</th>
                                 <th class="border-0 px-3 py-3 text-muted small fw-semibold">Nama Ruangan</th>
                                 <th class="border-0 px-3 py-3 text-muted small fw-semibold">Lokasi</th>
                                 <th class="border-0 px-3 py-3 text-muted small fw-semibold">Status</th>
@@ -142,9 +141,6 @@
                                             <i class="bi bi-building text-muted"></i>
                                         </div>
                                     @endif
-                                </td>
-                                <td class="px-3 py-3">
-                                    <div class="fw-semibold text-dark">{{ $ruangan->kode ?? '-' }}</div>
                                 </td>
                                 <td class="px-3 py-3">
                                     <div class="fw-semibold text-dark">{{ $ruangan->nama }}</div>

@@ -18,6 +18,9 @@ use App\Http\Controllers\Admin\AkunController;
 use App\Http\Controllers\FotoUploadController;
 
 Route::get('/', [BarangController::class, 'beranda'])->name('beranda');
+Route::get('/panduan', function () {
+    return view('panduan');
+})->name('panduan');
 Route::get('/list-barang', [BarangController::class, 'index'])->name('dashboard');
 Route::get('/barang/{id}', [BarangController::class, 'show'])->name('barang.detail');
 // Routes that require user authentication - temporarily without middleware for testing
@@ -25,7 +28,7 @@ Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang
 Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
 Route::post('/keranjang/tambah-ruangan', [KeranjangController::class, 'tambahRuangan'])->name('keranjang.tambah-ruangan');
 Route::post('/keranjang/hapus/{id}', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
-Route::post('/keranjang/update-qty/{id}', [KeranjangController::class, 'updateQty'])->name('keranjang.update-qty');
+Route::post('/keranjang/update-qty/{id}', [KeranjangController::class, 'updateQty'])->name('keranjang.update-qty')->where('id', '.*');
 Route::post('/keranjang/kosongkan-ruangan', [KeranjangController::class, 'kosongkanRuangan'])->name('keranjang.kosongkan-ruangan');
 
 Route::get('/peminjaman/form', [PeminjamanController::class, 'form'])->name('peminjaman.form');

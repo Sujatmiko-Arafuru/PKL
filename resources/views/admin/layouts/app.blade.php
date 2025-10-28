@@ -331,5 +331,7 @@
         // Expose to global scope for external access
         window.NotificationSystem = NotificationSystem;
     </script>
+    
+    @stack('scripts')
 </body>
 </html> 

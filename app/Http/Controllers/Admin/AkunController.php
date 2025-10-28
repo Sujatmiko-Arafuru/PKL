@@ -7,6 +7,7 @@ use App\Models\OrmawaJurusan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class AkunController extends Controller
 {
@@ -68,6 +69,15 @@ class AkunController extends Controller
     {
         $akun = OrmawaJurusan::findOrFail($id);
 
+        // Log data yang diterima
+        \Log::info('Update Akun Request', [
+            'id' => $id,
+            'nama' => $request->nama,
+            'password_filled' => $request->filled('password'),
+            'password_value' => $request->password ? '***' : 'null',
+            'all_data' => $request->except('password')
+        ]);
+
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:255',
             'tipe' => 'required|in:ormawa,jurusan',
@@ -75,14 +85,17 @@ class AkunController extends Controller
             'email' => 'nullable|email|max:255',
             'no_telp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
-            'is_active' => 'boolean',
+            // is_active is not validated here - handled below
         ]);
 
         if ($validator->fails()) {
+            \Log::error('Validation failed', ['errors' => $validator->errors()]);
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
         }
+
+        $oldPassword = $akun->password;
 
         $data = [
             'nama' => $request->nama,
@@ -93,14 +106,35 @@ class AkunController extends Controller
             'is_active' => $request->has('is_active'),
         ];
 
+        // Update password jika diisi
         if ($request->filled('password')) {
             $data['password'] = $request->password;
+            \Log::info('Password akan diupdate', [
+                'old_password' => $oldPassword,
+                'new_password' => $request->password
+            ]);
+        } else {
+            \Log::info('Password tidak diubah (field kosong)');
         }
 
         $akun->update($data);
 
+        // Refresh untuk mendapatkan data terbaru
+        $akun->refresh();
+        
+        \Log::info('Akun updated', [
+            'id' => $akun->id,
+            'password_after' => $akun->password,
+            'password_changed' => $oldPassword !== $akun->password
+        ]);
+
+        $message = 'Akun berhasil diperbarui!';
+        if ($request->filled('password')) {
+            $message = 'Akun dan password berhasil diperbarui!';
+        }
+
         return redirect()->route('admin.akun.index')
-            ->with('success', 'Akun berhasil diperbarui!');
+            ->with('success', $message);
     }
 
     public function destroy($id)

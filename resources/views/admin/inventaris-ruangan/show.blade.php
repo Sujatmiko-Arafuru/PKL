@@ -37,10 +37,6 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold text-muted">Kode Ruangan</label>
-                            <div class="fw-semibold text-dark">{{ $ruangan->kode ?? 'Tidak ada kode' }}</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold text-muted">Nama Ruangan</label>
                             <div class="fw-semibold text-dark">{{ $ruangan->nama }}</div>
                         </div>
@@ -82,27 +78,61 @@
                         <i class="bi bi-camera me-2"></i>Foto Ruangan
                     </h6>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     @if($ruangan->hasPhotos())
-                        <div class="row g-3">
-                            @foreach($ruangan->photos as $index => $photo)
-                                @if($photo)
-                                <div class="col-12">
-                                    <div class="position-relative">
-                                        <img src="{{ Storage::url($photo) }}" 
-                                             alt="Foto {{ $index + 1 }}" 
-                                             class="img-fluid rounded shadow-sm" 
-                                             style="width: 100%; height: 200px; object-fit: cover;">
-                                        <div class="position-absolute top-0 start-0 m-2">
-                                            <span class="badge bg-dark bg-opacity-75">Foto {{ $index + 1 }}</span>
-                                        </div>
+                        @php
+                            $validPhotos = array_filter($ruangan->photos);
+                            $photoCount = count($validPhotos);
+                        @endphp
+                        
+                        <!-- Carousel -->
+                        <div id="carouselRuangan" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                            <!-- Indicators -->
+                            @if($photoCount > 1)
+                            <div class="carousel-indicators">
+                                @foreach($validPhotos as $index => $photo)
+                                <button type="button" 
+                                        data-bs-target="#carouselRuangan" 
+                                        data-bs-slide-to="{{ $index }}" 
+                                        class="{{ $index === 0 ? 'active' : '' }}" 
+                                        aria-current="{{ $index === 0 ? 'true' : 'false' }}" 
+                                        aria-label="Foto {{ $index + 1 }}">
+                                </button>
+                                @endforeach
+                            </div>
+                            @endif
+                            
+                            <!-- Slides -->
+                            <div class="carousel-inner">
+                                @foreach($validPhotos as $index => $photo)
+                                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                    <img src="{{ Storage::url($photo) }}" 
+                                         class="d-block w-100" 
+                                         alt="Foto Ruangan {{ $index + 1 }}"
+                                         style="height: 500px; object-fit: cover;">
+                                    <div class="carousel-caption d-block" style="top: 20px; bottom: auto; left: 20px; right: auto; text-align: left;">
+                                        <span class="badge bg-dark bg-opacity-75 fs-5 px-3 py-2">
+                                            Foto {{ $index + 1 }} dari {{ $photoCount }}
+                                        </span>
                                     </div>
                                 </div>
-                                @endif
-                            @endforeach
+                                @endforeach
+                            </div>
+                            
+                            <!-- Controls -->
+                            @if($photoCount > 1)
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselRuangan" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselRuangan" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                            @endif
                         </div>
                     @else
-                        <div class="text-center py-4">
+                        <div class="text-center py-5">
                             <i class="bi bi-camera text-muted" style="font-size: 3rem;"></i>
                             <p class="text-muted mt-2">Tidak ada foto ruangan</p>
                         </div>
@@ -145,6 +175,64 @@
         </div>
     </div>
 </div>
+
+<style>
+/* Carousel Styling */
+#carouselRuangan {
+    background-color: #f8f9fa;
+}
+
+#carouselRuangan .carousel-control-prev-icon,
+#carouselRuangan .carousel-control-next-icon {
+    width: 50px;
+    height: 50px;
+    background-size: 50px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    padding: 10px;
+}
+
+#carouselRuangan .carousel-control-prev-icon:hover,
+#carouselRuangan .carousel-control-next-icon:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+}
+
+#carouselRuangan .carousel-control-prev,
+#carouselRuangan .carousel-control-next {
+    width: 10%;
+    opacity: 1;
+}
+
+#carouselRuangan .carousel-indicators button {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin: 0 5px;
+    border: 2px solid #fff;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+#carouselRuangan .carousel-indicators button.active {
+    background-color: #fff;
+    transform: scale(1.3);
+}
+
+#carouselRuangan .carousel-item img {
+    transition: transform 0.3s ease;
+}
+
+#carouselRuangan .carousel-item img:hover {
+    transform: scale(1.02);
+}
+
+.carousel-fade .carousel-item {
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+}
+
+.carousel-fade .carousel-item.active {
+    opacity: 1;
+}
+</style>
 @endsection
-
-

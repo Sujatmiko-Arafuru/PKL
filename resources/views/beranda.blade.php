@@ -297,7 +297,19 @@
             text-decoration: none;
         }
         
-
+        .cta-button-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            box-shadow: none;
+        }
+        
+        .cta-button-outline:hover {
+            background: white;
+            color: #20B2AA;
+            border-color: white;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+        }
         
         /* Footer */
         .footer {
@@ -431,9 +443,14 @@
                     Sistem Peminjaman Barang dan Ruangan Poltekkes Denpasar - 
                     Solusi digital untuk mengelola peminjaman peralatan dan inventaris dengan mudah dan efisien.
                 </p>
-                <a href="{{ route('auth.login') }}" class="cta-button">
-                    <i class="bi bi-box-seam me-2"></i>Mulai Peminjaman
-                </a>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="{{ route('auth.login') }}" class="cta-button">
+                        <i class="bi bi-box-seam me-2"></i>Mulai Peminjaman
+                    </a>
+                    <a href="{{ route('panduan') }}" class="cta-button cta-button-outline">
+                        <i class="bi bi-book me-2"></i>Panduan Penggunaan
+                    </a>
+                </div>
             </div>
             
 

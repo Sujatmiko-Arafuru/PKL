@@ -13,6 +13,8 @@
         .text-primary { color: #20B2AA !important; }
         .btn-biru { background: #20B2AA; color: #fff; border-radius: 0.5rem; border: none; padding: 0.5rem 1.2rem; font-weight: 500; transition: background 0.2s; }
         .btn-biru:hover { background: #008B8B; }
+        .back-link { color: #20B2AA; font-weight: 500; text-decoration: none; transition: all 0.2s; }
+        .back-link:hover { color: #008B8B; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -35,6 +37,15 @@
                 <button type="submit" class="btn btn-biru">Login</button>
             </div>
         </form>
+        
+        <div class="text-center mt-3">
+            <a href="{{ route('beranda') }}" class="back-link">
+                <i class="bi bi-arrow-left me-1"></i>Kembali ke Beranda
+            </a>
+        </div>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </body>
 </html> 

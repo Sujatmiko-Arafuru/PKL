@@ -121,18 +121,47 @@
                         <tr class="border-bottom">
                             <td class="px-3 py-3">
                                 @if($barang->hasPhotos())
+                                    @php
+                                        $validPhotos = array_filter($barang->photos);
+                                        $photoCount = count($validPhotos);
+                                    @endphp
+                                    
+                                    @if($photoCount > 1)
+                                    <!-- Mini Carousel for multiple photos -->
+                                    <div id="carouselBarang{{ $barang->id }}" class="carousel slide mini-carousel" data-bs-ride="false">
+                                        <div class="carousel-inner rounded">
+                                            @foreach($validPhotos as $index => $photo)
+                                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                                <img src="{{ Storage::url($photo) }}" 
+                                                     alt="{{ $barang->nama }}" 
+                                                     class="d-block w-100" 
+                                                     style="width: 60px; height: 60px; object-fit: cover;">
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselBarang{{ $barang->id }}" data-bs-slide="prev" style="width: 30%;">
+                                            <span class="carousel-control-prev-icon mini-control-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Previous</span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#carouselBarang{{ $barang->id }}" data-bs-slide="next" style="width: 30%;">
+                                            <span class="carousel-control-next-icon mini-control-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </button>
+                                        <div class="carousel-indicators mini-indicators">
+                                            @foreach($validPhotos as $index => $photo)
+                                            <button type="button" data-bs-target="#carouselBarang{{ $barang->id }}" data-bs-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}" aria-label="Foto {{ $index + 1 }}"></button>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @else
+                                    <!-- Single photo -->
                                     <div class="position-relative">
                                         <img src="{{ Storage::url($barang->main_photo) }}" 
                                              alt="{{ $barang->nama }}" 
                                              class="rounded" 
                                              style="width: 60px; height: 60px; object-fit: cover;">
-                                        @if($barang->photo_count > 1)
-                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" 
-                                                  style="font-size: 0.6rem; transform: translate(-50%, -50%);">
-                                                +{{ $barang->photo_count - 1 }}
-                                            </span>
-                                        @endif
                                     </div>
+                                    @endif
                                 @else
                                     <div class="bg-light rounded d-flex align-items-center justify-content-center" 
                                          style="width: 60px; height: 60px;">
@@ -306,6 +335,66 @@
     background-color: #0d6efd;
     border-color: #0d6efd;
     color: white;
+}
+
+/* Mini Carousel Styling */
+.mini-carousel {
+    width: 60px;
+    height: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.mini-carousel .carousel-inner {
+    width: 100%;
+    height: 100%;
+}
+
+.mini-carousel .carousel-item {
+    height: 100%;
+}
+
+.mini-carousel .carousel-item img {
+    height: 100%;
+    object-fit: cover;
+}
+
+.mini-carousel .carousel-control-prev,
+.mini-carousel .carousel-control-next {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mini-carousel:hover .carousel-control-prev,
+.mini-carousel:hover .carousel-control-next {
+    opacity: 1;
+}
+
+.mini-carousel .mini-control-icon {
+    width: 15px;
+    height: 15px;
+    background-size: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+}
+
+.mini-carousel .mini-indicators {
+    bottom: -20px;
+    margin: 0;
+}
+
+.mini-carousel .mini-indicators button {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin: 0 2px;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.mini-carousel .mini-indicators button.active {
+    background-color: #0d6efd;
+    transform: scale(1.2);
 }
 
 .pagination .page-item.disabled .page-link {

@@ -69,8 +69,8 @@ class PeminjamanController extends Controller
                 'nama_kegiatan' => 'required|string|max:255',
                 'tanggal_mulai' => 'required|date',
                 'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
-                'foto_peminjam' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-                'bukti' => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
+                'foto_peminjam' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
+                'bukti' => 'required|mimes:pdf,jpg,jpeg,png|max:10240',
             ], [
                 'nama.min' => 'Nama harus minimal 3 karakter untuk generate kode unik.',
                 'nama.required' => 'Nama wajib diisi.',
@@ -79,10 +79,10 @@ class PeminjamanController extends Controller
                 'nim_nip.max' => 'NIM/NIP maksimal 50 karakter.',
                 'foto_peminjam.image' => 'File foto harus berupa gambar.',
                 'foto_peminjam.mimes' => 'Format foto harus JPG, JPEG, atau PNG.',
-                'foto_peminjam.max' => 'Ukuran foto maksimal 2MB.',
+                'foto_peminjam.max' => 'Ukuran foto maksimal 10MB.',
                 'bukti.required' => 'Bukti kegiatan wajib diupload.',
                 'bukti.mimes' => 'Format bukti harus PDF, JPG, JPEG, atau PNG.',
-                'bukti.max' => 'Ukuran bukti maksimal 2MB.',
+                'bukti.max' => 'Ukuran bukti maksimal 10MB.',
             ]);
             // Simpan data form
             $formData = $request->except(['bukti', 'foto_peminjam']);

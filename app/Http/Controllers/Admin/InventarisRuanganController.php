@@ -19,7 +19,6 @@ class InventarisRuanganController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('kode', 'like', "%{$search}%")
                   ->orWhere('lokasi', 'like', "%{$search}%")
                   ->orWhere('deskripsi', 'like', "%{$search}%");
             });
@@ -51,7 +50,6 @@ class InventarisRuanganController extends Controller
         $request->validate([
             'nama' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
-            'kode' => 'nullable|string|max:50',
             'lokasi' => 'nullable|string|max:255',
             'status' => 'required|in:tersedia,maintenance,dipinjam,tidak tersedia',
             'foto1' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -60,7 +58,7 @@ class InventarisRuanganController extends Controller
         ]);
 
         $data = $request->only([
-            'nama', 'deskripsi', 'kode', 'lokasi', 'status'
+            'nama', 'deskripsi', 'lokasi', 'status'
         ]);
 
         // Handle photo uploads
@@ -98,7 +96,6 @@ class InventarisRuanganController extends Controller
         $request->validate([
             'nama' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
-            'kode' => 'nullable|string|max:50',
             'lokasi' => 'nullable|string|max:255',
             'status' => 'required|in:tersedia,maintenance,dipinjam,tidak tersedia',
             'foto1' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -107,7 +104,7 @@ class InventarisRuanganController extends Controller
         ]);
 
         $data = $request->only([
-            'nama', 'deskripsi', 'kode', 'lokasi', 'status'
+            'nama', 'deskripsi', 'lokasi', 'status'
         ]);
 
         // Handle photo uploads

@@ -212,7 +212,10 @@ function updateQty(itemId, action) {
     button.disabled = true;
     button.innerHTML = '<i class="bi bi-hourglass-split"></i>';
     
-    fetch(`/keranjang/update-qty/${itemId}`, {
+    // Encode itemId untuk handle special characters
+    const encodedId = encodeURIComponent(itemId);
+    
+    fetch(`/keranjang/update-qty/${encodedId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

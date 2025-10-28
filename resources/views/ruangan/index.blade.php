@@ -149,33 +149,38 @@
                     <div class="card h-100 shadow-sm border-0">
                         <!-- Photo Section -->
                         @if($ruangan->hasPhotos())
-                            @if($ruangan->photo_count > 1)
-                                <div id="ruanganPhotoCarousel{{ $ruangan->id }}" class="carousel slide photo-carousel photo-gallery dashboard" data-bs-ride="carousel">
+                            @php
+                                $validPhotos = array_filter($ruangan->photos);
+                                $photoCount = count($validPhotos);
+                            @endphp
+                            
+                            @if($photoCount > 1)
+                                <div id="carouselRuangan{{ $ruangan->id }}" class="carousel slide carousel-fade photo-carousel photo-gallery dashboard" data-bs-ride="false" data-bs-interval="false">
                                     <div class="carousel-indicators">
-                                        @foreach($ruangan->photos as $index => $photo)
-                                        <button type="button" data-bs-target="#ruanganPhotoCarousel{{ $ruangan->id }}" data-bs-slide-to="{{ $index }}" 
+                                        @foreach($validPhotos as $index => $photo)
+                                        <button type="button" data-bs-target="#carouselRuangan{{ $ruangan->id }}" data-bs-slide-to="{{ $index }}" 
                                                 class="{{ $index === 0 ? 'active' : '' }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}" 
-                                                aria-label="Slide {{ $index + 1 }}"></button>
+                                                aria-label="Foto {{ $index + 1 }}"></button>
                                         @endforeach
                                     </div>
                                     <div class="carousel-inner">
-                                        @foreach($ruangan->photos as $index => $photo)
+                                        @foreach($validPhotos as $index => $photo)
                                         <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                            <img src="{{ Storage::url($photo) }}" class="d-block w-100" alt="Foto {{ $index + 1 }}">
+                                            <img src="{{ Storage::url($photo) }}" class="d-block w-100" alt="Foto {{ $index + 1 }}" style="height: 250px; object-fit: cover;">
                                         </div>
                                         @endforeach
                                     </div>
-                                    <button class="carousel-control-prev" type="button" data-bs-target="#ruanganPhotoCarousel{{ $ruangan->id }}" data-bs-slide="prev">
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselRuangan{{ $ruangan->id }}" data-bs-slide="prev">
                                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                         <span class="visually-hidden">Previous</span>
                                     </button>
-                                    <button class="carousel-control-next" type="button" data-bs-target="#ruanganPhotoCarousel{{ $ruangan->id }}" data-bs-slide="next">
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carouselRuangan{{ $ruangan->id }}" data-bs-slide="next">
                                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                         <span class="visually-hidden">Next</span>
                                     </button>
                                 </div>
                             @else
-                                <img src="{{ Storage::url($ruangan->main_photo) }}" alt="{{ $ruangan->nama }}" class="photo-carousel dashboard">
+                                <img src="{{ Storage::url($ruangan->main_photo) }}" alt="{{ $ruangan->nama }}" class="photo-carousel dashboard" style="height: 250px; object-fit: cover;">
                             @endif
                         @else
                             <div class="photo-placeholder dashboard">
@@ -439,11 +444,11 @@
         function showSuccessNotification(message) {
             const notification = document.createElement('div');
             notification.className = 'alert alert-success position-fixed';
-            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; background-color: #28a745; color: white; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
             notification.innerHTML = `
                 <i class="bi bi-check-circle me-2"></i>
                 ${message}
-                <button type="button" class="btn-close ms-2" onclick="this.parentElement.remove()"></button>
+                <button type="button" class="btn-close btn-close-white ms-2" onclick="this.parentElement.remove()"></button>
             `;
             document.body.appendChild(notification);
             
